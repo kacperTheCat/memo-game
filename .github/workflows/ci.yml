@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, '001-project-setup']
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Vitest
+        run: pnpm test
+
+      - name: Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: E2E bootstrap (dev server)
+        run: pnpm exec playwright test -c playwright.bootstrap.config.ts
+
+      - name: E2E preview (build + quality + PWA)
+        run: pnpm exec playwright test
+
+      - name: Lint
+        run: pnpm lint

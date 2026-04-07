@@ -1,0 +1,36 @@
+---
+description: Project Development Guidelines
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# memo-game Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2026-04-07
+
+## Active Technologies
+
+- TypeScript 5.x, Node.js **22.x** (LTS) for local and CI + Vue 3.5+, Vite 6+, Pinia, Tailwind CSS 4.x (or 3.x stable—lock in `research.md`), Vitest + `@vue/test-utils`, Playwright, `vite-plugin-pwa` (001-project-setup)
+
+## Project Structure
+
+```text
+backend/
+frontend/
+tests/
+```
+
+## Commands
+
+npm test && npm run lint
+
+## Code Style
+
+TypeScript 5.x, Node.js **22.x** (LTS) for local and CI: Follow standard conventions
+
+## Recent Changes
+
+- 001-project-setup: Added TypeScript 5.x, Node.js **22.x** (LTS) for local and CI + Vue 3.5+, Vite 6+, Pinia, Tailwind CSS 4.x (or 3.x stable—lock in `research.md`), Vitest + `@vue/test-utils`, Playwright, `vite-plugin-pwa`
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->

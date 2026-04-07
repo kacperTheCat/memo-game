@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "memo-game-package-scripts",
+  "title": "Required package.json scripts (Project Setup)",
+  "description": "README and CI MUST expose these script names. Implementations are in package.json.",
+  "type": "object",
+  "required": ["scripts"],
+  "properties": {
+    "scripts": {
+      "type": "object",
+      "required": ["dev", "build", "preview", "test", "test:e2e"],
+      "properties": {
+        "dev": {
+          "type": "string",
+          "description": "Vite dev server for local development."
+        },
+        "build": {
+          "type": "string",
+          "description": "Production build to dist/."
+        },
+        "preview": {
+          "type": "string",
+          "description": "Serve dist/ (e.g. vite preview on 127.0.0.1:4173). Playwright + CI use this, not dev."
+        },
+        "test": {
+          "type": "string",
+          "description": "Vitest (non-watch in CI)."
+        },
+        "test:e2e": {
+          "type": "string",
+          "description": "Playwright; runs against preview per playwright.config."
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}
