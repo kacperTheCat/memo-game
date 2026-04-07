@@ -8,7 +8,8 @@ export const navToBriefcase = 'The Briefcase'
 export const navToHome = 'Home'
 
 export const gamePageHeading = 'Memory game'
-export const gamePageSubline = 'Canvas board (tiles will render here).'
+export const gamePageSubline =
+  'Display-only tile grid from The Briefcase difficulty (no match play yet).'
 
 export const briefcaseTitle = 'The Briefcase'
 /** Main Menu glass title subline — matches `the_briefcase_main_menu/code.html`. */

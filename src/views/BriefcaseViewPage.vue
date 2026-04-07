@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BriefcaseView from '@/components/briefcase/BriefcaseView.vue'
 import AppButton from '@/components/ui/AppButton.vue'
-import { navToHome } from '@/constants/appCopy'
+import { navToGame, navToHome } from '@/constants/appCopy'
 </script>
 
 <template>
@@ -26,7 +26,13 @@ import { navToHome } from '@/constants/appCopy'
       />
     </div>
     <div class="relative z-10 mx-auto flex w-full max-w-[480px] flex-col">
-      <div class="mb-6 flex justify-end">
+      <div class="mb-6 flex flex-wrap justify-end gap-2">
+        <AppButton
+          to="/game"
+          data-testid="nav-to-game"
+        >
+          {{ navToGame }}
+        </AppButton>
         <AppButton
           to="/"
           data-testid="nav-to-home"

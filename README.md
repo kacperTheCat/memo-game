@@ -26,9 +26,11 @@ More detail: [specs/001-project-setup/quickstart.md](specs/001-project-setup/qui
 Order matches project constitution (Vitest → build → preview → Playwright):
 
 ```bash
-pnpm test              # Vitest (unit / component)
+pnpm test              # Vitest (unit / component + tile-library validation)
 pnpm test:e2e          # Playwright: bootstrap on dev server, then build + preview suite
 ```
+
+**Tile library:** `pnpm test` fails if `src/data/tile-library.json` is invalid or files under `public/tiles/` are missing. Regenerate with `pnpm run fetch-tiles` (requires network; see [ATTRIBUTION.md](ATTRIBUTION.md)).
 
 Or step-by-step:
 
@@ -53,7 +55,7 @@ For the setup shell, do an occasional **First Contentful Paint** check with Chro
 
 ## Game imagery provenance
 
-Gameplay card art will be **vendored locally** after a **one-time ingest** from metadata/images described in the unofficial [ByMykel/CSGO-API](https://github.com/ByMykel/CSGO-API) project (MIT). This demo is **not** affiliated with or endorsed by Valve or Counter-Strike. A placeholder ingest script lives under `scripts/` (see `scripts/README.md`).
+Vendored tile art and `src/data/tile-library.json` come from a **one-time** ingest (`pnpm run fetch-tiles`) using the unofficial [ByMykel/CSGO-API](https://github.com/ByMykel/CSGO-API) (MIT). See [ATTRIBUTION.md](ATTRIBUTION.md). This demo is **not** affiliated with or endorsed by Valve or Counter-Strike.
 
 ## Scripts
 
@@ -62,7 +64,8 @@ Gameplay card art will be **vendored locally** after a **one-time ingest** from 
 | `pnpm dev`    | Vite dev server                                  |
 | `pnpm build`  | Production build to `dist/`                      |
 | `pnpm preview`| Serve `dist/` on `http://127.0.0.1:4173`         |
-| `pnpm test`   | Vitest                                           |
+| `pnpm test`   | Vitest (includes CS2 tile library checks)       |
+| `pnpm fetch-tiles` | Regenerate `public/tiles/` + `src/data/tile-library.json` |
 | `pnpm test:e2e` | Full Playwright pipeline (see above)         |
 | `pnpm lint`   | ESLint                                           |
 
