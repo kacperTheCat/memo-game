@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Briefcase - Gablota Kolekcjonera</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600&amp;f[]=satoshi@400,500&amp;f[]=space-grotesk@500,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#E4A834",
+          "background-light": "#f8f7f6",
+          "background-dark": "#090C12",
+          "surface": "rgba(20, 25, 36, 0.4)",
+          "text-main": "#F2F4F7",
+          "muted": "#8492A6",
+          "border-glass": "rgba(255, 255, 255, 0.08)",
+        },
+        fontFamily: {
+          "display": ["Clash Display", "sans-serif"],
+          "body": ["Satoshi", "sans-serif"],
+          "mono": ["Space Grotesk", "monospace"]
+        },
+        borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px", "sm": "4px", "md": "12px", "glass": "24px"},
+        backgroundImage: {
+          'noise': "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.05%22/%3E%3C/svg%3E')",
+        }
+      },
+    },
+  }
+</script>
+<style>
+  body {
+    background-color: #090C12;
+    color: #F2F4F7;
+    font-family: 'Satoshi', sans-serif;
+    position: relative;
+    min-height: 100vh;
+  }
+  
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.05%22/%3E%3C/svg%3E');
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .glass-panel {
+    background-color: var(--color-surface, rgba(20, 25, 36, 0.4));
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 24px 48px rgba(0,0,0,0.5);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(255,255,255,0.1);
+  }
+
+  .radio-card input:checked + div {
+    border-color: #E4A834;
+    box-shadow: 0 0 15px rgba(228, 168, 52, 0.2);
+  }
+  
+  .radio-card input:checked + div .radio-indicator {
+    background-color: #E4A834;
+    border-color: #E4A834;
+  }
+
+  .radio-card input:checked + div .radio-title {
+    color: #E4A834;
+  }
+
+  .radio-card:hover div {
+    border-color: rgba(255,255,255,0.2);
+  }
+</style>
+</head>
+<body class="antialiased flex flex-col items-center justify-center min-h-screen overflow-x-hidden relative">
+<!-- Ambient Background Glows -->
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
+<div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-900/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
+<!-- Main Container -->
+<div class="relative z-10 w-[95%] max-w-[480px] mx-auto">
+<!-- Header with Back Button (Exception for Focused Views) -->
+<header class="flex items-center mb-8 px-2">
+<button class="flex items-center text-muted hover:text-text-main transition-colors group cursor-pointer">
+<span class="material-symbols-outlined mr-2 transition-transform group-hover:-translate-x-1">arrow_back</span>
+<span class="font-body text-sm uppercase tracking-[0.05em] font-medium">Exit</span>
+</button>
+</header>
+<!-- Glass Modal -->
+<main class="glass-panel rounded-glass p-8 md:p-10 flex flex-col gap-8">
+<!-- Title Area -->
+<div class="text-center space-y-2">
+<h1 class="font-display font-semibold text-[32px] md:text-[48px] text-text-main text-glow leading-none tracking-tight">The Briefcase</h1>
+<p class="font-body text-muted text-sm md:text-base">Configure match parameters</p>
+</div>
+<!-- Difficulty Selector -->
+<div class="space-y-4">
+<h2 class="font-body text-[12px] uppercase tracking-[0.05em] font-medium text-muted">Select Difficulty</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<!-- Easy -->
+<label class="radio-card cursor-pointer relative">
+<input checked="" class="peer sr-only" name="difficulty" type="radio" value="easy"/>
+<div class="flex flex-col p-4 rounded-md border border-border-glass bg-white/5 transition-all duration-200">
+<div class="flex items-center justify-between mb-2">
+<span class="radio-title font-display font-semibold text-text-main transition-colors">Easy</span>
+<div class="radio-indicator w-4 h-4 rounded-full border border-muted transition-colors"></div>
+</div>
+<span class="font-mono text-sm text-muted">4x4 Grid</span>
+</div>
+</label>
+<!-- Medium -->
+<label class="radio-card cursor-pointer relative">
+<input class="peer sr-only" name="difficulty" type="radio" value="medium"/>
+<div class="flex flex-col p-4 rounded-md border border-border-glass bg-white/5 transition-all duration-200">
+<div class="flex items-center justify-between mb-2">
+<span class="radio-title font-display font-semibold text-text-main transition-colors">Medium</span>
+<div class="radio-indicator w-4 h-4 rounded-full border border-muted transition-colors"></div>
+</div>
+<span class="font-mono text-sm text-muted">6x6 Grid</span>
+</div>
+</label>
+<!-- Hard -->
+<label class="radio-card cursor-pointer relative">
+<input class="peer sr-only" name="difficulty" type="radio" value="hard"/>
+<div class="flex flex-col p-4 rounded-md border border-border-glass bg-white/5 transition-all duration-200">
+<div class="flex items-center justify-between mb-2">
+<span class="radio-title font-display font-semibold text-text-main transition-colors">Hard</span>
+<div class="radio-indicator w-4 h-4 rounded-full border border-muted transition-colors"></div>
+</div>
+<span class="font-mono text-sm text-muted">8x8 Grid</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Seed Input -->
+<div class="space-y-3">
+<label class="font-body text-[12px] uppercase tracking-[0.05em] font-medium text-muted block" for="seed-input">Deterministic Seed <span class="lowercase normal-case opacity-50 ml-1">(Optional)</span></label>
+<div class="relative">
+<input class="w-full bg-black/30 border border-border-glass rounded-md px-4 py-3 font-mono text-text-main placeholder-muted/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" id="seed-input" placeholder="Enter seed code..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-muted text-opacity-50">key</span>
+</div>
+</div>
+<!-- CTA -->
+<div class="pt-2">
+<button class="w-full bg-primary text-[#090C12] font-display font-semibold text-[16px] py-4 rounded-md transition-all duration-300 hover:brightness-110 hover:scale-[1.02] flex justify-center items-center gap-2 shadow-[0_0_20px_rgba(228,168,52,0.3)]">
+<span class="material-symbols-outlined text-[20px]">lock_open</span>
+          Unlock Showcase
+        </button>
+</div>
+</main>
+</div>
+</body></html>

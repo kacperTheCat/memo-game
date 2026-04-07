@@ -1,5 +1,40 @@
 @import 'tailwindcss';
 
+/*
+ * Theme rules (SC-004 / FR-002): values from
+ * designs/stitch_gablota_kolekcjonera_premium_glassmorphism_prd/the_briefcase_main_menu/code.html
+ * — primary #E4A834, background-dark #090C12, surface glass rgba(20,25,36,0.4), text-main, muted, border-glass.
+ */
+:root {
+  --memo-bg: #090c12;
+  /* Nav / small chips: export uses bg-white/5 on cards */
+  --memo-surface: rgb(255 255 255 / 0.05);
+  --memo-surface-hover: rgb(255 255 255 / 0.1);
+  --memo-glass-fill: rgb(20 25 36 / 0.4);
+  --memo-text: #f2f4f7;
+  --memo-muted: #8492a6;
+  --memo-border: rgb(255 255 255 / 0.08);
+  --memo-accent: #e4a834;
+  --memo-cta-text: #090c12;
+  --memo-radius-md: 12px;
+  --memo-radius-glass: 24px;
+  --memo-noise: url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.05%22/%3E%3C/svg%3E");
+}
+
+@theme inline {
+  --color-memo-bg: var(--memo-bg);
+  --color-memo-surface: var(--memo-surface);
+  --color-memo-surface-hover: var(--memo-surface-hover);
+  --color-memo-glass-fill: var(--memo-glass-fill);
+  --color-memo-text: var(--memo-text);
+  --color-memo-muted: var(--memo-muted);
+  --color-memo-border: var(--memo-border);
+  --color-memo-accent: var(--memo-accent);
+  --color-memo-cta-text: var(--memo-cta-text);
+  --radius-memo-md: var(--memo-radius-md);
+  --radius-memo-glass: var(--memo-radius-glass);
+}
+
 html,
 body,
 #app {
@@ -14,4 +49,9 @@ body {
     Segoe UI,
     Roboto,
     sans-serif;
+}
+
+.memo-backdrop-noise {
+  background-image: var(--memo-noise);
+  opacity: 0.05;
 }

@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "memo-game-briefcase-view-e2e-contract",
+  "title": "Briefcase + shell E2E contract (002-stitch-theme-briefcase)",
+  "description": "Playwright tests cover home (no canvas), home↔briefcase (FR-008), home→game (FR-009), canvas on /game, deep link /briefcase, Briefcase Main Menu chrome (FR-010a–e): difficulty as three radio tiles (not select), reduced-motion smoke, and English copy.",
+  "type": "object",
+  "required": ["routes", "stableSelectors", "englishCopyRules"],
+  "properties": {
+    "routes": {
+      "type": "object",
+      "required": ["home", "game", "briefcase"],
+      "properties": {
+        "home": { "type": "string", "const": "/", "description": "Main entry; DOM only; no GameCanvasShell." },
+        "game": { "type": "string", "const": "/game", "description": "Game view; hosts GameCanvasShell." },
+        "briefcase": { "type": "string", "const": "/briefcase", "description": "Briefcase themed DOM view." }
+      }
+    },
+    "stableSelectors": {
+      "type": "object",
+      "required": ["rootTestId", "navToBriefcaseTestId", "navToHomeTestId", "navToGameTestId", "canvasHostTestId", "briefcaseSeedInputTestId", "briefcaseBackdropTestId", "briefcaseDifficultyTestId", "briefcaseGlassPanelTestId", "briefcaseUnlockShowcaseTestId"],
+      "properties": {
+        "rootTestId": {
+          "type": "string",
+          "const": "briefcase-view",
+          "description": "Root container data-testid on the Briefcase page."
+        },
+        "navToBriefcaseTestId": {
+          "type": "string",
+          "const": "nav-to-briefcase",
+          "description": "data-testid on home control navigating to /briefcase."
+        },
+        "navToHomeTestId": {
+          "type": "string",
+          "const": "nav-to-home",
+          "description": "data-testid on Briefcase (or shared nav) navigating to /."
+        },
+        "navToGameTestId": {
+          "type": "string",
+          "const": "nav-to-game",
+          "description": "data-testid on home control navigating to /game."
+        },
+        "canvasHostTestId": {
+          "type": "string",
+          "const": "game-canvas",
+          "description": "data-testid on canvas (or wrapper) on /game only—not present on home."
+        },
+        "briefcaseSeedInputTestId": {
+          "type": "string",
+          "const": "briefcase-seed-input",
+          "description": "data-testid on Briefcase seed text input (FR-010d)."
+        },
+        "briefcaseBackdropTestId": {
+          "type": "string",
+          "const": "briefcase-backdrop",
+          "description": "data-testid on Briefcase page-level decorative backdrop layer (FR-010e); present on /briefcase only."
+        },
+        "briefcaseDifficultyTestId": {
+          "type": "string",
+          "const": "briefcase-difficulty",
+          "description": "data-testid on Briefcase difficulty radiogroup host (FR-010a): three tile-style radio options Easy/Medium/Hard; not a select."
+        },
+        "briefcaseGlassPanelTestId": {
+          "type": "string",
+          "const": "briefcase-glass-panel",
+          "description": "data-testid on frosted / glass-style panel region (FR-010b)."
+        },
+        "briefcaseUnlockShowcaseTestId": {
+          "type": "string",
+          "const": "briefcase-unlock-showcase",
+          "description": "data-testid on Unlock showcase primary control (FR-010c)."
+        },
+        "primaryHeadingTestId": {
+          "type": "string",
+          "description": "Optional: data-testid for main H1-level heading."
+        }
+      },
+      "additionalProperties": true
+    },
+    "englishCopyRules": {
+      "type": "object",
+      "required": ["visibleTextMustMatch"],
+      "properties": {
+        "visibleTextMustMatch": {
+          "type": "string",
+          "const": "^[\\x00-\\x7F]+$",
+          "description": "Sampled visible strings ASCII (English UI)."
+        }
+      },
+      "additionalProperties": true
+    },
+    "viewportsPx": {
+      "type": "object",
+      "description": "Widths for SC-003 checks.",
+      "properties": {
+        "phone": { "type": "integer", "minimum": 320, "default": 390 },
+        "desktop": { "type": "integer", "minimum": 800, "default": 1280 }
+      }
+    }
+  }
+}
