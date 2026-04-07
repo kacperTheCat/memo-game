@@ -9,8 +9,13 @@ alwaysApply: true
 Auto-generated from all feature plans. Last updated: 2026-04-07
 
 ## Active Technologies
+- TypeScript 5.x, Node.js **22.x** (LTS) — `package.json` / `001-project-setup` + Vue 3.5+, Vite 6+, Pinia, **Tailwind CSS 4.x** (`@tailwindcss/vite`), **vue-router** 4.x with routes **`/`**, **`/game`**, **`/briefcase`**, Vitest + `@vue/test-utils`, Playwright, `vite-plugin-pwa` (002-stitch-theme-briefcase)
+- N/A for server. Optional Pinia for Briefcase UI state (difficulty, seed); no persistence required unless product adds i (002-stitch-theme-briefcase)
+- TypeScript 5.x, Node.js **22.x** (LTS) — `package.json` / `001-project-setup` + Vue 3.5+, Vite 6+, Pinia, **Tailwind CSS 4.x** (`@tailwindcss/vite`), **vue-router** 4.x (`/`, `/game`, `/briefcase`), Vitest, Playwright, `vite-plugin-pwa` (002-stitch-theme-briefcase)
+- N/A server-side; optional Pinia / `ref` for Briefcase UI state (002-stitch-theme-briefcase)
+- TypeScript 5.x, Node.js **22.x** (LTS) — `package.json` / `001-project-setup` + Vue 3.5+, Vite 6+, Pinia, **Tailwind CSS 4.x** (`@tailwindcss/vite`), **vue-router** 4.x (`/`, `/game`, `/briefcase`), Vitest, Playwright, `vite-plugin-pwa` (002-stitch-theme-briefcase)
 
-- TypeScript 5.x, Node.js **22.x** (LTS) for local and CI + Vue 3.5+, Vite 6+, Pinia, Tailwind CSS 4.x (or 3.x stable—lock in `research.md`), Vitest + `@vue/test-utils`, Playwright, `vite-plugin-pwa` (001-project-setup)
+- TypeScript 5.x, Node.js **22.x** (LTS), Vue 3.5+, Vite 6+, Pinia, Tailwind CSS 4.x (`@tailwindcss/vite`), **vue-router** 4.x (**`/`** home, **`/game`** canvas, **`/briefcase`**), Vitest + `@vue/test-utils`, Playwright, `vite-plugin-pwa` (002-stitch-theme-briefcase; builds on 001-project-setup)
 
 ## Project Structure
 
@@ -29,8 +34,10 @@ npm test && npm run lint
 TypeScript 5.x, Node.js **22.x** (LTS) for local and CI: Follow standard conventions
 
 ## Recent Changes
+- 002-stitch-theme-briefcase: Added TypeScript 5.x, Node.js **22.x** (LTS) — `package.json` / `001-project-setup` + Vue 3.5+, Vite 6+, Pinia, **Tailwind CSS 4.x** (`@tailwindcss/vite`), **vue-router** 4.x (`/`, `/game`, `/briefcase`), Vitest, Playwright, `vite-plugin-pwa`
+- 002-stitch-theme-briefcase: Added TypeScript 5.x, Node.js **22.x** (LTS) — `package.json` / `001-project-setup` + Vue 3.5+, Vite 6+, Pinia, **Tailwind CSS 4.x** (`@tailwindcss/vite`), **vue-router** 4.x (`/`, `/game`, `/briefcase`), Vitest, Playwright, `vite-plugin-pwa`
+- 002-stitch-theme-briefcase: Added TypeScript 5.x, Node.js **22.x** (LTS) — `package.json` / `001-project-setup` + Vue 3.5+, Vite 6+, Pinia, **Tailwind CSS 4.x** (`@tailwindcss/vite`), **vue-router** 4.x with routes **`/`**, **`/game`**, **`/briefcase`**, Vitest + `@vue/test-utils`, Playwright, `vite-plugin-pwa`
 
-- 001-project-setup: Added TypeScript 5.x, Node.js **22.x** (LTS) for local and CI + Vue 3.5+, Vite 6+, Pinia, Tailwind CSS 4.x (or 3.x stable—lock in `research.md`), Vitest + `@vue/test-utils`, Playwright, `vite-plugin-pwa`
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

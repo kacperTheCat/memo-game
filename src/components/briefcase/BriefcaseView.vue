@@ -1,0 +1,149 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import BriefcaseGlassPanel from '@/components/briefcase/BriefcaseGlassPanel.vue'
+import {
+  briefcaseDescription,
+  briefcaseDifficultyEasy,
+  briefcaseDifficultyEasySubtitle,
+  briefcaseDifficultyHard,
+  briefcaseDifficultyHardSubtitle,
+  briefcaseDifficultyLabel,
+  briefcaseDifficultyMedium,
+  briefcaseDifficultyMediumSubtitle,
+  briefcaseSeedLabel,
+  briefcaseSeedPlaceholder,
+  briefcaseTitle,
+  briefcaseUnlockShowcase,
+} from '@/constants/appCopy'
+
+defineOptions({ name: 'BriefcaseView' })
+
+/** Client-only until the game loop consumes seed (spec FR-010d). */
+const seed = ref('')
+/** Client-only selection (spec FR-010a). */
+const difficulty = ref<'easy' | 'medium' | 'hard'>('medium')
+
+const difficultyRadiosName = 'briefcase-difficulty'
+
+const difficultyOptions = [
+  {
+    value: 'easy' as const,
+    label: briefcaseDifficultyEasy,
+    subtitle: briefcaseDifficultyEasySubtitle,
+  },
+  {
+    value: 'medium' as const,
+    label: briefcaseDifficultyMedium,
+    subtitle: briefcaseDifficultyMediumSubtitle,
+  },
+  {
+    value: 'hard' as const,
+    label: briefcaseDifficultyHard,
+    subtitle: briefcaseDifficultyHardSubtitle,
+  },
+]
+
+function onUnlockShowcase(): void {
+  return undefined /* Stub until showcase content exists (spec FR-010c). */
+}
+</script>
+
+<template>
+  <div class="flex flex-col">
+    <BriefcaseGlassPanel>
+      <div class="flex flex-col gap-8">
+        <!-- Title area — designs/.../the_briefcase_main_menu/code.html -->
+        <div class="space-y-2 text-center">
+          <h1
+            class="text-[32px] font-semibold leading-none tracking-tight text-memo-text md:text-[48px] [text-shadow:0_0_20px_rgba(255,255,255,0.1)]"
+          >
+            {{ briefcaseTitle }}
+          </h1>
+          <p class="text-sm text-memo-muted md:text-base">
+            {{ briefcaseDescription }}
+          </p>
+        </div>
+
+        <!-- Difficulty -->
+        <div class="space-y-4">
+          <fieldset
+            data-testid="briefcase-difficulty"
+            class="m-0 border-0 p-0"
+          >
+            <legend
+              class="text-[12px] font-medium uppercase tracking-[0.05em] text-memo-muted"
+            >
+              {{ briefcaseDifficultyLabel }}
+            </legend>
+            <div
+              class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3"
+            >
+              <label
+                v-for="opt in difficultyOptions"
+                :key="opt.value"
+                class="memo-radio-card cursor-pointer"
+              >
+                <input
+                  v-model="difficulty"
+                  type="radio"
+                  class="peer sr-only"
+                  :name="difficultyRadiosName"
+                  :value="opt.value"
+                >
+                <div
+                  class="flex flex-col rounded-[var(--memo-radius-md)] border border-memo-border bg-white/5 p-4 transition-all duration-200 peer-checked:border-memo-accent peer-checked:shadow-[0_0_15px_rgba(228,168,52,0.2)] peer-checked:[&_.memo-radio-title]:text-memo-accent peer-checked:[&_.memo-radio-indicator]:border-memo-accent peer-checked:[&_.memo-radio-indicator]:bg-memo-accent motion-safe:hover:border-white/20"
+                >
+                  <div class="mb-2 flex items-center justify-between">
+                    <span
+                      class="memo-radio-title text-base font-semibold text-memo-text transition-colors"
+                    >
+                      {{ opt.label }}
+                    </span>
+                    <div
+                      class="memo-radio-indicator h-4 w-4 shrink-0 rounded-full border border-memo-muted transition-colors"
+                    />
+                  </div>
+                  <span class="font-mono text-sm text-memo-muted">
+                    {{ opt.subtitle }}
+                  </span>
+                </div>
+              </label>
+            </div>
+          </fieldset>
+        </div>
+
+        <!-- Seed -->
+        <div class="space-y-3">
+          <label
+            class="block text-[12px] font-medium uppercase tracking-[0.05em] text-memo-muted"
+            for="briefcase-seed-input"
+          >
+            {{ briefcaseSeedLabel }}
+          </label>
+          <input
+            id="briefcase-seed-input"
+            v-model="seed"
+            type="text"
+            name="game-seed"
+            autocomplete="off"
+            :placeholder="briefcaseSeedPlaceholder"
+            data-testid="briefcase-seed-input"
+            class="w-full rounded-[var(--memo-radius-md)] border border-memo-border bg-black/30 px-4 py-3 text-sm text-memo-text placeholder:text-memo-muted/50 focus:border-memo-accent/50 focus:outline-none focus:ring-1 focus:ring-memo-accent/50"
+          >
+        </div>
+
+        <!-- CTA -->
+        <div class="pt-2">
+          <button
+            type="button"
+            data-testid="briefcase-unlock-showcase"
+            class="w-full rounded-[var(--memo-radius-md)] bg-memo-accent px-4 py-4 text-base font-semibold text-memo-cta-text shadow-[0_0_20px_rgb(228_168_52/0.3)] transition-all duration-300 hover:brightness-110 motion-safe:hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-memo-accent/80 focus:ring-offset-2 focus:ring-offset-memo-bg"
+            @click="onUnlockShowcase"
+          >
+            {{ briefcaseUnlockShowcase }}
+          </button>
+        </div>
+      </div>
+    </BriefcaseGlassPanel>
+  </div>
+</template>

@@ -5,7 +5,7 @@ import { defineConfig, devices } from '@playwright/test'
  * Excludes bootstrap.spec.ts (uses playwright.bootstrap.config.ts).
  */
 export default defineConfig({
-  testDir: 'e2e/project-setup',
+  testDir: 'e2e',
   testIgnore: '**/bootstrap.spec.ts',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
