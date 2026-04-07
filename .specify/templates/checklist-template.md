@@ -32,6 +32,15 @@
 - [ ] CHK005 Item with specific criteria
 - [ ] CHK006 Final item in this category
 
+## Constitution-aligned reminders (CS2 Memory / Vue — replace with feature-specific items)
+
+When the checklist is domain-generic, `/speckit.checklist` SHOULD still verify gates from `.specify/memory/constitution.md` where relevant:
+
+- [ ] CHK-PWA Offline core loop after first load; installable PWA; service worker scope documented
+- [ ] CHK-E2E Playwright maps to user stories; CI order Vitest → build → `vite preview` → Playwright
+- [ ] CHK-PERF Canvas redraw and frame budget acceptable on target devices/browsers
+- [ ] CHK-ASSETS Card images vendored locally; no runtime dependency on CSGO-API or remote tile URLs
+
 ## Notes
 
 - Check items off as completed: `[x]`

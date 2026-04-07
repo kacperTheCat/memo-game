@@ -31,7 +31,20 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+Verify alignment with `.specify/memory/constitution.md` (CS2 Memory Vue 3). All items MUST pass or be justified in **Complexity Tracking** below.
+
+- [ ] **Stack**: Vue 3 + TypeScript + Vite + Vitest + Pinia + Tailwind; exceptions documented with rationale.
+- [ ] **Canvas**: Playable memory grid (tiles, flip/reveal, hit testing) on HTML Canvas; pointer and touch; not DOM-as-primary game board.
+- [ ] **Performance**: Plan/spec define measurable interaction and rendering budgets where relevant.
+- [ ] **Responsive + PWA + state**: Desktop and mobile; offline core loop after first load; installable PWA; all persistent state client-side (mechanism named).
+- [ ] **Tests**: TDD; every user story has Playwright coverage mapped to acceptance scenarios; Vitest for unit/component logic.
+- [ ] **Assets**: One-time ingest from [ByMykel/CSGO-API](https://github.com/ByMykel/CSGO-API); local static assets; no runtime dependency on API/remote image hosts for core gameplay; attribution documented.
+- [ ] **Copy + browsers**: User-visible text English; browser matrix in this plan or `research.md` (latest + LTS/extended-support for Chromium, Firefox, Safari as applicable).
+- [ ] **Accessibility**: Pointer-first scope; no mandated screen-reader/WCAG unless constitution amended.
+- [ ] **Repo layout**: Single root `package.json`; Vitest + Playwright colocated (`e2e/` or `tests/e2e/`); no separate E2E-only repo unless plan-approved workspace exception.
+- [ ] **Design**: Stitch referenced in spec/plan when UI design is produced; visual tokens stay in code/config/docs—not constitution.
+- [ ] **CI** (if GitHub Actions or equivalent): Vitest → `vite build` → `vite preview` → Playwright; details in `.github/workflows/`, not constitution.
+- [ ] **Scope**: Recruitment/portfolio context and non-commercial posture acknowledged in README or spec where appropriate.
 
 ## Project Structure
 

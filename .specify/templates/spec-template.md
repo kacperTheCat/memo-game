@@ -20,6 +20,8 @@
   - Demonstrated to users independently
 -->
 
+**Constitution (this repository):** User-visible strings MUST be **English**. Each user story MUST include a **Playwright coverage** subsection: list the planned spec file path (e.g. `e2e/<story>.spec.ts`) and which acceptance scenarios it exercises. Vitest covers pure logic/components as needed. When UI is designed with **MCP Stitch**, link or reference the Stitch output in the spec or plan.
+
 ### User Story 1 - [Brief Title] (Priority: P1)
 
 [Describe this user journey in plain language]
@@ -27,6 +29,8 @@
 **Why this priority**: [Explain the value and why it has this priority level]
 
 **Independent Test**: [Describe how this can be tested independently - e.g., "Can be fully tested by [specific action] and delivers [specific value]"]
+
+**Playwright coverage**: [Path: `e2e/....spec.ts`; maps to scenarios 1–N below]
 
 **Acceptance Scenarios**:
 
@@ -43,6 +47,8 @@
 
 **Independent Test**: [Describe how this can be tested independently]
 
+**Playwright coverage**: [Path: `e2e/....spec.ts`; maps to scenarios below]
+
 **Acceptance Scenarios**:
 
 1. **Given** [initial state], **When** [action], **Then** [expected outcome]
@@ -56,6 +62,8 @@
 **Why this priority**: [Explain the value and why it has this priority level]
 
 **Independent Test**: [Describe how this can be tested independently]
+
+**Playwright coverage**: [Path: `e2e/....spec.ts`; maps to scenarios below]
 
 **Acceptance Scenarios**:
 

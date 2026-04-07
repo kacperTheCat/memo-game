@@ -8,7 +8,7 @@ description: "Task list template for feature implementation"
 **Input**: Design documents from `/specs/[###-feature-name]/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
+**Tests (mandatory for this repository)**: Every user story MUST include failing-first **Vitest** tasks and **Playwright** tasks per `.specify/memory/constitution.md`. Omitting tests requires a constitution amendment, not a silent skip.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -20,10 +20,8 @@ description: "Task list template for feature implementation"
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+- **This project (default)**: Single repo, root `package.json`; `src/` for Vue app; Vitest in `src/**/*.spec.ts` and/or `tests/unit/`; Playwright in `e2e/` (or `tests/e2e/`) with `playwright.config.ts` at repo root
+- **Other layouts**: If plan.md selects `backend/` + `frontend/`, adjust paths accordingly
 
 <!-- 
   ============================================================================
@@ -60,14 +58,14 @@ description: "Task list template for feature implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-Examples of foundational tasks (adjust based on your project):
+Examples of foundational tasks (adjust based on your project; Vue SPA example):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] T004 [P] Configure Vite, TypeScript, Tailwind, and Pinia bootstrap per plan.md
+- [ ] T005 [P] Add PWA/service worker shell and offline cache strategy (stub if story-owned)
+- [ ] T006 [P] Add shared Canvas sizing / DPR utilities and game loop hooks
+- [ ] T007 Configure Vitest and Playwright in CI (`vite build` → `vite preview` → E2E)
+- [ ] T008 One-time asset ingest script and static image paths (if not already present)
+- [ ] T009 Environment and build flags documented for preview vs production
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -79,21 +77,21 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 1 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 1 (mandatory) ⚠️
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T010 [P] [US1] Vitest spec for [pure logic / composable] in src/[path]/[name].spec.ts
+- [ ] T011 [P] [US1] Playwright spec for [user journey] in e2e/[name].spec.ts (maps to acceptance scenarios)
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T012 [P] [US1] Add or extend Pinia store / composables in src/[path]
+- [ ] T013 [US1] Implement Canvas rendering and input for [feature] in src/[path]
+- [ ] T014 [US1] Wire Vue components and Tailwind layout in src/[path]
+- [ ] T015 [US1] Client persistence hooks if story requires state (localStorage / IndexedDB per plan)
+- [ ] T016 [US1] Error and edge-case handling for story scope
+- [ ] T017 [US1] Verify Playwright + Vitest green for US1
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -105,17 +103,17 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 2 (mandatory) ⚠️
 
-- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T018 [P] [US2] Vitest spec in src/[path]/[name].spec.ts
+- [ ] T019 [P] [US2] Playwright spec in e2e/[name].spec.ts
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] in src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T023 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T020 [P] [US2] Extend stores/composables in src/[path]
+- [ ] T021 [US2] Canvas or UI changes in src/[path]
+- [ ] T022 [US2] Vue components in src/[path]
+- [ ] T023 [US2] Integrate with User Story 1 (if needed) without breaking US1 tests
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -127,16 +125,16 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 3 (mandatory) ⚠️
 
-- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T024 [P] [US3] Vitest spec in src/[path]/[name].spec.ts
+- [ ] T025 [P] [US3] Playwright spec in e2e/[name].spec.ts
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] in src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T026 [P] [US3] Extend src/[path] for stores/composables
+- [ ] T027 [US3] Canvas or UI in src/[path]
+- [ ] T028 [US3] Final integration for US3 scope
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -153,7 +151,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX [P] Documentation updates in docs/
 - [ ] TXXX Code cleanup and refactoring
 - [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
+- [ ] TXXX [P] Additional Vitest coverage in src/ or tests/unit/ as needed
 - [ ] TXXX Security hardening
 - [ ] TXXX Run quickstart.md validation
 
@@ -178,11 +176,10 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Within Each User Story
 
-- Tests (if included) MUST be written and FAIL before implementation
-- Models before services
-- Services before endpoints
-- Core implementation before integration
-- Story complete before moving to next priority
+- Vitest and Playwright tests MUST be written and FAIL before implementation
+- Pure logic / stores before Canvas glue
+- Canvas and input before polish
+- Story complete (all tests green) before moving to next priority
 
 ### Parallel Opportunities
 
@@ -198,13 +195,13 @@ Examples of foundational tasks (adjust based on your project):
 ## Parallel Example: User Story 1
 
 ```bash
-# Launch all tests for User Story 1 together (if tests requested):
-Task: "Contract test for [endpoint] in tests/contract/test_[name].py"
-Task: "Integration test for [user journey] in tests/integration/test_[name].py"
+# Launch all tests for User Story 1 together:
+Task: "Vitest spec in src/[path]/[name].spec.ts"
+Task: "Playwright spec in e2e/[name].spec.ts"
 
-# Launch all models for User Story 1 together:
-Task: "Create [Entity1] model in src/models/[entity1].py"
-Task: "Create [Entity2] model in src/models/[entity2].py"
+# Parallel implementation files (example):
+Task: "Composables in src/composables/[name].ts"
+Task: "Canvas module in src/game/[name].ts"
 ```
 
 ---
