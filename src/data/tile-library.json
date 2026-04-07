@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "skin-f64cdaac0b90",
+      "rarity": "Classified",
+      "color": "#d32ce6",
+      "imagePath": "/tiles/skin-f64cdaac0b90.png"
+    },
+    {
+      "id": "skin-0e1e6b491759",
+      "rarity": "Consumer Grade",
+      "color": "#b0c3d9",
+      "imagePath": "/tiles/skin-0e1e6b491759.png"
+    },
+    {
+      "id": "skin-95436efce4d8",
+      "rarity": "Industrial Grade",
+      "color": "#5e98d9",
+      "imagePath": "/tiles/skin-95436efce4d8.png"
+    },
+    {
+      "id": "skin-0ca39d6a9fe2",
+      "rarity": "Restricted",
+      "color": "#8847ff",
+      "imagePath": "/tiles/skin-0ca39d6a9fe2.png"
+    },
+    {
+      "id": "skin-91147006443a",
+      "rarity": "Classified",
+      "color": "#d32ce6",
+      "imagePath": "/tiles/skin-91147006443a.png"
+    },
+    {
+      "id": "skin-95831ce7c492",
+      "rarity": "Covert",
+      "color": "#eb4b4b",
+      "imagePath": "/tiles/skin-95831ce7c492.png"
+    },
+    {
+      "id": "skin-4c2e3face5fd",
+      "rarity": "Classified",
+      "color": "#d32ce6",
+      "imagePath": "/tiles/skin-4c2e3face5fd.png"
+    },
+    {
+      "id": "skin-994bf96d44d4",
+      "rarity": "Industrial Grade",
+      "color": "#5e98d9",
+      "imagePath": "/tiles/skin-994bf96d44d4.png"
+    },
+    {
+      "id": "skin-a301441ae084",
+      "rarity": "Industrial Grade",
+      "color": "#5e98d9",
+      "imagePath": "/tiles/skin-a301441ae084.png"
+    },
+    {
+      "id": "skin-3f7f4a9702ef",
+      "rarity": "Mil-Spec Grade",
+      "color": "#4b69ff",
+      "imagePath": "/tiles/skin-3f7f4a9702ef.png"
+    },
+    {
+      "id": "skin-f7171c75986f",
+      "rarity": "Consumer Grade",
+      "color": "#b0c3d9",
+      "imagePath": "/tiles/skin-f7171c75986f.png"
+    },
+    {
+      "id": "skin-d466b1683b88",
+      "rarity": "Covert",
+      "color": "#eb4b4b",
+      "imagePath": "/tiles/skin-d466b1683b88.png"
+    },
+    {
+      "id": "skin-4608abab8351",
+      "rarity": "Covert",
+      "color": "#eb4b4b",
+      "imagePath": "/tiles/skin-4608abab8351.png"
+    },
+    {
+      "id": "skin-f489d119026b",
+      "rarity": "Mil-Spec Grade",
+      "color": "#4b69ff",
+      "imagePath": "/tiles/skin-f489d119026b.png"
+    },
+    {
+      "id": "skin-8ba5e5f3632f",
+      "rarity": "Mil-Spec Grade",
+      "color": "#4b69ff",
+      "imagePath": "/tiles/skin-8ba5e5f3632f.png"
+    },
+    {
+      "id": "skin-4c1d61428041",
+      "rarity": "Mil-Spec Grade",
+      "color": "#4b69ff",
+      "imagePath": "/tiles/skin-4c1d61428041.png"
+    },
+    {
+      "id": "skin-0843472a9098",
+      "rarity": "Mil-Spec Grade",
+      "color": "#4b69ff",
+      "imagePath": "/tiles/skin-0843472a9098.png"
+    },
+    {
+      "id": "skin-941c11783314",
+      "rarity": "Covert",
+      "color": "#eb4b4b",
+      "imagePath": "/tiles/skin-941c11783314.png"
+    },
+    {
+      "id": "skin-ad56dc47a4c4",
+      "rarity": "Classified",
+      "color": "#d32ce6",
+      "imagePath": "/tiles/skin-ad56dc47a4c4.png"
+    },
+    {
+      "id": "skin-6f20b68a8c63",
+      "rarity": "Mil-Spec Grade",
+      "color": "#4b69ff",
+      "imagePath": "/tiles/skin-6f20b68a8c63.png"
+    },
+    {
+      "id": "skin-891034135d58",
+      "rarity": "Mil-Spec Grade",
+      "color": "#4b69ff",
+      "imagePath": "/tiles/skin-891034135d58.png"
+    },
+    {
+      "id": "skin-302f05527562",
+      "rarity": "Restricted",
+      "color": "#8847ff",
+      "imagePath": "/tiles/skin-302f05527562.png"
+    },
+    {
+      "id": "skin-55264b2a150c",
+      "rarity": "Industrial Grade",
+      "color": "#5e98d9",
+      "imagePath": "/tiles/skin-55264b2a150c.png"
+    },
+    {
+      "id": "skin-85646e9ca45c",
+      "rarity": "Covert",
+      "color": "#eb4b4b",
+      "imagePath": "/tiles/skin-85646e9ca45c.png"
+    },
+    {
+      "id": "skin-82dc98e09ba6",
+      "rarity": "Covert",
+      "color": "#eb4b4b",
+      "imagePath": "/tiles/skin-82dc98e09ba6.png"
+    },
+    {
+      "id": "skin-9ed635da7e55",
+      "rarity": "Restricted",
+      "color": "#8847ff",
+      "imagePath": "/tiles/skin-9ed635da7e55.png"
+    },
+    {
+      "id": "skin-a8c2f61364e2",
+      "rarity": "Mil-Spec Grade",
+      "color": "#4b69ff",
+      "imagePath": "/tiles/skin-a8c2f61364e2.png"
+    },
+    {
+      "id": "skin-eed9c3fe4b9d",
+      "rarity": "Consumer Grade",
+      "color": "#b0c3d9",
+      "imagePath": "/tiles/skin-eed9c3fe4b9d.png"
+    },
+    {
+      "id": "skin-9446ef74272b",
+      "rarity": "Restricted",
+      "color": "#8847ff",
+      "imagePath": "/tiles/skin-9446ef74272b.png"
+    },
+    {
+      "id": "skin-6f5d1311fcae",
+      "rarity": "Covert",
+      "color": "#eb4b4b",
+      "imagePath": "/tiles/skin-6f5d1311fcae.png"
+    },
+    {
+      "id": "skin-cde9a27f0dd5",
+      "rarity": "Classified",
+      "color": "#d32ce6",
+      "imagePath": "/tiles/skin-cde9a27f0dd5.png"
+    },
+    {
+      "id": "skin-a7feff53ac53",
+      "rarity": "Classified",
+      "color": "#d32ce6",
+      "imagePath": "/tiles/skin-a7feff53ac53.png"
+    }
+  ]
+}

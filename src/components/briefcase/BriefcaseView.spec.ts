@@ -1,5 +1,7 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
+import { createPinia } from 'pinia'
 import { describe, expect, it } from 'vitest'
+import { createRouter, createMemoryHistory } from 'vue-router'
 import BriefcaseView from './BriefcaseView.vue'
 import {
   briefcaseDescription,
@@ -12,9 +14,29 @@ import {
   briefcaseUnlockShowcase,
 } from '@/constants/appCopy'
 
+function createTestRouter() {
+  return createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { path: '/', name: 'home', component: { template: '<div />' } },
+      { path: '/game', name: 'game', component: { template: '<div />' } },
+      { path: '/briefcase', name: 'briefcase', component: { template: '<div />' } },
+    ],
+  })
+}
+
+async function mountBriefcase() {
+  const pinia = createPinia()
+  const router = createTestRouter()
+  await router.push('/')
+  await router.isReady()
+  const wrapper = mount(BriefcaseView, { global: { plugins: [pinia, router] } })
+  return { wrapper, router }
+}
+
 describe('BriefcaseView', () => {
-  it('renders English Main Menu title (h1), tagline, and difficulty heading', () => {
-    const wrapper = mount(BriefcaseView)
+  it('renders English Main Menu title (h1), tagline, and difficulty heading', async () => {
+    const { wrapper } = await mountBriefcase()
     const h1 = wrapper.get('h1')
     expect(h1.text()).toContain(briefcaseTitle)
     expect(wrapper.text()).toContain(briefcaseDescription)
@@ -28,7 +50,7 @@ describe('BriefcaseView', () => {
   })
 
   it('renders Main Menu seed input with English label (FR-010d)', async () => {
-    const wrapper = mount(BriefcaseView)
+    const { wrapper } = await mountBriefcase()
     expect(wrapper.text()).toContain(briefcaseSeedLabel)
     const input = wrapper.get('[data-testid="briefcase-seed-input"]')
     expect(input.attributes('type')).toBe('text')
@@ -37,7 +59,7 @@ describe('BriefcaseView', () => {
   })
 
   it('renders glass panel, difficulty radiogroup, and Unlock showcase (FR-010a–c)', async () => {
-    const wrapper = mount(BriefcaseView)
+    const { wrapper, router } = await mountBriefcase()
     expect(wrapper.get('[data-testid="briefcase-glass-panel"]').exists()).toBe(true)
     expect(wrapper.text()).toContain(briefcaseDifficultyLabel)
     expect(wrapper.text()).toContain(briefcaseDifficultyEasy)
@@ -66,5 +88,7 @@ describe('BriefcaseView', () => {
     expect((medium.element as HTMLInputElement).checked).toBe(false)
 
     await wrapper.get('[data-testid="briefcase-unlock-showcase"]').trigger('click')
+    await flushPromises()
+    expect(router.currentRoute.value.name).toBe('game')
   })
 })

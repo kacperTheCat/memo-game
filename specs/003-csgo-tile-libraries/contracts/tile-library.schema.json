@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://memo-game.local/contracts/tile-library.schema.json",
+  "title": "CS2 Memory tile library",
+  "description": "Bundled tile metadata for Game grid (feature 003). Images are vendored under public/; paths are app-relative.",
+  "type": "object",
+  "required": ["entries"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 32,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "required": ["id", "rarity", "color", "imagePath"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "rarity": { "type": "string", "minLength": 1 },
+          "color": { "type": "string", "minLength": 1 },
+          "imagePath": {
+            "type": "string",
+            "pattern": "^/[^\\s]+$"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
