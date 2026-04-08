@@ -49,6 +49,7 @@ const difficultyOptions = [
 ]
 
 function onUnlockShowcase(): void {
+  gameSettings.dealSeed = seed.value.trim() || null
   navigateToGame()
 }
 </script>
