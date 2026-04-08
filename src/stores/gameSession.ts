@@ -164,6 +164,11 @@ export const useGameSessionStore = defineStore('gameSession', () => {
     }
   }
 
+  function clearSession(): void {
+    clearSaveTimer()
+    gameSession.value = null
+  }
+
   function finalizeSession(outcome: 'won' | 'abandoned'): void {
     const s = gameSession.value
     if (!s) {
@@ -202,5 +207,6 @@ export const useGameSessionStore = defineStore('gameSession', () => {
     clearInProgressStorage,
     finalizeSession,
     readCompletedList,
+    clearSession,
   }
 })

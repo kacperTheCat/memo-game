@@ -9,7 +9,7 @@ description: "Task list for feature 005 — Deterministic game seed (Briefcase)"
 
 **Tests (mandatory for this repository)**: Failing-first **Vitest** and **Playwright** per `.specify/memory/constitution.md`. **`e2e/briefcase-seed-layout.spec.ts`** maps to US1–US3 in [`spec.md`](./spec.md).
 
-**Status**: **T001–T024** baseline (deterministic deal + mask + navigation state) is **done** in tree. **T025+** implement **2026-04-08 clarify**: **FR-005a** (no tenth digit) and **FR-006a** (**`dealBriefcaseSeedRaw`** + Briefcase navigate guard parity with **FR-014**).
+**Status**: **T001–T035** done in tree (**FR-005a**, **FR-006a**, automated tests). **T036** is a manual **`quickstart.md`** §**3b** pass (run locally when validating Briefcase UX).
 
 **Organization**: Setup → Foundational parse → US1 → US2 → US3 → Polish → **Post-clarification**. Stateless dealing: **`rngForDealInit`** + **`history.state.memoDealInit`** ([`data-model.md`](./data-model.md)).
 
@@ -120,23 +120,23 @@ Single repo: root `package.json`; `src/` Vue app; Vitest `src/**/*.spec.ts`; Pla
 
 ### Tests (write first; expect red until implementation)
 
-- [ ] T025 [P] Vitest `src/composables/useNineDigitSeedMask.spec.ts` for **`formatMaskedNineDigitsFromRawInput`**: nine digits then extra digits **do not** lengthen canonical digit run; long digit-only paste ⇒ first nine only (**FR-005a** / **SC-003**)
-- [ ] T026 [P] Vitest `src/components/briefcase/BriefcaseView.spec.ts` (or dedicated `src/composables/useBriefcaseNavigateToGame.spec.ts` if extracted): **`in_progress`** session with **`dealBriefcaseSeedRaw`** **`'111-111-111'`**, settings **`'222-222-222'`**, **`navigateToGame`** triggers **`window.confirm`** and does not **`router.push`** until confirm; on confirm, finalize + reset + push (mock **`window.confirm`** + router)
+- [x] T025 [P] Vitest `src/composables/useNineDigitSeedMask.spec.ts` for **`formatMaskedNineDigitsFromRawInput`**: nine digits then extra digits **do not** lengthen canonical digit run; long digit-only paste ⇒ first nine only (**FR-005a** / **SC-003**)
+- [x] T026 [P] Vitest `src/components/briefcase/BriefcaseView.spec.ts` (or dedicated `src/composables/useBriefcaseNavigateToGame.spec.ts` if extracted): **`in_progress`** session with **`dealBriefcaseSeedRaw`** **`'111-111-111'`**, settings **`'222-222-222'`**, **`navigateToGame`** triggers **`window.confirm`** and does not **`router.push`** until confirm; on confirm, finalize + reset + push (mock **`window.confirm`** + router)
 
 ### Implementation
 
-- [ ] T027 Add **`dealBriefcaseSeedRaw: string`** to **`GameSession`** in **`src/game/memoryTypes.ts`** per **`specs/005-seed-tile-layout/data-model.md`**
-- [ ] T028 Extend **`beginSession`** in **`src/stores/gameSession.ts`** to set **`dealBriefcaseSeedRaw`** (parameter or options object; default **`''`** for direct **`/game`** / win continuation)
-- [ ] T029 **`src/components/GameCanvasShell.vue`**: pass **`settings.briefcaseSeedRaw`** into **`beginSession`** when starting a **new** deal from the **`briefcase-navigation`** path (lines ~292–308); pass **`''`** for **win** → **`beginSession`** and any path **without** Briefcase context per data-model
-- [ ] T030 **`src/views/GameView.vue`**: **`beginSession`** after Abandon uses **`dealBriefcaseSeedRaw: ''`**
-- [ ] T031 **`session.restoreFromSnapshot`** / hydrate path: legacy snapshots missing **`dealBriefcaseSeedRaw`** ⇒ normalize to **`''`** (in **`src/stores/gameSession.ts`** or **`GameCanvasShell.vue`**)
-- [ ] T032 **`src/composables/useBriefcaseNavigateToGame.ts`**: if **`gs?.status === 'in_progress'`** and **`settings.briefcaseSeedRaw !== gs.dealBriefcaseSeedRaw`**, run same finalize/reset as difficulty mismatch (**FR-006a**); add or reuse English copy in **`src/constants/appCopy.ts`**
-- [ ] T033 Update **`src/stores/gameSession.spec.ts`** (and any **`BriefcaseView.spec.ts`** **`beginSession`** stubs) for new **`GameSession`** field and **`beginSession`** signature
+- [x] T027 Add **`dealBriefcaseSeedRaw: string`** to **`GameSession`** in **`src/game/memoryTypes.ts`** per **`specs/005-seed-tile-layout/data-model.md`**
+- [x] T028 Extend **`beginSession`** in **`src/stores/gameSession.ts`** to set **`dealBriefcaseSeedRaw`** (parameter or options object; default **`''`** for direct **`/game`** / win continuation)
+- [x] T029 **`src/components/GameCanvasShell.vue`**: pass **`settings.briefcaseSeedRaw`** into **`beginSession`** when starting a **new** deal from the **`briefcase-navigation`** path (lines ~292–308); pass **`''`** for **win** → **`beginSession`** and any path **without** Briefcase context per data-model
+- [x] T030 **`src/views/GameView.vue`**: **`beginSession`** after Abandon uses **`dealBriefcaseSeedRaw: ''`**
+- [x] T031 **`session.restoreFromSnapshot`** / hydrate path: legacy snapshots missing **`dealBriefcaseSeedRaw`** ⇒ normalize to **`''`** (in **`src/stores/gameSession.ts`** or **`GameCanvasShell.vue`**)
+- [x] T032 **`src/composables/useBriefcaseNavigateToGame.ts`**: if **`gs?.status === 'in_progress'`** and **`settings.briefcaseSeedRaw !== gs.dealBriefcaseSeedRaw`**, run same finalize/reset as difficulty mismatch (**FR-006a**); add or reuse English copy in **`src/constants/appCopy.ts`**
+- [x] T033 Update **`src/stores/gameSession.spec.ts`** (and any **`BriefcaseView.spec.ts`** **`beginSession`** stubs) for new **`GameSession`** field and **`beginSession`** signature
 
 ### Playwright & manual
 
-- [ ] T034 [P] **`e2e/briefcase-seed-layout.spec.ts`**: after nine digits typed, a **tenth** keystroke leaves **`briefcase-seed-input`** value **unchanged**
-- [ ] T035 [P] **`e2e/briefcase-seed-layout.spec.ts`**: **FR-006a** — seed **`/game`** from Briefcase with **in-progress** snapshot whose stored **`dealBriefcaseSeedRaw`** differs from current field ⇒ **confirm** appears; accept ⇒ navigates to **`/game`** with new deal (seed **`localStorage`** fixture or documented steps in spec comment if too brittle)
+- [x] T034 [P] **`e2e/briefcase-seed-layout.spec.ts`**: after nine digits typed, a **tenth** keystroke leaves **`briefcase-seed-input`** value **unchanged**
+- [x] T035 [P] **`e2e/briefcase-seed-layout.spec.ts`**: **FR-006a** — seed **`/game`** from Briefcase with **in-progress** snapshot whose stored **`dealBriefcaseSeedRaw`** differs from current field ⇒ **confirm** appears; accept ⇒ navigates to **`/game`** with new deal (seed **`localStorage`** fixture or documented steps in spec comment if too brittle)
 - [ ] T036 Re-run **`specs/005-seed-tile-layout/quickstart.md`** §**3b** manually after T032–T035 green
 
 **Checkpoint**: **FR-005a** + **FR-006a** green in **`pnpm test`** and **`pnpm run test:e2e`**.
@@ -189,7 +189,7 @@ Complete **Phase 7** (**T025–T036**) to satisfy **Session 2026-04-08 (clarify)
 | US2 | T011–T016 | 6 | done |
 | US3 | T017–T021 | 5 | done |
 | Polish | T022–T024 | 3 | done |
-| Post-clarify | T025–T036 | 12 | open |
-| **Total** | **T001–T036** | **36** | 24 done / 12 open |
+| Post-clarify | T025–T036 | 12 | 11 done / T036 manual |
+| **Total** | **T001–T036** | **36** | 35 done + T036 manual |
 
 **Format validation**: Open work uses `- [ ]`; completed uses `- [x]`. **[Story]** only on US phases. **[P]** only where parallel-safe. Each line names at least one **file path**.

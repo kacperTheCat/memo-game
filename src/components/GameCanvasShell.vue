@@ -19,12 +19,25 @@ import { cellIndexFromPointer } from '@/game/canvasHitTest'
 import { BOARD_GAP_PX, BOARD_MAX_WIDTH_CSS } from '@/game/canvasLayout'
 import { drawTile } from '@/game/canvasTileDraw'
 import type { TilePhase } from '@/game/memoryTypes'
-import type { TileEntry, TileLibraryFile } from '@/game/tileLibraryTypes'
+import { consumeReloadNewGameDifficulty } from '@/game/reloadNewGameDifficulty'
+import { createSeededRandom } from '@/game/seededRng'
+import type { Difficulty, TileEntry, TileLibraryFile } from '@/game/tileLibraryTypes'
 import { useGamePlayStore } from '@/stores/gamePlay'
 import { useGameSessionStore } from '@/stores/gameSession'
 import { useGameSettingsStore } from '@/stores/gameSettings'
 
 defineOptions({ name: 'GameCanvasShell' })
+
+const emit = defineEmits<{ won: [] }>()
+
+function takeDealRng(): () => number {
+  const s = settings.dealSeed
+  if (s) {
+    settings.dealSeed = null
+    return createSeededRandom(s)
+  }
+  return Math.random
+}
 
 const lib = rawLibrary as TileLibraryFile
 const entries = lib.entries
@@ -81,6 +94,10 @@ const matchedCount = computed(() => {
   }
   return m.cells.filter((c) => c.phase === 'matched').length
 })
+
+const identityOrderAttr = computed(() =>
+  play.memory ? play.memory.cells.map((c) => c.identityIndex).join(',') : '',
+)
 
 const ariaBoard = computed(() => {
   return `Memory game board, ${gridRows.value} by ${gridCols.value} tile grid`
@@ -212,8 +229,7 @@ function onCanvasPick(ev: MouseEvent | TouchEvent): void {
   }
   if (won) {
     session.finalizeSession('won')
-    session.beginSession(settings.difficulty, { dealBriefcaseSeedRaw: '' })
-    play.startNewRound(layout.value, Math.random, { dealInitKind: 'random' })
+    emit('won')
   }
   session.flushSave(play.memory)
   schedulePaint()
@@ -296,6 +312,15 @@ function schedulePaint(): void {
   })
 }
 
+function difficultyForFreshRound(): Difficulty {
+  const fromReload = consumeReloadNewGameDifficulty()
+  if (fromReload) {
+    settings.$patch({ difficulty: fromReload })
+    return fromReload
+  }
+  return settings.difficulty
+}
+
 function initRoundIfNeeded(): void {
   const snap = session.loadInProgressSnapshot()
   if (snap && snap.session.status === 'in_progress') {
@@ -307,22 +332,35 @@ function initRoundIfNeeded(): void {
     session.beginSession(settings.difficulty, {
       dealBriefcaseSeedRaw: settings.briefcaseSeedRaw,
     })
-    const { rng, dealKind } = resolveRngAndDealKindForNewShuffle(
+    const memo = resolveRngAndDealKindForNewShuffle(
       settings.difficulty,
       window.history.state,
       'briefcase-navigation',
     )
+    let rng = memo.rng
+    let dealKind = memo.dealKind
+    if (memo.dealKind === 'random') {
+      rng = takeDealRng()
+      dealKind = rng === Math.random ? 'random' : 'seeded'
+    }
     play.startNewRound(layout.value, rng, { dealInitKind: dealKind })
     void stripMemoDealFromHistory()
   } else if (play.memory.cells.length !== layout.value.totalCells) {
-    session.beginSession(settings.difficulty, {
+    const d = difficultyForFreshRound()
+    session.beginSession(d, {
       dealBriefcaseSeedRaw: settings.briefcaseSeedRaw,
     })
-    const { rng, dealKind } = resolveRngAndDealKindForNewShuffle(
-      settings.difficulty,
+    const memo = resolveRngAndDealKindForNewShuffle(
+      d,
       window.history.state,
       'briefcase-navigation',
     )
+    let rng = memo.rng
+    let dealKind = memo.dealKind
+    if (memo.dealKind === 'random') {
+      rng = takeDealRng()
+      dealKind = rng === Math.random ? 'random' : 'seeded'
+    }
     play.startNewRound(layout.value, rng, { dealInitKind: dealKind })
     void stripMemoDealFromHistory()
   }
@@ -388,6 +426,7 @@ watch(debugPeekAllFaces, () => {
       class="sr-only"
       :data-revealed="String(revealedCount)"
       :data-matched="String(matchedCount)"
+      :data-identities="identityOrderAttr"
     />
     <div
       data-testid="game-initial-identities"

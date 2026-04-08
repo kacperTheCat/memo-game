@@ -9,8 +9,8 @@ import { useGameSessionStore } from '@/stores/gameSession'
 import { useGameSettingsStore } from '@/stores/gameSettings'
 
 /**
- * Start /game from The Briefcase: confirm abandon if an in-progress session no longer matches
- * selected difficulty (**FR-014**) or Briefcase seed field vs session snapshot (**FR-006a**).
+ * Start /game from The Briefcase: confirm abandon if an in-progress session’s difficulty
+ * differs from the selected preset (hub UX; not FR-014 win-debrief reset).
  */
 export function useBriefcaseNavigateToGame() {
   const router = useRouter()

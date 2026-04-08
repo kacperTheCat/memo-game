@@ -13,6 +13,11 @@ export const useGameSettingsStore = defineStore('gameSettings', {
      * the value is no longer an incomplete entry.
      */
     briefcaseSeedIncompleteAfterBlur: false,
+    /**
+     * One-shot optional seed for the next `startNewRound` shuffle (Briefcase input or `?seed=`).
+     * Consumed when a new deal is dealt.
+     */
+    dealSeed: null as string | null,
   }),
   actions: {
     onBriefcaseSeedFieldFocus() {
