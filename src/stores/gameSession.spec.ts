@@ -25,6 +25,13 @@ describe('gameSession store', () => {
     s.beginSession('easy')
     s.addActiveMs(100)
     expect(s.gameSession?.activePlayMs).toBe(100)
+    expect(s.gameSession?.dealBriefcaseSeedRaw).toBe('')
+  })
+
+  it('beginSession stores dealBriefcaseSeedRaw when provided', () => {
+    const s = useGameSessionStore()
+    s.beginSession('medium', { dealBriefcaseSeedRaw: '123-456-789' })
+    expect(s.gameSession?.dealBriefcaseSeedRaw).toBe('123-456-789')
   })
 
   it('persists clickCount in snapshot and passes repeated restore trials', () => {

@@ -46,10 +46,14 @@ export const useGameSessionStore = defineStore('gameSession', () => {
     }
   }
 
-  function beginSession(difficulty: Difficulty): void {
+  function beginSession(
+    difficulty: Difficulty,
+    opts?: { dealBriefcaseSeedRaw?: string },
+  ): void {
     gameSession.value = {
       sessionId: crypto.randomUUID(),
       difficulty,
+      dealBriefcaseSeedRaw: opts?.dealBriefcaseSeedRaw ?? '',
       clickCount: 0,
       activePlayMs: 0,
       startedAt: new Date().toISOString(),
@@ -58,8 +62,15 @@ export const useGameSessionStore = defineStore('gameSession', () => {
     }
   }
 
+  function normalizeSession(session: GameSession): GameSession {
+    return {
+      ...session,
+      dealBriefcaseSeedRaw: session.dealBriefcaseSeedRaw ?? '',
+    }
+  }
+
   function restoreFromSnapshot(snap: SessionSnapshot): void {
-    gameSession.value = { ...snap.session }
+    gameSession.value = normalizeSession(snap.session)
   }
 
   function incrementClick(): void {

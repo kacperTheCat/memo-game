@@ -19,6 +19,8 @@ export type SessionStatus = 'in_progress' | 'won' | 'abandoned'
 export interface GameSession {
   sessionId: string
   difficulty: Difficulty
+  /** Briefcase seed field snapshot when this in-progress round began (`''` if not from Briefcase). */
+  dealBriefcaseSeedRaw: string
   clickCount: number
   activePlayMs: number
   startedAt: string

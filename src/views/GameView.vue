@@ -28,8 +28,10 @@ function confirmAbandon(): void {
     return
   }
   session.finalizeSession('abandoned')
-  session.beginSession(settings.difficulty)
-  play.startNewRound(buildGridCells(entries, settings.difficulty))
+  session.beginSession(settings.difficulty, { dealBriefcaseSeedRaw: '' })
+  play.startNewRound(buildGridCells(entries, settings.difficulty), Math.random, {
+    dealInitKind: 'random',
+  })
 }
 </script>
 
