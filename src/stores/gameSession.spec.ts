@@ -58,6 +58,33 @@ describe('gameSession store', () => {
     expect(list[list.length - 1]?.outcome).toBe('abandoned')
   })
 
+  it('clearSession drops in-memory session', () => {
+    const s = useGameSessionStore()
+    s.beginSession('easy')
+    expect(s.gameSession).not.toBeNull()
+    s.clearSession()
+    expect(s.gameSession).toBeNull()
+  })
+
+  it('after won finalize, clearSession clears memory but keeps completed won row (FR-014 hub dismiss)', () => {
+    const s = useGameSessionStore()
+    s.beginSession('medium')
+    s.finalizeSession('won')
+    expect(s.gameSession?.status).toBe('won')
+    const rawBefore = backing.get(STORAGE_COMPLETED_SESSIONS_KEY)
+    expect(rawBefore).toBeTruthy()
+    const lenBefore = (JSON.parse(rawBefore!) as unknown[]).length
+
+    s.clearSession()
+    expect(s.gameSession).toBeNull()
+
+    const rawAfter = backing.get(STORAGE_COMPLETED_SESSIONS_KEY)
+    expect(rawAfter).toBeTruthy()
+    const list = JSON.parse(rawAfter!) as { outcome: string }[]
+    expect(list.length).toBe(lenBefore)
+    expect(list[list.length - 1]?.outcome).toBe('won')
+  })
+
   it('caps completed history length', () => {
     const s = useGameSessionStore()
     for (let i = 0; i < 250; i++) {
