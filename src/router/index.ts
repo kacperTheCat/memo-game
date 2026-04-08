@@ -15,8 +15,13 @@ export const router = createRouter({
   ],
 })
 
-/** FR-014: entering briefcase clears won debrief state (Pinia survives route changes). */
-router.beforeEach((to) => {
+/**
+ * FR-014: entering briefcase clears won debrief state (Pinia survives route changes).
+ * Use **afterEach** so cleanup runs only once `/game` has unmounted. Clearing in `beforeEach`
+ * flipped GameView off the debrief while still on `/game`, remounted `GameCanvasShell`, and
+ * `stripMemoDealFromHistory()`'s `router.replace` cancelled the in-flight navigation to briefcase.
+ */
+router.afterEach((to) => {
   if (to.name !== 'briefcase') {
     return
   }

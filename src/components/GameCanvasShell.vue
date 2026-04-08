@@ -329,11 +329,12 @@ function initRoundIfNeeded(): void {
     play.hydrateFromSnapshot(snap.cells, snap.pair, snap.session.difficulty)
     void stripMemoDealFromHistory()
   } else if (!play.memory) {
-    session.beginSession(settings.difficulty, {
+    const d = difficultyForFreshRound()
+    session.beginSession(d, {
       dealBriefcaseSeedRaw: settings.briefcaseSeedRaw,
     })
     const memo = resolveRngAndDealKindForNewShuffle(
-      settings.difficulty,
+      d,
       window.history.state,
       'briefcase-navigation',
     )
