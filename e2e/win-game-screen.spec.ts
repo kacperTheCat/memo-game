@@ -63,7 +63,7 @@ test.describe('win debrief (006)', () => {
 
   test('history table has column headers after win', async ({ page }) => {
     await solveSeededEasyGame(page)
-    const table = page.getByTestId('win-history-table')
+    const table = page.getByTestId('session-history-table')
     await expect(table.getByRole('columnheader', { name: 'Date' })).toBeVisible()
     await expect(table.getByRole('columnheader', { name: 'Difficulty' })).toBeVisible()
     await expect(table.getByRole('columnheader', { name: 'Time' })).toBeVisible()

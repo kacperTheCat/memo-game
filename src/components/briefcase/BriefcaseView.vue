@@ -2,8 +2,10 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import BriefcaseGlassPanel from '@/components/briefcase/BriefcaseGlassPanel.vue'
+import MemoSecondaryNavButton from '@/components/ui/MemoSecondaryNavButton.vue'
 import { useBriefcaseNavigateToGame } from '@/composables/useBriefcaseNavigateToGame'
 import { formatMaskedNineDigitsFromRawInput } from '@/composables/useNineDigitSeedMask'
+import { useGameSessionStore } from '@/stores/gameSession'
 import {
   briefcaseDescription,
   briefcaseDifficultyEasy,
@@ -18,6 +20,8 @@ import {
   briefcaseSeedPlaceholder,
   briefcaseTitle,
   briefcaseUnlockShowcase,
+  navReturnToGame,
+  navReturnToStartScreen,
 } from '@/constants/appCopy'
 import { isBriefcaseSeedIncompleteEntry } from '@/game/seedDeal'
 import { useGameSettingsStore } from '@/stores/gameSettings'
@@ -27,6 +31,12 @@ defineOptions({ name: 'BriefcaseView' })
 const gameSettings = useGameSettingsStore()
 const { difficulty, briefcaseSeedRaw } = storeToRefs(gameSettings)
 const { navigateToGame } = useBriefcaseNavigateToGame()
+const session = useGameSessionStore()
+const { gameSession } = storeToRefs(session)
+
+const showReturnToGame = computed(
+  () => gameSession.value?.status === 'in_progress',
+)
 
 const seedIncomplete = computed(() =>
   isBriefcaseSeedIncompleteEntry(briefcaseSeedRaw.value),
@@ -75,7 +85,25 @@ function onUnlockShowcase(): void {
 </script>
 
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col gap-6">
+    <div
+      class="flex flex-wrap items-center justify-between gap-3"
+      data-testid="briefcase-hub-nav"
+    >
+      <MemoSecondaryNavButton
+        variant="back"
+        :label="navReturnToStartScreen"
+        data-testid="briefcase-return-home"
+        :to="{ name: 'home' }"
+      />
+      <MemoSecondaryNavButton
+        v-if="showReturnToGame"
+        variant="forward"
+        :label="navReturnToGame"
+        data-testid="briefcase-return-game"
+        :to="{ name: 'game' }"
+      />
+    </div>
     <BriefcaseGlassPanel>
       <div class="flex flex-col gap-8">
         <!-- Title area — designs/.../the_briefcase_main_menu/code.html -->

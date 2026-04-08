@@ -70,11 +70,11 @@ test.describe('CSGO tile library game grid (preview)', () => {
     page,
   }) => {
     await page.goto('/')
-    await page.getByTestId('nav-to-briefcase').click()
+    await page.getByTestId('home-configure-game').click()
     await expect(page).toHaveURL(/\/briefcase$/)
 
     await selectDifficulty(page, 'hard')
-    await page.getByTestId('nav-to-game').click()
+    await page.getByTestId('briefcase-unlock-showcase').click()
     await expect(page).toHaveURL(/\/game$/)
     const meta = page.getByTestId('game-grid-meta')
     await expect(meta).toHaveAttribute('data-rows', '8')
@@ -84,7 +84,7 @@ test.describe('CSGO tile library game grid (preview)', () => {
     await page.goto('/briefcase')
     await selectDifficulty(page, 'easy')
     page.once('dialog', (d) => d.accept())
-    await page.getByTestId('nav-to-game').click()
+    await page.getByTestId('briefcase-unlock-showcase').click()
     await expect(meta).toHaveAttribute('data-rows', '4')
     await expect(meta).toHaveAttribute('data-cols', '4')
     await expect(meta).toHaveAttribute('data-cells', '16')
@@ -103,14 +103,14 @@ test.describe('CSGO tile library game grid (preview)', () => {
   }) => {
     await page.goto('/briefcase')
     await selectDifficulty(page, 'hard')
-    await page.getByTestId('nav-to-game').click()
+    await page.getByTestId('briefcase-unlock-showcase').click()
     const meta = page.getByTestId('game-grid-meta')
     await expect(meta).toHaveAttribute('data-cells', '64')
 
     await page.goto('/briefcase')
     await selectDifficulty(page, 'medium')
     page.once('dialog', (d) => d.accept())
-    await page.getByTestId('nav-to-game').click()
+    await page.getByTestId('briefcase-unlock-showcase').click()
     await expect(meta).toHaveAttribute('data-rows', '6')
     await expect(meta).toHaveAttribute('data-cols', '6')
     await expect(meta).toHaveAttribute('data-cells', '36')

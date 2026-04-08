@@ -2,7 +2,6 @@ import { expect, test, type Page } from '@playwright/test'
 import {
   briefcaseSeedIncompleteMessage,
   briefcaseSeedLabel,
-  navToGame,
 } from '../src/constants/appCopy'
 
 const goldenEasy000 = '[6,3,4,3,7,7,5,6,0,1,0,5,1,2,2,4]'
@@ -65,7 +64,6 @@ test.describe('US2 optional / partial seed', () => {
     await seed.fill('1234')
     await expect(page.getByTestId('briefcase-seed-incomplete-hint')).toHaveCount(0)
     await expect(page.getByTestId('briefcase-unlock-showcase')).toBeEnabled()
-    await expect(page.getByTestId('nav-to-game')).toBeEnabled()
     await page.getByTestId('briefcase-unlock-showcase').click()
     await expect(page).toHaveURL(/\/briefcase/)
     await seed.blur()
@@ -73,7 +71,6 @@ test.describe('US2 optional / partial seed', () => {
       briefcaseSeedIncompleteMessage,
     )
     await expect(page.getByTestId('briefcase-unlock-showcase')).toBeDisabled()
-    await expect(page.getByTestId('nav-to-game')).toBeDisabled()
     await page.getByTestId('briefcase-unlock-showcase').click({ force: true })
     await expect(page).toHaveURL(/\/briefcase/)
     await seed.fill('')
@@ -101,11 +98,11 @@ test.describe('US3 mask', () => {
     await expect(seed).toHaveValue('424-242-424')
   })
 
-  test('header Play uses same seed as Unlock', async ({ page }) => {
+  test('Unlock showcase uses same seed as seeded deal', async ({ page }) => {
     await page.goto('/briefcase')
     await selectDifficulty(page, 'easy')
     await page.getByTestId('briefcase-seed-input').fill('000000000')
-    await page.getByTestId('nav-to-game').click()
+    await page.getByTestId('briefcase-unlock-showcase').click()
     await expect(page).toHaveURL(/\/game$/)
     await expect(page.getByTestId('game-initial-identities')).toHaveAttribute(
       'data-identities',
@@ -137,9 +134,7 @@ test.describe('FR-006a in-progress seed change', () => {
     const idBox = page.getByTestId('game-initial-identities')
     await expect(idBox).toHaveAttribute('data-identities', goldenEasy000)
 
-    await page.getByTestId('nav-to-home').click()
-    await expect(page.getByTestId('nav-to-briefcase')).toBeVisible()
-    await page.getByTestId('nav-to-briefcase').click()
+    await page.getByTestId('game-return-briefcase').click()
     await expect(page).toHaveURL(/\/briefcase$/)
 
     await selectDifficulty(page, 'easy')
@@ -159,9 +154,3 @@ test.describe('FR-006a in-progress seed change', () => {
   })
 })
 
-test.describe('nav copy', () => {
-  test('Play button still shows nav label', async ({ page }) => {
-    await page.goto('/briefcase')
-    await expect(page.getByTestId('nav-to-game')).toContainText(navToGame)
-  })
-})

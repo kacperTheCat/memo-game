@@ -26,7 +26,7 @@ test.describe('tile library validation (preview)', () => {
     ]) {
       await page.goto('/briefcase')
       await selectDifficulty(page, level)
-      await page.getByTestId('nav-to-game').click()
+      await page.getByTestId('briefcase-unlock-showcase').click()
       await expect(page).toHaveURL(/\/game$/)
       await expect(meta).toHaveAttribute('data-cells', cells)
     }

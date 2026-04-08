@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import GameCanvasShell from '@/components/GameCanvasShell.vue'
 import WinDebriefPanel from '@/components/WinDebriefPanel.vue'
-import AppButton from '@/components/ui/AppButton.vue'
+import MemoSecondaryNavButton from '@/components/ui/MemoSecondaryNavButton.vue'
 import rawLibrary from '@/data/tile-library.json'
 import { useActivePlayTime } from '@/composables/useActivePlayTime'
 import { buildGridCells } from '@/game/buildGridLayout'
@@ -12,7 +12,7 @@ import {
   setReloadNewGameDifficulty,
 } from '@/game/reloadNewGameDifficulty'
 import type { Difficulty, TileLibraryFile } from '@/game/tileLibraryTypes'
-import { gamePageHeading, gamePageSubline, navToHome } from '@/constants/appCopy'
+import { abandonGameConfirm, navAbandonGame, navReturnToBriefcase } from '@/constants/appCopy'
 import { useGamePlayStore } from '@/stores/gamePlay'
 import { useGameSessionStore } from '@/stores/gameSession'
 import { useGameSettingsStore } from '@/stores/gameSettings'
@@ -64,12 +64,13 @@ watch([showDebrief, () => session.gameSession?.status], () => {
   }
 })
 
+function returnToBriefcaseDuringPlay(): void {
+  session.flushSave(play.memory)
+  void router.push({ name: 'briefcase' })
+}
+
 function confirmAbandon(): void {
-  if (
-    !window.confirm(
-      'Abandon this game? A record will be saved for statistics (outcome: abandoned).',
-    )
-  ) {
+  if (!window.confirm(abandonGameConfirm)) {
     return
   }
   session.finalizeSession('abandoned')
@@ -119,45 +120,34 @@ async function onReturnBriefcase(): Promise<void> {
   </div>
   <div
     v-else
-    class="flex min-h-screen min-w-[320px] flex-col bg-memo-bg px-4 py-8 text-memo-text"
+    class="relative flex min-h-screen min-w-[320px] flex-col bg-memo-bg px-4 py-6 text-memo-text"
   >
-    <header class="mb-4 flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h1 class="text-xl font-semibold tracking-tight md:text-2xl">
-          {{ gamePageHeading }}
-        </h1>
-        <p class="mt-1 text-sm text-memo-muted">
-          {{ gamePageSubline }}
-        </p>
-      </div>
-      <AppButton
-        to="/"
-        data-testid="nav-to-home"
-      >
-        {{ navToHome }}
-      </AppButton>
+    <header
+      class="relative z-10 mb-4 flex w-full max-w-[min(100%,1200px)] items-center justify-between gap-3 self-center"
+    >
+      <MemoSecondaryNavButton
+        variant="back"
+        :label="navReturnToBriefcase"
+        data-testid="game-return-briefcase"
+        @click="returnToBriefcaseDuringPlay"
+      />
+      <MemoSecondaryNavButton
+        variant="dismiss"
+        :label="navAbandonGame"
+        data-testid="game-abandon-game"
+        @click="confirmAbandon"
+      />
     </header>
     <p
       v-if="session.storageError"
-      class="mb-2 text-center text-sm text-amber-400"
+      class="relative z-10 mb-2 text-center text-sm text-amber-400"
       role="status"
     >
       {{ session.storageError }}
     </p>
-    <main class="relative flex flex-1 flex-col items-center justify-center">
+    <main class="relative z-10 flex flex-1 flex-col items-center justify-center">
       <div class="relative w-full max-w-[min(100%,1200px)]">
-        <button
-          type="button"
-          class="absolute left-0 top-0 z-10 rounded border border-memo-border bg-memo-surface px-3 py-1.5 text-sm font-medium text-memo-text shadow hover:bg-memo-bg"
-          data-testid="game-abandon-game"
-          @click="confirmAbandon"
-        >
-          Abandon game
-        </button>
-        <GameCanvasShell
-          class="pt-10"
-          @won="onGameWon"
-        />
+        <GameCanvasShell @won="onGameWon" />
       </div>
     </main>
   </div>

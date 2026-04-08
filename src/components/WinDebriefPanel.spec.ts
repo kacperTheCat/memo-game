@@ -31,7 +31,7 @@ describe('WinDebriefPanel', () => {
     expect(wrapper.get('[data-testid="win-summary-time"]').text()).toBe('01:30')
     expect(wrapper.get('[data-testid="win-summary-moves"]').text()).toBe('10')
     expect(wrapper.find('[data-testid="win-play-again"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="win-history-table"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="session-history-table"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="win-return-briefcase"]').exists()).toBe(true)
   })
 })

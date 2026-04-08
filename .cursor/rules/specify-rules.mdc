@@ -9,6 +9,10 @@ alwaysApply: true
 Auto-generated from all feature plans. Last updated: 2026-04-08
 
 ## Active Technologies
+- TypeScript **5.7**, Node **22.x** (see root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa` (007-home-nav-briefcase-ui)
+- **N/A** new keys — existing **`localStorage`** (`memo-game.v1.inProgress`, `memo-game.v1.completedSessions`) per **004** / **006** (007-home-nav-briefcase-ui)
+- TypeScript **5.7**, Node **22.x** (see root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa` (007-home-nav-briefcase-ui)
+- **N/A** new keys — existing **`localStorage`** (`memo-game.v1.inProgress`, `memo-game.v1.completedSessions`) per **004** / **006** (007-home-nav-briefcase-ui)
 
 - **Stack** (see root `package.json`): TypeScript **5.7**, Node **22.x**, Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), Vitest **3**, Playwright **~1.49**, `vite-plugin-pwa`. **Package manager**: `pnpm` (declared in `package.json`).
 - **Routes**: **`/`** (home), **`/game`**, **`/briefcase`** (002-stitch-theme-briefcase).
@@ -44,10 +48,10 @@ memo-game/                 # single root package.json
 TypeScript **5.7**, Node **22.x** for local and CI: follow repository ESLint / team conventions.
 
 ## Recent Changes
+- 007-home-nav-briefcase-ui: Added TypeScript **5.7**, Node **22.x** (see root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa`
+- 007-home-nav-briefcase-ui: Added TypeScript **5.7**, Node **22.x** (see root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa`
 
 - **004-game-core-logic**: Client `localStorage` snapshots, session lifecycle, canvas-first core loop.
-- **005-seed-tile-layout**: Briefcase seed → deterministic initial deal; optional seed; `briefcaseSeedRaw` not persisted for v1 by default.
-- **006-win-game-screen**: Post-win debrief UI; completed-session history unchanged at persistence layer (same v1 keys as 004).
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
