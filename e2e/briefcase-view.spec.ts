@@ -81,7 +81,7 @@ test.describe('briefcase + navigation (preview build)', () => {
     await assertNoGameCanvas(page)
   })
 
-  test('P1: home Configure and briefcase Return to Start use secondary nav', async ({
+  test('P1: home Configure (primary CTA) opens briefcase; Return to Start uses hub nav', async ({
     page,
   }) => {
     await page.goto('/')

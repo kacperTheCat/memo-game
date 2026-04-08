@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import BriefcaseGlassPanel from '@/components/briefcase/BriefcaseGlassPanel.vue'
 import MemoSecondaryNavButton from '@/components/ui/MemoSecondaryNavButton.vue'
 import { useBriefcaseNavigateToGame } from '@/composables/useBriefcaseNavigateToGame'
 import { formatMaskedNineDigitsFromRawInput } from '@/composables/useNineDigitSeedMask'
 import { useGameSessionStore } from '@/stores/gameSession'
-import { useGameSettingsStore } from '@/stores/gameSettings'
 import {
   briefcaseDescription,
   briefcaseDifficultyEasy,
@@ -99,7 +98,7 @@ function onUnlockShowcase(): void {
       />
       <MemoSecondaryNavButton
         v-if="showReturnToGame"
-        variant="back"
+        variant="forward"
         :label="navReturnToGame"
         data-testid="briefcase-return-game"
         :to="{ name: 'game' }"

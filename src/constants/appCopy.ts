@@ -11,7 +11,7 @@ export const navToHome = 'Home'
 export const navReturnToBriefcase = 'Return to Briefcase'
 export const navAbandonGame = 'Abandon Game'
 export const navReturnToStartScreen = 'Return to Start Screen'
-export const navConfigureGame = 'Configure Game'
+export const navConfigureGame = 'Configure New Game'
 export const navReturnToGame = 'Return to Game'
 
 export const abandonGameConfirm =

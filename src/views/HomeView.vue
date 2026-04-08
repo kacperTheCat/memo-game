@@ -1,24 +1,25 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { storeToRefs } from 'pinia'
-import SessionHistoryLedger from '@/components/SessionHistoryLedger.vue'
-import HubGrainLayer from '@/components/layout/HubGrainLayer.vue'
-import MemoSecondaryNavButton from '@/components/ui/MemoSecondaryNavButton.vue'
+import { computed } from "vue";
+import { RouterLink } from "vue-router";
+import { storeToRefs } from "pinia";
+import SessionHistoryLedger from "@/components/SessionHistoryLedger.vue";
+import HubGrainLayer from "@/components/layout/HubGrainLayer.vue";
+import MemoSecondaryNavButton from "@/components/ui/MemoSecondaryNavButton.vue";
 import {
   navConfigureGame,
   navReturnToGame,
   primaryHeading,
-} from '@/constants/appCopy'
-import { useGameSessionStore } from '@/stores/gameSession'
+} from "@/constants/appCopy";
+import { useGameSessionStore } from "@/stores/gameSession";
 
-defineOptions({ name: 'HomeView' })
+defineOptions({ name: "HomeView" });
 
-const session = useGameSessionStore()
-const { gameSession } = storeToRefs(session)
+const session = useGameSessionStore();
+const { gameSession } = storeToRefs(session);
 
 const showReturnToGame = computed(
-  () => gameSession.value?.status === 'in_progress',
-)
+  () => gameSession.value?.status === "in_progress",
+);
 </script>
 
 <template>
@@ -33,7 +34,9 @@ const showReturnToGame = computed(
     </div>
     <div class="relative z-10 mx-auto flex w-full max-w-4xl flex-col gap-8">
       <header class="text-center">
-        <h1 class="text-2xl font-semibold tracking-tight text-white md:text-3xl">
+        <h1
+          class="text-2xl font-semibold tracking-tight text-white md:text-3xl"
+        >
           {{ primaryHeading }}
         </h1>
       </header>
@@ -41,18 +44,19 @@ const showReturnToGame = computed(
         class="flex flex-wrap items-center justify-center gap-4"
         data-testid="home-action-row"
       >
+        <RouterLink
+          data-testid="home-configure-game"
+          :to="{ name: 'briefcase' }"
+          class="inline-flex h-12 min-w-[200px] items-center justify-center rounded-[var(--memo-radius-md)] bg-memo-accent px-6 text-base font-semibold text-memo-cta-text shadow-[0_0_20px_rgb(228_168_52/0.25)] transition-all hover:scale-[1.02] hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-memo-accent/80 focus-visible:ring-offset-2 focus-visible:ring-offset-memo-bg"
+        >
+          {{ navConfigureGame }}
+        </RouterLink>
         <MemoSecondaryNavButton
           v-if="showReturnToGame"
-          variant="back"
+          variant="forward"
           :label="navReturnToGame"
           data-testid="home-return-game"
           :to="{ name: 'game' }"
-        />
-        <MemoSecondaryNavButton
-          variant="back"
-          :label="navConfigureGame"
-          data-testid="home-configure-game"
-          :to="{ name: 'briefcase' }"
         />
       </div>
       <SessionHistoryLedger />
