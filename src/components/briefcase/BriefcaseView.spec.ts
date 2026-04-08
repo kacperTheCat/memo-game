@@ -1,8 +1,10 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import BriefcaseView from './BriefcaseView.vue'
+import { useGameSettingsStore } from '@/stores/gameSettings'
+import { useGameSessionStore } from '@/stores/gameSession'
 import {
   briefcaseDescription,
   briefcaseDifficultyEasy,
@@ -91,4 +93,87 @@ describe('BriefcaseView', () => {
     await flushPromises()
     expect(router.currentRoute.value.name).toBe('game')
   })
+
+  describe('FR-014: difficulty as next-start parameter', () => {
+    beforeEach(() => {
+      vi.spyOn(crypto, 'randomUUID').mockReturnValue(
+        '00000000-0000-4000-8000-000000000099',
+      )
+      const ls = new Map<string, string>()
+      vi.stubGlobal('localStorage', {
+        getItem: (k: string) => (ls.has(k) ? ls.get(k)! : null),
+        setItem: (k: string, v: string) => void ls.set(k, v),
+        removeItem: (k: string) => void ls.delete(k),
+      })
+    })
+
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    it('does not prompt when changing difficulty radios during in_progress', async () => {
+      const confirmSpy = vi.spyOn(window, 'confirm')
+      const pinia = createPinia()
+      const session = useGameSessionStore(pinia)
+      session.beginSession('medium')
+      const settings = useGameSettingsStore(pinia)
+      settings.difficulty = 'medium'
+
+      const { wrapper } = await mountBriefcaseWithPinia(pinia)
+      const hard = wrapper
+        .findAll('input[type="radio"]')
+        .find((r) => (r.element as HTMLInputElement).value === 'hard')!
+      await hard.setValue(true)
+      await flushPromises()
+
+      expect(settings.difficulty).toBe('hard')
+      expect(session.gameSession?.status).toBe('in_progress')
+      expect(confirmSpy).not.toHaveBeenCalled()
+    })
+
+    it('prompts on Unlock when selected difficulty mismatches in_progress session; cancel skips navigation', async () => {
+      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
+      const pinia = createPinia()
+      const session = useGameSessionStore(pinia)
+      session.beginSession('medium')
+      const settings = useGameSettingsStore(pinia)
+      settings.difficulty = 'hard'
+
+      const { wrapper, router } = await mountBriefcaseWithPinia(pinia)
+      const pushSpy = vi.spyOn(router, 'push')
+
+      await wrapper.get('[data-testid="briefcase-unlock-showcase"]').trigger('click')
+      await flushPromises()
+
+      expect(confirmSpy).toHaveBeenCalledOnce()
+      expect(session.gameSession?.status).toBe('in_progress')
+      expect(pushSpy).not.toHaveBeenCalled()
+    })
+
+    it('Unlock confirm abandons and navigates when user accepts', async () => {
+      vi.spyOn(window, 'confirm').mockReturnValue(true)
+      const pinia = createPinia()
+      const session = useGameSessionStore(pinia)
+      session.beginSession('medium')
+      const settings = useGameSettingsStore(pinia)
+      settings.difficulty = 'easy'
+
+      const { wrapper, router } = await mountBriefcaseWithPinia(pinia)
+      const pushSpy = vi.spyOn(router, 'push').mockResolvedValue(undefined)
+
+      await wrapper.get('[data-testid="briefcase-unlock-showcase"]').trigger('click')
+      await flushPromises()
+
+      expect(session.gameSession?.status).toBe('abandoned')
+      expect(pushSpy).toHaveBeenCalledWith({ name: 'game' })
+    })
+  })
 })
+
+async function mountBriefcaseWithPinia(pinia: ReturnType<typeof createPinia>) {
+  const router = createTestRouter()
+  await router.push('/')
+  await router.isReady()
+  const wrapper = mount(BriefcaseView, { global: { plugins: [pinia, router] } })
+  return { wrapper, router }
+}

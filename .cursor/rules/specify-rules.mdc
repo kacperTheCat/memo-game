@@ -16,6 +16,8 @@ Auto-generated from all feature plans. Last updated: 2026-04-07
 - TypeScript 5.x, Node.js **22.x** (LTS) — `package.json` / `001-project-setup` + Vue 3.5+, Vite 6+, Pinia, **Tailwind CSS 4.x** (`@tailwindcss/vite`), **vue-router** 4.x (`/`, `/game`, `/briefcase`), Vitest, Playwright, `vite-plugin-pwa` (002-stitch-theme-briefcase)
 - TypeScript **5.7** / Node **22.x** (see `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), Vitest **3**, Playwright **1.49** (003-csgo-tile-libraries)
 - Static files only—`public/tiles/*`, `src/data/tile-library.json`; Pinia in-memory **`GameSettings`** (default difficulty **`medium`** for direct `/game` visits) (003-csgo-tile-libraries)
+- TypeScript **5.7** (see root `package.json`), Node **22.x** + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa` (004-game-core-logic)
+- **`localStorage`** for versioned JSON blobs (in-progress snapshot + append-only completed-session list); migrate to **`indexedDB`** only if quota or payload size becomes an issue (documented in `research.md`) (004-game-core-logic)
 
 - TypeScript 5.x, Node.js **22.x** (LTS), Vue 3.5+, Vite 6+, Pinia, Tailwind CSS 4.x (`@tailwindcss/vite`), **vue-router** 4.x (**`/`** home, **`/game`** canvas, **`/briefcase`**), Vitest + `@vue/test-utils`, Playwright, `vite-plugin-pwa` (002-stitch-theme-briefcase; builds on 001-project-setup)
 
@@ -36,8 +38,8 @@ npm test && npm run lint
 TypeScript 5.x, Node.js **22.x** (LTS) for local and CI: Follow standard conventions
 
 ## Recent Changes
+- 004-game-core-logic: Added TypeScript **5.7** (see root `package.json`), Node **22.x** + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa`
 - 003-csgo-tile-libraries: Added TypeScript **5.7** / Node **22.x** (see `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), Vitest **3**, Playwright **1.49**
-- 002-stitch-theme-briefcase: Added TypeScript 5.x, Node.js **22.x** (LTS) — `package.json` / `001-project-setup` + Vue 3.5+, Vite 6+, Pinia, **Tailwind CSS 4.x** (`@tailwindcss/vite`), **vue-router** 4.x (`/`, `/game`, `/briefcase`), Vitest, Playwright, `vite-plugin-pwa`
 - 002-stitch-theme-briefcase: Added TypeScript 5.x, Node.js **22.x** (LTS) — `package.json` / `001-project-setup` + Vue 3.5+, Vite 6+, Pinia, **Tailwind CSS 4.x** (`@tailwindcss/vite`), **vue-router** 4.x (`/`, `/game`, `/briefcase`), Vitest, Playwright, `vite-plugin-pwa`
 
 

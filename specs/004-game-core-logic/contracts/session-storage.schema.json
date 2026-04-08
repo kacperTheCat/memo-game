@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.memo-game/specs/004-game-core-logic/session-storage.schema.json",
+  "title": "MemoGameSessionSnapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "session", "cells", "pair"],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "session": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId",
+        "difficulty",
+        "clickCount",
+        "activePlayMs",
+        "startedAt",
+        "completedAt",
+        "status"
+      ],
+      "properties": {
+        "sessionId": { "type": "string", "minLength": 1 },
+        "difficulty": {
+          "type": "string",
+          "enum": ["easy", "medium", "hard"]
+        },
+        "clickCount": { "type": "integer", "minimum": 0 },
+        "activePlayMs": { "type": "number", "minimum": 0 },
+        "startedAt": { "type": "string", "minLength": 1 },
+        "completedAt": { "type": ["string", "null"] },
+        "status": {
+          "type": "string",
+          "enum": ["in_progress", "won", "abandoned"]
+        }
+      }
+    },
+    "cells": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["identityIndex", "phase"],
+        "properties": {
+          "identityIndex": { "type": "integer", "minimum": 0 },
+          "phase": {
+            "type": "string",
+            "enum": ["concealed", "revealed", "matched"]
+          },
+          "flipProgress": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "pair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["firstIndex", "secondIndex", "locked"],
+      "properties": {
+        "firstIndex": {
+          "anyOf": [{ "type": "null" }, { "type": "integer", "minimum": 0 }]
+        },
+        "secondIndex": {
+          "anyOf": [{ "type": "null" }, { "type": "integer", "minimum": 0 }]
+        },
+        "locked": { "type": "boolean" }
+      }
+    }
+  }
+}

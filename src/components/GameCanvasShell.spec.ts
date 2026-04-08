@@ -2,10 +2,18 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import GameCanvasShell from './GameCanvasShell.vue'
+import { STORAGE_IN_PROGRESS_KEY } from '@/game/sessionConstants'
 import { useGameSettingsStore } from '@/stores/gameSettings'
 
 describe('GameCanvasShell', () => {
   beforeEach(() => {
+    const ls = new Map<string, string>()
+    vi.stubGlobal('localStorage', {
+      getItem: (k: string) => (ls.has(k) ? ls.get(k)! : null),
+      setItem: (k: string, v: string) => void ls.set(k, v),
+      removeItem: (k: string) => void ls.delete(k),
+    })
+    vi.spyOn(crypto, 'randomUUID').mockReturnValue('00000000-0000-4000-8000-000000000001')
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(
       () =>
         ({
@@ -15,6 +23,12 @@ describe('GameCanvasShell', () => {
           fillRect: vi.fn(),
           strokeRect: vi.fn(),
           drawImage: vi.fn(),
+          createLinearGradient: () => ({ addColorStop: vi.fn() }),
+          beginPath: vi.fn(),
+          rect: vi.fn(),
+          clip: vi.fn(),
+          save: vi.fn(),
+          restore: vi.fn(),
         }) as unknown as CanvasRenderingContext2D,
     )
   })
@@ -51,5 +65,39 @@ describe('GameCanvasShell', () => {
     const pinia = createPinia()
     const wrapper = mount(GameCanvasShell, { global: { plugins: [pinia] } })
     expect(wrapper.get('[data-testid="game-canvas"]').exists()).toBe(true)
+  })
+
+  it('syncs settings difficulty from easy in-progress snapshot (refresh parity)', async () => {
+    const cells = Array.from({ length: 16 }, (_, i) => ({
+      identityIndex: i % 8,
+      phase: 'concealed' as const,
+    }))
+    const snap = {
+      schemaVersion: 1,
+      session: {
+        sessionId: 'snap-easy',
+        difficulty: 'easy' as const,
+        clickCount: 0,
+        activePlayMs: 0,
+        startedAt: '2026-01-01T00:00:00.000Z',
+        completedAt: null,
+        status: 'in_progress' as const,
+      },
+      cells,
+      pair: { firstIndex: null, secondIndex: null, locked: false },
+    }
+    localStorage.setItem(STORAGE_IN_PROGRESS_KEY, JSON.stringify(snap))
+
+    const pinia = createPinia()
+    const store = useGameSettingsStore(pinia)
+    store.difficulty = 'medium'
+    const wrapper = mount(GameCanvasShell, { global: { plugins: [pinia] } })
+    await flushPromises()
+
+    expect(store.difficulty).toBe('easy')
+    const meta = wrapper.get('[data-testid="game-grid-meta"]')
+    expect(meta.attributes('data-rows')).toBe('4')
+    expect(meta.attributes('data-cols')).toBe('4')
+    expect(meta.attributes('data-cells')).toBe('16')
   })
 })

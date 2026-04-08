@@ -27,3 +27,7 @@ export const briefcaseDifficultyEasySubtitle = '4x4 Grid'
 export const briefcaseDifficultyMediumSubtitle = '6x6 Grid'
 export const briefcaseDifficultyHardSubtitle = '8x8 Grid'
 export const briefcaseUnlockShowcase = 'Unlock showcase'
+
+/** Shown when clicking Unlock showcase if selected difficulty ≠ in-progress session difficulty. */
+export const briefcaseUnlockAbandonDifferentDifficulty =
+  'You have a game in progress at a different difficulty. Start the showcase with your new selection and abandon the current game? A record will be saved for statistics (outcome: abandoned).'
