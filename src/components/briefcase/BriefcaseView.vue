@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
 import BriefcaseGlassPanel from '@/components/briefcase/BriefcaseGlassPanel.vue'
+import { useBriefcaseNavigateToGame } from '@/composables/useBriefcaseNavigateToGame'
 import { useGameSettingsStore } from '@/stores/gameSettings'
 import {
   briefcaseDescription,
@@ -26,7 +26,7 @@ const seed = ref('')
 /** Shared with Game route (feature 003). */
 const gameSettings = useGameSettingsStore()
 const { difficulty } = storeToRefs(gameSettings)
-const router = useRouter()
+const { navigateToGame } = useBriefcaseNavigateToGame()
 
 const difficultyRadiosName = 'briefcase-difficulty'
 
@@ -49,7 +49,7 @@ const difficultyOptions = [
 ]
 
 function onUnlockShowcase(): void {
-  void router.push({ name: 'game' })
+  navigateToGame()
 }
 </script>
 

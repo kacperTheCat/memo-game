@@ -83,6 +83,7 @@ test.describe('CSGO tile library game grid (preview)', () => {
 
     await page.goto('/briefcase')
     await selectDifficulty(page, 'easy')
+    page.once('dialog', (d) => d.accept())
     await page.getByTestId('nav-to-game').click()
     await expect(meta).toHaveAttribute('data-rows', '4')
     await expect(meta).toHaveAttribute('data-cols', '4')
@@ -108,6 +109,7 @@ test.describe('CSGO tile library game grid (preview)', () => {
 
     await page.goto('/briefcase')
     await selectDifficulty(page, 'medium')
+    page.once('dialog', (d) => d.accept())
     await page.getByTestId('nav-to-game').click()
     await expect(meta).toHaveAttribute('data-rows', '6')
     await expect(meta).toHaveAttribute('data-cols', '6')
