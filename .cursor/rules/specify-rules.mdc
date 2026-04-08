@@ -13,6 +13,11 @@ Auto-generated from all feature plans. Last updated: 2026-04-08
 - **N/A** new keys — existing **`localStorage`** (`memo-game.v1.inProgress`, `memo-game.v1.completedSessions`) per **004** / **006** (007-home-nav-briefcase-ui)
 - TypeScript **5.7**, Node **22.x** (see root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa` (007-home-nav-briefcase-ui)
 - **N/A** new keys — existing **`localStorage`** (`memo-game.v1.inProgress`, `memo-game.v1.completedSessions`) per **004** / **006** (007-home-nav-briefcase-ui)
+- TypeScript **5.7**, Node **22.x** (root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa` (008-game-tile-polish)
+- `localStorage` keys `memo-game.v1.inProgress`, `memo-game.v1.completedSessions` (no new keys for this feature; strip not in snapshot v1) (008-game-tile-polish)
+- TypeScript **5.7**, Node **22.x** (root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa` (008-game-tile-polish)
+- `localStorage` keys `memo-game.v1.inProgress`, `memo-game.v1.completedSessions` (no new keys; strip not in snapshot v1) (008-game-tile-polish)
+- TypeScript **5.7**, Node **22.x** (root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa` (008-game-tile-polish)
 
 - **Stack** (see root `package.json`): TypeScript **5.7**, Node **22.x**, Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), Vitest **3**, Playwright **~1.49**, `vite-plugin-pwa`. **Package manager**: `pnpm` (declared in `package.json`).
 - **Routes**: **`/`** (home), **`/game`**, **`/briefcase`** (002-stitch-theme-briefcase).
@@ -48,10 +53,10 @@ memo-game/                 # single root package.json
 TypeScript **5.7**, Node **22.x** for local and CI: follow repository ESLint / team conventions.
 
 ## Recent Changes
-- 007-home-nav-briefcase-ui: Added TypeScript **5.7**, Node **22.x** (see root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa`
-- 007-home-nav-briefcase-ui: Added TypeScript **5.7**, Node **22.x** (see root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa`
+- 008-game-tile-polish: Added TypeScript **5.7**, Node **22.x** (root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa`
+- 008-game-tile-polish: Added TypeScript **5.7**, Node **22.x** (root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa`
+- 008-game-tile-polish: Added TypeScript **5.7**, Node **22.x** (root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa`
 
-- **004-game-core-logic**: Client `localStorage` snapshots, session lifecycle, canvas-first core loop.
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

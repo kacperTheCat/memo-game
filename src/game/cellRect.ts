@@ -13,14 +13,17 @@ export function cellRectsForGrid(
   rows: number,
   cols: number,
   gap: number,
+  inset = 0,
 ): { metrics: GridLayoutMetrics; rects: CellRect[] } {
-  const metrics = computeGridLayout(cssWidth, cssHeight, rows, cols, gap)
+  const innerW = Math.max(1, cssWidth - 2 * inset)
+  const innerH = Math.max(1, cssHeight - 2 * inset)
+  const metrics = computeGridLayout(innerW, innerH, rows, cols, gap)
   const rects: CellRect[] = []
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       rects.push({
-        x: col * (metrics.cellW + gap),
-        y: row * (metrics.cellH + gap),
+        x: col * (metrics.cellW + gap) + inset,
+        y: row * (metrics.cellH + gap) + inset,
         w: metrics.cellW,
         h: metrics.cellH,
       })

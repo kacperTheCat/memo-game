@@ -1,72 +1,201 @@
-import type { TileRuntimeState } from '@/game/memoryTypes'
 import type { CellRect } from '@/game/cellRect'
-import { parallaxOffset } from '@/game/tileParallax'
+import { easeOutCubic } from '@/game/animationEasing'
+import { faceGradientStopsForEntry } from '@/game/tileFaceStyle'
+import type { TileRuntimeState } from '@/game/memoryTypes'
 
 export type TilePhase = TileRuntimeState['phase']
 
+export interface TileDrawParams {
+  phase: TilePhase
+  img: HTMLImageElement | undefined
+  catalogColor: string
+  rarity: string
+  parallax: { ox: number; oy: number }
+  reducedMotion: boolean
+  /** 0 = back at start of flip, 1 = face fully shown */
+  reveal01: number
+  /** 0 = opaque matched tile, 1 = fully faded (caller may skip draw) */
+  matchFade01: number
+  shakePx: number
+  /** Face → concealed during mismatch flip-back (0..1); omit during shake. */
+  mismatchConceal01?: number
+  /** Dev: draw face even for concealed/matched */
+  forceShowFace: boolean
+}
+
+const PAD = 3
+
+function drawConcealedBack(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): void {
+  const grd = ctx.createLinearGradient(x, y, x + w, y + h)
+  grd.addColorStop(0, '#1e293b')
+  grd.addColorStop(1, '#0f172a')
+  ctx.fillStyle = grd
+  ctx.fillRect(x, y, w, h)
+  /* Neutral frame only — must not use catalog / rarity color (FR-001). */
+  ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)'
+  ctx.lineWidth = 1
+  ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1)
+}
+
 /**
- * Draw one tile: concealed back, revealed face (with optional parallax), or skip if matched.
+ * One cohesive face: gradient + contained image + glass in the same inner rect (FR-005, FR-006).
+ */
+function drawFaceContent(
+  ctx: CanvasRenderingContext2D,
+  rect: CellRect,
+  img: HTMLImageElement | undefined,
+  catalogColor: string,
+  rarity: string,
+  ox: number,
+  oy: number,
+): void {
+  const { x, y, w, h } = rect
+  const innerW = w - PAD * 2
+  const innerH = h - PAD * 2
+  const ix = x + PAD
+  const iy = y + PAD
+
+  const { start, end } = faceGradientStopsForEntry(catalogColor, rarity)
+  const bg = ctx.createLinearGradient(ix, iy, ix + innerW, iy + innerH)
+  bg.addColorStop(0, start)
+  bg.addColorStop(1, end)
+  ctx.fillStyle = bg
+  ctx.fillRect(ix, iy, innerW, innerH)
+
+  ctx.save()
+  ctx.beginPath()
+  ctx.rect(ix, iy, innerW, innerH)
+  ctx.clip()
+
+  if (img?.complete && img.naturalWidth > 0) {
+    const iw = img.naturalWidth
+    const ih = img.naturalHeight
+    const scale = Math.min(innerW / iw, innerH / ih)
+    const dw = iw * scale
+    const dh = ih * scale
+    const dx = ix + (innerW - dw) / 2 + ox
+    const dy = iy + (innerH - dh) / 2 + oy
+    ctx.drawImage(img, dx, dy, dw, dh)
+  } else {
+    ctx.fillStyle = 'rgba(30, 41, 59, 0.9)'
+    ctx.fillRect(ix, iy, innerW, innerH)
+  }
+
+  const glass = ctx.createLinearGradient(ix, iy, ix + innerW, iy + innerH)
+  glass.addColorStop(0, 'rgba(255,255,255,0.22)')
+  glass.addColorStop(0.45, 'rgba(255,255,255,0.04)')
+  glass.addColorStop(1, 'rgba(15,23,42,0.12)')
+  ctx.fillStyle = glass
+  ctx.fillRect(ix, iy, innerW, innerH)
+
+  ctx.restore()
+}
+
+/**
+ * Draw one tile: concealed back, revealed face (parallax, rarity gradient), matched fade.
  */
 export function drawTile(
   ctx: CanvasRenderingContext2D,
   rect: CellRect,
-  phase: TilePhase,
-  img: HTMLImageElement | undefined,
-  borderColor: string,
-  pointerCss: { x: number; y: number } | null,
-  reducedMotion: boolean,
+  params: TileDrawParams,
 ): void {
-  const pad = 2
   const { x, y, w, h } = rect
-  if (phase === 'matched') {
+  const {
+    phase,
+    img,
+    catalogColor,
+    rarity,
+    parallax,
+    reducedMotion,
+    reveal01,
+    matchFade01,
+    shakePx,
+    mismatchConceal01,
+    forceShowFace,
+  } = params
+
+  if (phase === 'matched' && matchFade01 >= 1) {
     return
   }
+
+  const ox = reducedMotion ? 0 : parallax.ox
+  const oy = reducedMotion ? 0 : parallax.oy
 
   ctx.save()
   ctx.beginPath()
   ctx.rect(x, y, w, h)
   ctx.clip()
 
-  if (phase === 'concealed') {
-    const grd = ctx.createLinearGradient(x, y, x + w, y + h)
-    grd.addColorStop(0, '#1e293b')
-    grd.addColorStop(1, '#0f172a')
-    ctx.fillStyle = grd
-    ctx.strokeStyle = borderColor
-    ctx.lineWidth = 2
-    ctx.fillRect(x + pad, y + pad, w - pad * 2, h - pad * 2)
-    ctx.strokeRect(x + pad, y + pad, w - pad * 2, h - pad * 2)
+  const innerX = x + PAD
+  const innerY = y + PAD
+  const innerW = w - PAD * 2
+  const innerH = h - PAD * 2
+  const cx = x + w / 2
+  const cy = y + h / 2
+
+  if (shakePx !== 0) {
+    ctx.translate(shakePx, 0)
+  }
+
+  let alpha = 1
+  if (phase === 'matched') {
+    alpha = 1 - easeOutCubic(matchFade01)
+  }
+  ctx.globalAlpha = alpha
+
+  if (
+    phase === 'revealed' &&
+    mismatchConceal01 !== undefined &&
+    !forceShowFace
+  ) {
+    const flipP = 1 - easeOutCubic(mismatchConceal01)
+    const scaleX = Math.abs(Math.cos(Math.PI * (1 - flipP)))
+    ctx.translate(cx, cy)
+    ctx.scale(Math.max(0.08, scaleX), 1)
+    ctx.translate(-cx, -cy)
+    if (flipP > 0.5) {
+      drawFaceContent(ctx, rect, img, catalogColor, rarity, ox, oy)
+    } else {
+      drawConcealedBack(ctx, innerX, innerY, innerW, innerH)
+    }
     ctx.restore()
     return
   }
 
-  let ox = 0
-  let oy = 0
-  if (pointerCss && !reducedMotion) {
-    const cx = x + w / 2
-    const cy = y + h / 2
-    const p = parallaxOffset(pointerCss.x, pointerCss.y, cx, cy)
-    ox = p.ox
-    oy = p.oy
+  const showFace =
+    forceShowFace ||
+    phase === 'revealed' ||
+    (phase === 'matched' && matchFade01 < 1)
+
+  if (phase === 'concealed' && !forceShowFace) {
+    drawConcealedBack(ctx, innerX, innerY, innerW, innerH)
+    ctx.restore()
+    return
   }
 
-  if (img?.complete && img.naturalWidth > 0) {
-    const iw = img.naturalWidth
-    const ih = img.naturalHeight
-    const innerW = w - pad * 2
-    const innerH = h - pad * 2
-    const scale = Math.max(innerW / iw, innerH / ih)
-    const dw = iw * scale
-    const dh = ih * scale
-    const dx = x + pad + (innerW - dw) / 2 + ox
-    const dy = y + pad + (innerH - dh) / 2 + oy
-    ctx.drawImage(img, dx, dy, dw, dh)
-  } else {
-    ctx.fillStyle = '#334155'
-    ctx.fillRect(x + pad, y + pad, w - pad * 2, h - pad * 2)
+  if (!showFace) {
+    ctx.restore()
+    return
   }
-  ctx.strokeStyle = borderColor
-  ctx.lineWidth = 1
-  ctx.strokeRect(x + pad, y + pad, w - pad * 2, h - pad * 2)
+
+  const p = forceShowFace ? 1 : easeOutCubic(reveal01)
+  const scaleX = Math.abs(Math.cos(Math.PI * (1 - p)))
+
+  ctx.translate(cx, cy)
+  ctx.scale(Math.max(0.08, scaleX), 1)
+  ctx.translate(-cx, -cy)
+
+  if (p < 0.5 && !forceShowFace) {
+    drawConcealedBack(ctx, innerX, innerY, innerW, innerH)
+  } else {
+    drawFaceContent(ctx, rect, img, catalogColor, rarity, ox, oy)
+  }
+
   ctx.restore()
 }

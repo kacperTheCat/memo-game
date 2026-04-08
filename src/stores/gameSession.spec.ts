@@ -1,6 +1,6 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createInitialState } from '@/game/memoryEngine'
+import { createInitialState, type MemoryState } from '@/game/memoryEngine'
 import {
   STORAGE_COMPLETED_SESSIONS_KEY,
   STORAGE_IN_PROGRESS_KEY,
@@ -63,6 +63,17 @@ describe('gameSession store', () => {
     expect(raw).toBeTruthy()
     const list = JSON.parse(raw!) as { outcome: string }[]
     expect(list[list.length - 1]?.outcome).toBe('abandoned')
+  })
+
+  it('buildSnapshot strips ephemeral cell fields (flipProgress)', () => {
+    const s = useGameSessionStore()
+    s.beginSession('easy')
+    const mem = createInitialState([0, 0, 1, 1]) as MemoryState
+    mem.cells[0] = { ...mem.cells[0]!, flipProgress: 0.42 }
+    const snap = s.buildSnapshot(mem)
+    expect(snap).not.toBeNull()
+    const keys = Object.keys(snap!.cells[0]!).sort()
+    expect(keys).toEqual(['identityIndex', 'phase'])
   })
 
   it('clearSession drops in-memory session', () => {
