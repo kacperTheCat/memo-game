@@ -1,49 +1,61 @@
 <script setup lang="ts">
-import AppButton from '@/components/ui/AppButton.vue'
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import SessionHistoryLedger from '@/components/SessionHistoryLedger.vue'
+import HubGrainLayer from '@/components/layout/HubGrainLayer.vue'
+import MemoSecondaryNavButton from '@/components/ui/MemoSecondaryNavButton.vue'
 import {
-  homeTagline,
-  navToBriefcase,
-  navToGame,
+  navConfigureGame,
+  navReturnToGame,
   primaryHeading,
 } from '@/constants/appCopy'
+import { useGameSessionStore } from '@/stores/gameSession'
+
+defineOptions({ name: 'HomeView' })
+
+const session = useGameSessionStore()
+const { gameSession } = storeToRefs(session)
+
+const showReturnToGame = computed(
+  () => gameSession.value?.status === 'in_progress',
+)
 </script>
 
 <template>
   <div
-    class="flex min-h-screen min-w-[320px] flex-col bg-memo-bg px-4 py-8 text-memo-text"
+    class="relative isolate flex min-h-screen min-w-[320px] flex-col px-4 py-8 text-memo-text"
   >
-    <header class="mb-6 text-center">
-      <h1 class="text-2xl font-semibold tracking-tight md:text-3xl">
-        {{ primaryHeading }}
-      </h1>
-      <p class="mt-2 text-sm text-memo-muted">
-        {{ homeTagline }}
-      </p>
-    </header>
-    <nav
-      class="mb-6 flex flex-wrap items-center justify-center gap-3"
-      aria-label="Main navigation"
+    <div
+      class="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+      aria-hidden="true"
     >
-      <AppButton
-        to="/game"
-        data-testid="nav-to-game"
+      <HubGrainLayer />
+    </div>
+    <div class="relative z-10 mx-auto flex w-full max-w-4xl flex-col gap-8">
+      <header class="text-center">
+        <h1 class="text-2xl font-semibold tracking-tight text-white md:text-3xl">
+          {{ primaryHeading }}
+        </h1>
+      </header>
+      <div
+        class="flex flex-wrap items-center justify-center gap-4"
+        data-testid="home-action-row"
       >
-        {{ navToGame }}
-      </AppButton>
-      <AppButton
-        to="/briefcase"
-        data-testid="nav-to-briefcase"
-      >
-        {{ navToBriefcase }}
-      </AppButton>
-    </nav>
-    <main
-      class="flex flex-1 flex-col items-center justify-center text-center text-memo-muted"
-    >
-      <p class="max-w-md text-sm">
-        Choose <strong class="text-memo-text">{{ navToGame }}</strong> to open the game board, or
-        <strong class="text-memo-text">{{ navToBriefcase }}</strong> for your themed overview.
-      </p>
-    </main>
+        <MemoSecondaryNavButton
+          v-if="showReturnToGame"
+          variant="back"
+          :label="navReturnToGame"
+          data-testid="home-return-game"
+          :to="{ name: 'game' }"
+        />
+        <MemoSecondaryNavButton
+          variant="back"
+          :label="navConfigureGame"
+          data-testid="home-configure-game"
+          :to="{ name: 'briefcase' }"
+        />
+      </div>
+      <SessionHistoryLedger />
+    </div>
   </div>
 </template>

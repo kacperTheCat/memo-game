@@ -44,5 +44,10 @@ export function useBriefcaseNavigateToGame() {
     })
   }
 
-  return { navigateToGame }
+  /** Resume current match: no abandon confirm (007). */
+  function resumeToGame(): void {
+    void router.push({ name: 'game' })
+  }
+
+  return { navigateToGame, resumeToGame }
 }

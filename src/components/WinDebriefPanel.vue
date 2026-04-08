@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Difficulty } from '@/game/tileLibraryTypes'
+import SessionHistoryLedger from '@/components/SessionHistoryLedger.vue'
+import MemoSecondaryNavButton from '@/components/ui/MemoSecondaryNavButton.vue'
 import {
-  difficultyDisplayLabel,
   formatActivePlayMsAsMmSs,
-  formatCompletedAtDateLocalYyyyMmDd,
 } from '@/game/winDebriefFormat'
 import { filterWonSessionsNewestFirst } from '@/game/winDebriefHistory'
+import { navReturnToBriefcase } from '@/constants/appCopy'
 import { useGameSessionStore } from '@/stores/gameSession'
 
 defineOptions({ name: 'WinDebriefPanel' })
@@ -38,19 +38,6 @@ const summary = computed(() => {
     difficulty: row.difficulty,
   }
 })
-
-const historyRows = computed(() => filterWonSessionsNewestFirst(session.readCompletedList()))
-
-function chipClass(d: Difficulty): string {
-  switch (d) {
-    case 'hard':
-      return 'border border-red-500/20 bg-red-500/10 text-red-400'
-    case 'medium':
-      return 'border border-purple-500/20 bg-purple-500/10 text-purple-400'
-    default:
-      return 'border border-blue-500/20 bg-blue-500/10 text-blue-400'
-  }
-}
 </script>
 
 <template>
@@ -67,18 +54,12 @@ function chipClass(d: Difficulty): string {
       aria-hidden="true"
     />
     <header class="relative z-[2] mx-auto flex w-full max-w-7xl items-center p-6">
-      <button
-        type="button"
+      <MemoSecondaryNavButton
+        variant="back"
+        :label="navReturnToBriefcase"
         data-testid="win-return-briefcase"
-        class="group flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-medium uppercase tracking-wide text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
         @click="emit('return-briefcase')"
-      >
-        <span
-          class="inline-block transition-transform group-hover:-translate-x-1"
-          aria-hidden="true"
-        >←</span>
-        Return to Briefcase
-      </button>
+      />
     </header>
     <main
       class="relative z-[2] mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-8 sm:px-6 lg:px-8"
@@ -140,75 +121,7 @@ function chipClass(d: Difficulty): string {
           </div>
         </div>
         <div class="flex w-full flex-col gap-6 lg:w-7/12">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xl font-semibold text-white">
-              History Ledger
-            </h3>
-            <span class="font-mono text-xs uppercase tracking-widest text-gray-500">Local Data</span>
-          </div>
-          <div class="glass-panel overflow-hidden rounded-2xl">
-            <div class="w-full overflow-x-auto">
-              <table
-                data-testid="win-history-table"
-                class="w-full whitespace-nowrap text-left"
-              >
-                <thead>
-                  <tr class="border-b border-white/10 bg-black/40">
-                    <th class="px-6 py-4 text-xs font-medium uppercase tracking-[0.1em] text-gray-400">
-                      Date
-                    </th>
-                    <th class="px-6 py-4 text-xs font-medium uppercase tracking-[0.1em] text-gray-400">
-                      Difficulty
-                    </th>
-                    <th class="px-6 py-4 text-xs font-medium uppercase tracking-[0.1em] text-gray-400">
-                      Time
-                    </th>
-                    <th class="px-6 py-4 text-xs font-medium uppercase tracking-[0.1em] text-gray-400">
-                      Moves
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-white/5">
-                  <template v-if="historyRows.length === 0">
-                    <tr>
-                      <td
-                        colspan="4"
-                        class="px-6 py-12 text-center text-sm text-gray-500"
-                      >
-                        <span data-testid="win-history-empty">No operational data found.</span>
-                      </td>
-                    </tr>
-                  </template>
-                  <template v-else>
-                    <tr
-                      v-for="(row, idx) in historyRows"
-                      :key="row.sessionId + row.completedAt"
-                      class="transition-colors hover:bg-white/[0.02]"
-                      :class="{ 'bg-white/[0.01]': idx % 2 === 1 }"
-                    >
-                      <td class="px-6 py-5 font-mono text-sm text-gray-300">
-                        {{ formatCompletedAtDateLocalYyyyMmDd(row.completedAt) }}
-                      </td>
-                      <td class="px-6 py-5">
-                        <span
-                          class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium"
-                          :class="chipClass(row.difficulty)"
-                        >
-                          {{ difficultyDisplayLabel(row.difficulty) }}
-                        </span>
-                      </td>
-                      <td class="px-6 py-5 font-mono text-sm font-medium text-white">
-                        {{ formatActivePlayMsAsMmSs(row.activePlayMs) }}
-                      </td>
-                      <td class="px-6 py-5 font-mono text-sm font-medium text-gray-300">
-                        {{ row.clickCount }}
-                      </td>
-                    </tr>
-                  </template>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <SessionHistoryLedger />
         </div>
       </div>
     </main>

@@ -5,9 +5,8 @@ import {
   briefcaseSeedLabel,
   briefcaseTitle,
   briefcaseUnlockShowcase,
-  navToBriefcase,
-  navToGame,
-  navToHome,
+  navReturnToGame,
+  navReturnToStartScreen,
   primaryHeading,
 } from '../src/constants/appCopy'
 
@@ -19,19 +18,20 @@ async function assertNoGameCanvas(page: import('@playwright/test').Page) {
 }
 
 test.describe('briefcase + navigation (preview build)', () => {
-  test('P1: home has no canvas; nav to Briefcase shows themed view (phone)', async ({
+  test('P1: home has grain, ledger, Configure; navigate to Briefcase (phone)', async ({
     page,
   }) => {
     await page.setViewportSize(phone)
     await page.goto('/')
     await assertNoGameCanvas(page)
+    await expect(page.getByTestId('hub-grain-layer')).toBeVisible()
     await expect(page.getByRole('heading', { level: 1 })).toContainText(primaryHeading)
-    await expect(page.getByTestId('nav-to-briefcase')).toBeVisible()
-    await expect(page.getByTestId('nav-to-briefcase')).toContainText(navToBriefcase)
-    await page.getByTestId('nav-to-briefcase').click()
+    await expect(page.getByTestId('home-configure-game')).toBeVisible()
+    await page.getByTestId('home-configure-game').click()
     await expect(page).toHaveURL(/\/briefcase$/)
     await expect(page.getByTestId('briefcase-view')).toBeVisible()
     await expect(page.getByTestId('briefcase-backdrop')).toBeVisible()
+    await expect(page.getByTestId('hub-grain-layer')).toBeVisible()
     const briefcaseMain = page.getByTestId('briefcase-view')
     await expect(briefcaseMain.getByRole('heading', { level: 1 })).toContainText(briefcaseTitle)
     await expect(briefcaseMain.getByText(briefcaseDescription)).toBeVisible()
@@ -64,32 +64,39 @@ test.describe('briefcase + navigation (preview build)', () => {
     expect(/^[\t\n\r\x20-\x7E]*$/.test(text)).toBe(true)
   })
 
-  test('P1: responsive Briefcase layout (desktop)', async ({ page }) => {
+  test('P1: responsive Briefcase layout (desktop) with hub nav', async ({ page }) => {
     await page.setViewportSize(desktop)
     await page.goto('/briefcase')
     await expect(page.getByTestId('briefcase-view')).toBeVisible()
-    await expect(page.getByTestId('nav-to-home')).toBeVisible()
+    await expect(page.getByTestId('briefcase-return-home')).toBeVisible()
+    await expect(page.getByTestId('briefcase-return-home')).toContainText(
+      navReturnToStartScreen,
+    )
   })
 
   test('P1: Briefcase → home has no canvas on home', async ({ page }) => {
     await page.goto('/briefcase')
-    await page.getByTestId('nav-to-home').click()
+    await page.getByTestId('briefcase-return-home').click()
     await expect(page).toHaveURL(/\/$/)
     await assertNoGameCanvas(page)
   })
 
-  test('P1: discoverable English nav on home and Briefcase', async ({ page }) => {
+  test('P1: home Configure and briefcase Return to Start use secondary nav', async ({
+    page,
+  }) => {
     await page.goto('/')
-    await expect(page.getByTestId('nav-to-game')).toContainText(navToGame)
-    await expect(page.getByTestId('nav-to-briefcase')).toContainText(navToBriefcase)
-    await page.getByTestId('nav-to-briefcase').click()
-    await expect(page.getByTestId('nav-to-home')).toContainText(navToHome)
+    await expect(page.getByTestId('home-configure-game')).toBeVisible()
+    await page.getByTestId('home-configure-game').click()
+    await expect(page.getByTestId('briefcase-return-home')).toContainText(
+      navReturnToStartScreen,
+    )
   })
 
-  test('P1: home → game shows game-canvas', async ({ page }) => {
+  test('P1: Configure → Unlock → game shows game-canvas', async ({ page }) => {
     await page.goto('/')
-    await assertNoGameCanvas(page)
-    await page.getByTestId('nav-to-game').click()
+    await page.getByTestId('home-configure-game').click()
+    await expect(page).toHaveURL(/\/briefcase$/)
+    await page.getByTestId('briefcase-unlock-showcase').click()
     await expect(page).toHaveURL(/\/game$/)
     await expect(page.getByTestId('game-canvas')).toBeVisible()
   })
@@ -99,30 +106,30 @@ test.describe('briefcase + navigation (preview build)', () => {
   }) => {
     await page.goto('/briefcase')
     await expect(page.getByTestId('briefcase-view')).toBeVisible()
-    await page.getByTestId('nav-to-home').click()
+    await page.getByTestId('briefcase-return-home').click()
     await expect(page).toHaveURL(/\/$/)
-    await page.getByTestId('nav-to-briefcase').click()
+    await page.getByTestId('home-configure-game').click()
     await expect(page).toHaveURL(/\/briefcase$/)
   })
 
-  test('P1: Briefcase backdrop remains with prefers-reduced-motion (scenario 8 edge)', async ({
+  test('P1: Briefcase backdrop and grain remain with prefers-reduced-motion', async ({
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     await page.goto('/briefcase')
     await expect(page.getByTestId('briefcase-backdrop')).toBeVisible()
+    await expect(page.getByTestId('hub-grain-layer')).toBeVisible()
     await expect(page.getByTestId('briefcase-view')).toBeVisible()
     await expect(page.getByTestId('briefcase-glass-panel')).toBeVisible()
   })
 
-  test('P2: nav and Briefcase surfaces share theme utility classes', async ({
-    page,
-  }) => {
-    await page.goto('/')
-    await expect(page.getByTestId('nav-to-game')).toHaveClass(/border-memo-border/)
-    await expect(page.getByTestId('nav-to-game')).toHaveClass(/bg-memo-surface/)
-    await page.getByTestId('nav-to-briefcase').click()
-    await expect(page.getByTestId('briefcase-backdrop')).toHaveClass(/bg-memo-bg/)
-    await expect(page.getByTestId('nav-to-home')).toHaveClass(/bg-memo-surface/)
+  test('P2: Return to Game on briefcase when session in progress', async ({ page }) => {
+    await page.goto('/briefcase')
+    await page.getByTestId('briefcase-unlock-showcase').click()
+    await expect(page).toHaveURL(/\/game$/)
+    await page.getByTestId('game-return-briefcase').click()
+    await expect(page).toHaveURL(/\/briefcase$/)
+    await expect(page.getByTestId('briefcase-return-game')).toBeVisible()
+    await expect(page.getByTestId('briefcase-return-game')).toContainText(navReturnToGame)
   })
 })

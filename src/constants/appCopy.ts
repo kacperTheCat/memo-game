@@ -7,6 +7,16 @@ export const navToGame = 'Play'
 export const navToBriefcase = 'The Briefcase'
 export const navToHome = 'Home'
 
+/** Secondary nav (007): same family as post-match Return to Briefcase. */
+export const navReturnToBriefcase = 'Return to Briefcase'
+export const navAbandonGame = 'Abandon Game'
+export const navReturnToStartScreen = 'Return to Start Screen'
+export const navConfigureGame = 'Configure Game'
+export const navReturnToGame = 'Return to Game'
+
+export const abandonGameConfirm =
+  'Abandon this game? A record will be saved for statistics (outcome: abandoned).'
+
 export const gamePageHeading = 'Memory game'
 export const gamePageSubline =
   'Display-only tile grid from The Briefcase difficulty (no match play yet).'

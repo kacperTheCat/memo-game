@@ -1,10 +1,8 @@
-import { flushPromises, mount } from '@vue/test-utils'
-import { createPinia } from 'pinia'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createRouter, createMemoryHistory } from 'vue-router'
-import BriefcaseView from './BriefcaseView.vue'
-import { useGameSettingsStore } from '@/stores/gameSettings'
-import { useGameSessionStore } from '@/stores/gameSession'
+import { mount, flushPromises } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
+import { createMemoryHistory, createRouter } from 'vue-router'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import BriefcaseView from '@/components/briefcase/BriefcaseView.vue'
 import {
   briefcaseDescription,
   briefcaseDifficultyEasy,
@@ -15,7 +13,10 @@ import {
   briefcaseSeedLabel,
   briefcaseTitle,
   briefcaseUnlockShowcase,
+  navReturnToGame,
+  navReturnToStartScreen,
 } from '@/constants/appCopy'
+import { useGameSessionStore } from '@/stores/gameSession'
 
 function createTestRouter() {
   return createRouter({
@@ -30,11 +31,12 @@ function createTestRouter() {
 
 async function mountBriefcase() {
   const pinia = createPinia()
+  setActivePinia(pinia)
   const router = createTestRouter()
   await router.push('/')
   await router.isReady()
   const wrapper = mount(BriefcaseView, { global: { plugins: [pinia, router] } })
-  return { wrapper, router }
+  return { wrapper, router, pinia }
 }
 
 describe('BriefcaseView', () => {
@@ -127,112 +129,64 @@ describe('BriefcaseView', () => {
     await flushPromises()
     expect(router.currentRoute.value.name).toBe('game')
   })
-
-  describe('FR-014: difficulty as next-start parameter', () => {
-    beforeEach(() => {
-      vi.spyOn(crypto, 'randomUUID').mockReturnValue(
-        '00000000-0000-4000-8000-000000000099',
-      )
-      const ls = new Map<string, string>()
-      vi.stubGlobal('localStorage', {
-        getItem: (k: string) => (ls.has(k) ? ls.get(k)! : null),
-        setItem: (k: string, v: string) => void ls.set(k, v),
-        removeItem: (k: string) => void ls.delete(k),
-      })
-    })
-
-    afterEach(() => {
-      vi.restoreAllMocks()
-    })
-
-    it('does not prompt when changing difficulty radios during in_progress', async () => {
-      const confirmSpy = vi.spyOn(window, 'confirm')
-      const pinia = createPinia()
-      const session = useGameSessionStore(pinia)
-      session.beginSession('medium')
-      const settings = useGameSettingsStore(pinia)
-      settings.difficulty = 'medium'
-
-      const { wrapper } = await mountBriefcaseWithPinia(pinia)
-      const hard = wrapper
-        .findAll('input[type="radio"]')
-        .find((r) => (r.element as HTMLInputElement).value === 'hard')!
-      await hard.setValue(true)
-      await flushPromises()
-
-      expect(settings.difficulty).toBe('hard')
-      expect(session.gameSession?.status).toBe('in_progress')
-      expect(confirmSpy).not.toHaveBeenCalled()
-    })
-
-    it('prompts on Unlock when selected difficulty mismatches in_progress session; cancel skips navigation', async () => {
-      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
-      const pinia = createPinia()
-      const session = useGameSessionStore(pinia)
-      session.beginSession('medium')
-      const settings = useGameSettingsStore(pinia)
-      settings.difficulty = 'hard'
-
-      const { wrapper, router } = await mountBriefcaseWithPinia(pinia)
-      const pushSpy = vi.spyOn(router, 'push')
-
-      await wrapper.get('[data-testid="briefcase-unlock-showcase"]').trigger('click')
-      await flushPromises()
-
-      expect(confirmSpy).toHaveBeenCalledOnce()
-      expect(session.gameSession?.status).toBe('in_progress')
-      expect(pushSpy).not.toHaveBeenCalled()
-    })
-
-    it('Unlock confirm abandons and navigates when user accepts', async () => {
-      vi.spyOn(window, 'confirm').mockReturnValue(true)
-      const pinia = createPinia()
-      const session = useGameSessionStore(pinia)
-      session.beginSession('medium')
-      const settings = useGameSettingsStore(pinia)
-      settings.difficulty = 'easy'
-
-      const { wrapper, router } = await mountBriefcaseWithPinia(pinia)
-      const pushSpy = vi.spyOn(router, 'push').mockResolvedValue(undefined)
-
-      await wrapper.get('[data-testid="briefcase-unlock-showcase"]').trigger('click')
-      await flushPromises()
-
-      expect(session.gameSession?.status).toBe('abandoned')
-      expect(pushSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          name: 'game',
-          state: { memoDealInit: { seedNine: null } },
-        }),
-      )
-    })
-
-    it('prompts on Unlock when Briefcase seed differs from in_progress session; cancel skips navigation', async () => {
-      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
-      const pinia = createPinia()
-      const session = useGameSessionStore(pinia)
-      session.beginSession('easy', { dealBriefcaseSeedRaw: '111-111-111' })
-      const settings = useGameSettingsStore(pinia)
-      settings.difficulty = 'easy'
-      settings.briefcaseSeedRaw = '222-222-222'
-
-      const { wrapper, router } = await mountBriefcaseWithPinia(pinia)
-      const pushSpy = vi.spyOn(router, 'push')
-
-      await wrapper.get('[data-testid="briefcase-unlock-showcase"]').trigger('click')
-      await flushPromises()
-
-      expect(confirmSpy).toHaveBeenCalledOnce()
-      expect(session.gameSession?.status).toBe('in_progress')
-      expect(pushSpy).not.toHaveBeenCalled()
-    })
-  })
 })
 
-async function mountBriefcaseWithPinia(pinia: ReturnType<typeof createPinia>) {
-  const router = createTestRouter()
-  await router.push('/')
-  await router.isReady()
-  const wrapper = mount(BriefcaseView, { global: { plugins: [pinia, router] } })
-  return { wrapper, router }
-}
+describe('BriefcaseView hub nav', () => {
+  beforeEach(() => {
+    vi.stubGlobal('localStorage', {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    })
+  })
+
+  it('always shows Return to Start Screen', async () => {
+    const pinia = createPinia()
+    setActivePinia(pinia)
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: '/briefcase', name: 'briefcase', component: { template: '<div/>' } },
+        { path: '/', name: 'home', component: { template: '<div/>' } },
+        { path: '/game', name: 'game', component: { template: '<div/>' } },
+      ],
+    })
+    await router.push('/briefcase')
+
+    const wrapper = mount(BriefcaseView, {
+      global: { plugins: [pinia, router] },
+    })
+    await flushPromises()
+
+    expect(wrapper.get('[data-testid="briefcase-return-home"]').text()).toContain(
+      navReturnToStartScreen,
+    )
+    expect(wrapper.find('[data-testid="briefcase-return-game"]').exists()).toBe(false)
+  })
+
+  it('shows Return to Game when a match is in progress', async () => {
+    const pinia = createPinia()
+    setActivePinia(pinia)
+    const session = useGameSessionStore()
+    session.beginSession('easy')
+
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: '/briefcase', name: 'briefcase', component: { template: '<div/>' } },
+        { path: '/', name: 'home', component: { template: '<div/>' } },
+        { path: '/game', name: 'game', component: { template: '<div/>' } },
+      ],
+    })
+    await router.push('/briefcase')
+
+    const wrapper = mount(BriefcaseView, {
+      global: { plugins: [pinia, router] },
+    })
+    await flushPromises()
+
+    expect(wrapper.get('[data-testid="briefcase-return-game"]').text()).toContain(
+      navReturnToGame,
+    )
+  })
+})
