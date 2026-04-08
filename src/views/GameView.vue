@@ -97,12 +97,13 @@ function onPlayAgain(): void {
   session.flushSave(play.memory)
 }
 
-function onReturnBriefcase(): void {
-  clearReloadNewGameDifficulty()
-  session.clearSession()
-  play.resetRound()
-  showDebrief.value = false
-  void router.push({ name: 'briefcase' })
+/**
+ * Navigate first: clearing session / hiding debrief before `push` completes remounts
+ * `GameCanvasShell` on `/game`, whose `stripMemoDealFromHistory()` `replace` can race and
+ * cancel this navigation (e2e: return to briefcase).
+ */
+async function onReturnBriefcase(): Promise<void> {
+  await router.push({ name: 'briefcase' })
 }
 </script>
 

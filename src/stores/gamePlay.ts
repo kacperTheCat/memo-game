@@ -13,10 +13,14 @@ import { gridDimensions } from '@/game/buildGridLayout'
 
 const MISMATCH_MS = 850
 
+export type DealInitKind = 'seeded' | 'random'
+
 export const useGamePlayStore = defineStore('gamePlay', () => {
   const memory = shallowRef<MemoryState | null>(null)
   const rows = ref(4)
   const cols = ref(4)
+  /** How the current board was shuffled (E2E / debug; snapshot hydrate = random). */
+  const dealInitKind = ref<DealInitKind>('random')
   let mismatchTimer: ReturnType<typeof setTimeout> | null = null
 
   function clearMismatchTimer(): void {
@@ -26,7 +30,11 @@ export const useGamePlayStore = defineStore('gamePlay', () => {
     }
   }
 
-  function startNewRound(grid: BuiltGrid, rng: () => number = Math.random): void {
+  function startNewRound(
+    grid: BuiltGrid,
+    rng: () => number = Math.random,
+    opts?: { dealInitKind?: DealInitKind },
+  ): void {
     clearMismatchTimer()
     const ids = shuffleIdentities(
       grid.cells.map((c) => c.identityIndex),
@@ -35,6 +43,7 @@ export const useGamePlayStore = defineStore('gamePlay', () => {
     memory.value = createInitialState(ids)
     rows.value = grid.rows
     cols.value = grid.cols
+    dealInitKind.value = opts?.dealInitKind ?? 'random'
   }
 
   function hydrateFromSnapshot(
@@ -54,6 +63,7 @@ export const useGamePlayStore = defineStore('gamePlay', () => {
     }
     rows.value = r
     cols.value = c
+    dealInitKind.value = 'random'
   }
 
   /**
@@ -99,6 +109,7 @@ export const useGamePlayStore = defineStore('gamePlay', () => {
     memory,
     rows,
     cols,
+    dealInitKind,
     startNewRound,
     hydrateFromSnapshot,
     tryPick,

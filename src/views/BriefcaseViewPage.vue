@@ -1,10 +1,21 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import BriefcaseView from '@/components/briefcase/BriefcaseView.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import { useBriefcaseNavigateToGame } from '@/composables/useBriefcaseNavigateToGame'
 import { navToGame, navToHome } from '@/constants/appCopy'
+import { isBriefcaseSeedIncompleteEntry } from '@/game/seedDeal'
+import { useGameSettingsStore } from '@/stores/gameSettings'
 
 const { navigateToGame } = useBriefcaseNavigateToGame()
+const settings = useGameSettingsStore()
+const { briefcaseSeedRaw } = storeToRefs(settings)
+const seedBlocksNav = computed(
+  () =>
+    isBriefcaseSeedIncompleteEntry(briefcaseSeedRaw.value) &&
+    settings.briefcaseSeedIncompleteAfterBlur,
+)
 </script>
 
 <template>
@@ -32,6 +43,7 @@ const { navigateToGame } = useBriefcaseNavigateToGame()
       <div class="mb-6 flex flex-wrap justify-end gap-2">
         <AppButton
           data-testid="nav-to-game"
+          :disabled="seedBlocksNav"
           @click="navigateToGame"
         >
           {{ navToGame }}

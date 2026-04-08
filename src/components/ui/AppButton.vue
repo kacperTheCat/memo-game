@@ -1,12 +1,21 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 
 defineOptions({ name: 'AppButton' })
 
-defineProps<{
+const props = defineProps<{
   /** When set, renders as RouterLink */
   to?: string
+  /** Native button only; ignored when `to` is set */
+  disabled?: boolean
 }>()
+
+const buttonClass = computed(() => {
+  const base =
+    'theme-nav-link rounded-[var(--memo-radius-md)] border border-memo-border bg-memo-surface px-4 py-2 text-sm font-medium text-memo-text transition-colors hover:border-white/20 hover:bg-memo-surface-hover'
+  return props.disabled ? `${base} cursor-not-allowed opacity-50` : base
+})
 </script>
 
 <template>
@@ -20,7 +29,8 @@ defineProps<{
   <button
     v-else
     type="button"
-    class="theme-nav-link rounded-[var(--memo-radius-md)] border border-memo-border bg-memo-surface px-4 py-2 text-sm font-medium text-memo-text transition-colors hover:border-white/20 hover:bg-memo-surface-hover"
+    :disabled="disabled"
+    :class="buttonClass"
   >
     <slot />
   </button>

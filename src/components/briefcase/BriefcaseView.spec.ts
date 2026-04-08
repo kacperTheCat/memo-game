@@ -11,6 +11,7 @@ import {
   briefcaseDifficultyHard,
   briefcaseDifficultyLabel,
   briefcaseDifficultyMedium,
+  briefcaseSeedIncompleteMessage,
   briefcaseSeedLabel,
   briefcaseTitle,
   briefcaseUnlockShowcase,
@@ -45,6 +46,39 @@ describe('BriefcaseView', () => {
     expect(wrapper.text()).toContain(briefcaseDifficultyLabel)
   })
 
+  it('shows incomplete seed chrome only after blur (FR-005b)', async () => {
+    const { wrapper } = await mountBriefcase()
+    const input = wrapper.get('[data-testid="briefcase-seed-input"]')
+    const unlock = wrapper.get('[data-testid="briefcase-unlock-showcase"]')
+    await input.setValue('12')
+    expect((unlock.element as HTMLButtonElement).disabled).toBe(false)
+    expect(
+      wrapper.find('[data-testid="briefcase-seed-incomplete-hint"]').exists(),
+    ).toBe(false)
+    await input.trigger('blur')
+    expect((unlock.element as HTMLButtonElement).disabled).toBe(true)
+    expect(wrapper.text()).toContain(briefcaseSeedIncompleteMessage)
+    expect(
+      wrapper.find('[data-testid="briefcase-seed-incomplete-hint"]').exists(),
+    ).toBe(true)
+    await input.setValue('123456789')
+    expect((unlock.element as HTMLButtonElement).disabled).toBe(false)
+    expect(
+      wrapper.find('[data-testid="briefcase-seed-incomplete-hint"]').exists(),
+    ).toBe(false)
+  })
+
+  it('masks nine-digit seed as xxx-xxx-xxx (005)', async () => {
+    const { wrapper } = await mountBriefcase()
+    const input = wrapper.get('[data-testid="briefcase-seed-input"]')
+    await input.setValue('123456789')
+    expect((input.element as HTMLInputElement).value).toBe('123-456-789')
+    await input.setValue('000000000')
+    expect((input.element as HTMLInputElement).value).toBe('000-000-000')
+    await input.setValue('abc12def34ghi56jkl78mno9')
+    expect((input.element as HTMLInputElement).value).toBe('123-456-789')
+  })
+
   it('uses only ASCII-visible copy in key strings (English UI sample)', () => {
     const ascii = /^[\t\n\r\x20-\x7E]+$/
     expect(briefcaseTitle).toMatch(ascii)
@@ -57,7 +91,7 @@ describe('BriefcaseView', () => {
     const input = wrapper.get('[data-testid="briefcase-seed-input"]')
     expect(input.attributes('type')).toBe('text')
     await input.setValue('test-seed-42')
-    expect((input.element as HTMLInputElement).value).toBe('test-seed-42')
+    expect((input.element as HTMLInputElement).value).toBe('42')
   })
 
   it('renders glass panel, difficulty radiogroup, and Unlock showcase (FR-010a–c)', async () => {
@@ -165,7 +199,32 @@ describe('BriefcaseView', () => {
       await flushPromises()
 
       expect(session.gameSession?.status).toBe('abandoned')
-      expect(pushSpy).toHaveBeenCalledWith({ name: 'game' })
+      expect(pushSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'game',
+          state: { memoDealInit: { seedNine: null } },
+        }),
+      )
+    })
+
+    it('prompts on Unlock when Briefcase seed differs from in_progress session; cancel skips navigation', async () => {
+      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
+      const pinia = createPinia()
+      const session = useGameSessionStore(pinia)
+      session.beginSession('easy', { dealBriefcaseSeedRaw: '111-111-111' })
+      const settings = useGameSettingsStore(pinia)
+      settings.difficulty = 'easy'
+      settings.briefcaseSeedRaw = '222-222-222'
+
+      const { wrapper, router } = await mountBriefcaseWithPinia(pinia)
+      const pushSpy = vi.spyOn(router, 'push')
+
+      await wrapper.get('[data-testid="briefcase-unlock-showcase"]').trigger('click')
+      await flushPromises()
+
+      expect(confirmSpy).toHaveBeenCalledOnce()
+      expect(session.gameSession?.status).toBe('in_progress')
+      expect(pushSpy).not.toHaveBeenCalled()
     })
   })
 })

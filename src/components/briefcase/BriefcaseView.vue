@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import BriefcaseGlassPanel from '@/components/briefcase/BriefcaseGlassPanel.vue'
 import { useBriefcaseNavigateToGame } from '@/composables/useBriefcaseNavigateToGame'
-import { useGameSettingsStore } from '@/stores/gameSettings'
+import { formatMaskedNineDigitsFromRawInput } from '@/composables/useNineDigitSeedMask'
 import {
   briefcaseDescription,
   briefcaseDifficultyEasy,
@@ -13,20 +13,30 @@ import {
   briefcaseDifficultyLabel,
   briefcaseDifficultyMedium,
   briefcaseDifficultyMediumSubtitle,
+  briefcaseSeedIncompleteMessage,
   briefcaseSeedLabel,
   briefcaseSeedPlaceholder,
   briefcaseTitle,
   briefcaseUnlockShowcase,
 } from '@/constants/appCopy'
+import { isBriefcaseSeedIncompleteEntry } from '@/game/seedDeal'
+import { useGameSettingsStore } from '@/stores/gameSettings'
 
 defineOptions({ name: 'BriefcaseView' })
 
-/** Client-only until the game loop consumes seed (spec FR-010d). */
-const seed = ref('')
-/** Shared with Game route (feature 003). */
 const gameSettings = useGameSettingsStore()
-const { difficulty } = storeToRefs(gameSettings)
+const { difficulty, briefcaseSeedRaw } = storeToRefs(gameSettings)
 const { navigateToGame } = useBriefcaseNavigateToGame()
+
+const seedIncomplete = computed(() =>
+  isBriefcaseSeedIncompleteEntry(briefcaseSeedRaw.value),
+)
+
+/** FR-005b: error chrome + disabled CTAs only after blur with partial seed. */
+const seedShowIncompleteChrome = computed(
+  () =>
+    seedIncomplete.value && gameSettings.briefcaseSeedIncompleteAfterBlur,
+)
 
 const difficultyRadiosName = 'briefcase-difficulty'
 
@@ -48,8 +58,18 @@ const difficultyOptions = [
   },
 ]
 
+function onSeedInput(ev: Event): void {
+  const el = ev.target as HTMLInputElement
+  const next = formatMaskedNineDigitsFromRawInput(el.value)
+  briefcaseSeedRaw.value = next
+  /** Keep DOM in sync when the tenth digit is dropped (FR-005a). */
+  if (el.value !== next) {
+    el.value = next
+  }
+  gameSettings.clearBriefcaseSeedIncompleteAfterBlurIfResolved()
+}
+
 function onUnlockShowcase(): void {
-  gameSettings.dealSeed = seed.value.trim() || null
   navigateToGame()
 }
 </script>
@@ -128,14 +148,39 @@ function onUnlockShowcase(): void {
           </label>
           <input
             id="briefcase-seed-input"
-            v-model="seed"
+            :value="briefcaseSeedRaw"
             type="text"
+            inputmode="numeric"
             name="game-seed"
             autocomplete="off"
             :placeholder="briefcaseSeedPlaceholder"
             data-testid="briefcase-seed-input"
-            class="w-full rounded-[var(--memo-radius-md)] border border-memo-border bg-black/30 px-4 py-3 text-sm text-memo-text placeholder:text-memo-muted/50 focus:border-memo-accent/50 focus:outline-none focus:ring-1 focus:ring-memo-accent/50"
+            :aria-invalid="seedShowIncompleteChrome"
+            :aria-required="seedShowIncompleteChrome"
+            :aria-describedby="
+              seedShowIncompleteChrome
+                ? 'briefcase-seed-incomplete-hint'
+                : undefined
+            "
+            :class="[
+              'w-full rounded-[var(--memo-radius-md)] border bg-black/30 px-4 py-3 text-sm text-memo-text placeholder:text-memo-muted/50 focus:outline-none focus:ring-1',
+              seedShowIncompleteChrome
+                ? 'border-red-400/70 focus:border-red-400/80 focus:ring-red-400/40'
+                : 'border-memo-border focus:border-memo-accent/50 focus:ring-memo-accent/50',
+            ]"
+            @focus="gameSettings.onBriefcaseSeedFieldFocus()"
+            @blur="gameSettings.onBriefcaseSeedFieldBlur()"
+            @input="onSeedInput"
           >
+          <p
+            v-if="seedShowIncompleteChrome"
+            id="briefcase-seed-incomplete-hint"
+            data-testid="briefcase-seed-incomplete-hint"
+            role="alert"
+            class="text-sm text-red-300/90"
+          >
+            {{ briefcaseSeedIncompleteMessage }}
+          </p>
         </div>
 
         <!-- CTA -->
@@ -143,7 +188,8 @@ function onUnlockShowcase(): void {
           <button
             type="button"
             data-testid="briefcase-unlock-showcase"
-            class="w-full rounded-[var(--memo-radius-md)] bg-memo-accent px-4 py-4 text-base font-semibold text-memo-cta-text shadow-[0_0_20px_rgb(228_168_52/0.3)] transition-all duration-300 hover:brightness-110 motion-safe:hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-memo-accent/80 focus:ring-offset-2 focus:ring-offset-memo-bg"
+            :disabled="seedShowIncompleteChrome"
+            class="w-full rounded-[var(--memo-radius-md)] bg-memo-accent px-4 py-4 text-base font-semibold text-memo-cta-text shadow-[0_0_20px_rgb(228_168_52/0.3)] transition-all duration-300 hover:brightness-110 motion-safe:hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-memo-accent/80 focus:ring-offset-2 focus:ring-offset-memo-bg disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
             @click="onUnlockShowcase"
           >
             {{ briefcaseUnlockShowcase }}

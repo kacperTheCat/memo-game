@@ -15,7 +15,12 @@ export const briefcaseTitle = 'The Briefcase'
 /** Main Menu glass title subline — matches `the_briefcase_main_menu/code.html`. */
 export const briefcaseDescription = 'Configure match parameters'
 export const briefcaseSeedLabel = 'Seed'
-export const briefcaseSeedPlaceholder = 'Optional seed for shuffled deals'
+export const briefcaseSeedPlaceholder =
+  'Optional — nine digits, same deal every time (xxx-xxx-xxx)'
+
+/** Shown when the field has 1–8 digits: must complete nine or clear to continue. */
+export const briefcaseSeedIncompleteMessage =
+  'Enter all nine digits to use a seed, or clear the field to play without one.'
 
 /** Difficulty block heading — matches export `Select Difficulty` (fieldset legend). */
 export const briefcaseDifficultyLabel = 'Select Difficulty'
@@ -28,6 +33,13 @@ export const briefcaseDifficultyMediumSubtitle = '6x6 Grid'
 export const briefcaseDifficultyHardSubtitle = '8x8 Grid'
 export const briefcaseUnlockShowcase = 'Unlock showcase'
 
-/** Shown when clicking Unlock showcase if selected difficulty ≠ in-progress session difficulty. */
+/**
+ * Shown when Briefcase → /game would abandon an in-progress round because **difficulty** and/or
+ * **Briefcase seed field** no longer match the session that started the current game (**FR-014** / **FR-006a**).
+ */
+export const briefcaseUnlockAbandonInProgress =
+  'You have a game in progress that does not match your current Briefcase settings (difficulty or seed). Continue to abandon it and start with your selection? A record will be saved for statistics (outcome: abandoned).'
+
+/** @deprecated Use `briefcaseUnlockAbandonInProgress` (same string; kept for spec / doc grep parity). */
 export const briefcaseUnlockAbandonDifferentDifficulty =
-  'You have a game in progress at a different difficulty. Start the showcase with your new selection and abandon the current game? A record will be saved for statistics (outcome: abandoned).'
+  briefcaseUnlockAbandonInProgress

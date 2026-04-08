@@ -7,12 +7,18 @@ import {
   ref,
   watch,
 } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import rawLibrary from '@/data/tile-library.json'
 import { buildGridCells, gridDimensions } from '@/game/buildGridLayout'
+import {
+  historyStateWithoutMemoDeal,
+  resolveRngAndDealKindForNewShuffle,
+} from '@/game/dealInitFromNavigation'
 import { cellRectsForGrid } from '@/game/cellRect'
 import { cellIndexFromPointer } from '@/game/canvasHitTest'
 import { BOARD_GAP_PX, BOARD_MAX_WIDTH_CSS } from '@/game/canvasLayout'
 import { drawTile } from '@/game/canvasTileDraw'
+import type { TilePhase } from '@/game/memoryTypes'
 import { consumeReloadNewGameDifficulty } from '@/game/reloadNewGameDifficulty'
 import { createSeededRandom } from '@/game/seededRng'
 import type { Difficulty, TileEntry, TileLibraryFile } from '@/game/tileLibraryTypes'
@@ -41,9 +47,25 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 const settings = useGameSettingsStore()
 const play = useGamePlayStore()
 const session = useGameSessionStore()
+const route = useRoute()
+const router = useRouter()
 
 const pointerCss = ref<{ x: number; y: number } | null>(null)
 const reducedMotion = ref(false)
+
+/** Dev-only: paint all tile faces (concealed + matched) as revealed for asset inspection. */
+const debugPeekAllFaces = ref(false)
+const showDebugPeekButton = import.meta.env.DEV
+
+function drawPhaseForCanvas(cellPhase: TilePhase, peekAll: boolean): TilePhase {
+  if (!peekAll) {
+    return cellPhase
+  }
+  if (cellPhase === 'concealed' || cellPhase === 'matched') {
+    return 'revealed'
+  }
+  return cellPhase
+}
 
 const layout = computed(() => buildGridCells(entries, settings.difficulty))
 
@@ -80,6 +102,21 @@ const identityOrderAttr = computed(() =>
 const ariaBoard = computed(() => {
   return `Memory game board, ${gridRows.value} by ${gridCols.value} tile grid`
 })
+
+const initialIdentitiesJson = computed(() => {
+  const m = play.memory
+  if (!m) {
+    return ''
+  }
+  return JSON.stringify(m.cells.map((c) => c.identityIndex))
+})
+
+async function stripMemoDealFromHistory(): Promise<void> {
+  await router.replace({
+    path: route.fullPath,
+    state: historyStateWithoutMemoDeal(window.history.state),
+  })
+}
 
 function assetUrl(imagePath: string): string {
   const base = import.meta.env.BASE_URL.endsWith('/')
@@ -259,7 +296,7 @@ async function paint(): Promise<void> {
     drawTile(
       ctx,
       r,
-      cell.phase,
+      drawPhaseForCanvas(cell.phase, debugPeekAllFaces.value),
       img,
       entry.color || '#334155',
       pointerCss.value,
@@ -290,14 +327,43 @@ function initRoundIfNeeded(): void {
     session.restoreFromSnapshot(snap)
     settings.$patch({ difficulty: snap.session.difficulty })
     play.hydrateFromSnapshot(snap.cells, snap.pair, snap.session.difficulty)
+    void stripMemoDealFromHistory()
   } else if (!play.memory) {
     const d = difficultyForFreshRound()
-    session.beginSession(d)
-    play.startNewRound(buildGridCells(entries, d), takeDealRng())
+    session.beginSession(d, {
+      dealBriefcaseSeedRaw: settings.briefcaseSeedRaw,
+    })
+    const memo = resolveRngAndDealKindForNewShuffle(
+      d,
+      window.history.state,
+      'briefcase-navigation',
+    )
+    let rng = memo.rng
+    let dealKind = memo.dealKind
+    if (memo.dealKind === 'random') {
+      rng = takeDealRng()
+      dealKind = rng === Math.random ? 'random' : 'seeded'
+    }
+    play.startNewRound(layout.value, rng, { dealInitKind: dealKind })
+    void stripMemoDealFromHistory()
   } else if (play.memory.cells.length !== layout.value.totalCells) {
     const d = difficultyForFreshRound()
-    session.beginSession(d)
-    play.startNewRound(buildGridCells(entries, d), takeDealRng())
+    session.beginSession(d, {
+      dealBriefcaseSeedRaw: settings.briefcaseSeedRaw,
+    })
+    const memo = resolveRngAndDealKindForNewShuffle(
+      d,
+      window.history.state,
+      'briefcase-navigation',
+    )
+    let rng = memo.rng
+    let dealKind = memo.dealKind
+    if (memo.dealKind === 'random') {
+      rng = takeDealRng()
+      dealKind = rng === Math.random ? 'random' : 'seeded'
+    }
+    play.startNewRound(layout.value, rng, { dealInitKind: dealKind })
+    void stripMemoDealFromHistory()
   }
 }
 
@@ -331,13 +397,19 @@ watch(
   { deep: true },
 )
 
+watch(debugPeekAllFaces, () => {
+  schedulePaint()
+})
+
 </script>
 
 <template>
   <div
     ref="shellRef"
-    class="game-canvas-shell mx-auto w-full max-w-[min(100%,1200px)] touch-manipulation px-2"
+    data-testid="game-canvas-shell"
+    class="game-canvas-shell relative mx-auto w-full max-w-[min(100%,1200px)] touch-manipulation px-2"
     :style="{ maxWidth: `${BOARD_MAX_WIDTH_CSS}px` }"
+    :data-deal-init="play.dealInitKind"
     @mousemove="onShellPointerMove"
     @touchmove.passive="onShellPointerMove"
   >
@@ -357,6 +429,26 @@ watch(
       :data-matched="String(matchedCount)"
       :data-identities="identityOrderAttr"
     />
+    <div
+      data-testid="game-initial-identities"
+      class="sr-only"
+      :data-identities="initialIdentitiesJson"
+    />
+    <button
+      v-if="showDebugPeekButton"
+      type="button"
+      class="absolute right-2 top-0 z-10 rounded border border-amber-600/80 bg-amber-950/90 px-2 py-1 text-xs font-medium text-amber-100 shadow hover:bg-amber-900/90"
+      data-testid="game-debug-peek-faces"
+      :aria-pressed="debugPeekAllFaces ? 'true' : 'false'"
+      :aria-label="
+        debugPeekAllFaces
+          ? 'Hide all tile faces (debug)'
+          : 'Show all tile faces (debug)'
+      "
+      @click="debugPeekAllFaces = !debugPeekAllFaces"
+    >
+      {{ debugPeekAllFaces ? 'Hide faces' : 'Debug: faces' }}
+    </button>
     <canvas
       ref="canvasRef"
       data-testid="game-canvas"
