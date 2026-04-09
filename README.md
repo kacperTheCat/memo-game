@@ -1,6 +1,6 @@
 # CS2 Memory
 
-Non-commercial **recruitment / portfolio** project: a Counter-Strike 2–themed memory game (in progress). This repository follows [.specify/memory/constitution.md](.specify/memory/constitution.md) (Vue 3, Canvas gameplay later, PWA, TDD, Playwright).
+Non-commercial **recruitment / portfolio** project: a Counter-Strike 2–themed memory game. This repository follows [.specify/memory/constitution.md](.specify/memory/constitution.md) (Vue 3, Canvas gameplay later, PWA, TDD, Playwright).
 
 ## Getting started
 
@@ -20,6 +20,10 @@ Open the URL shown in the terminal (default `http://127.0.0.1:5173`). The UI is 
 - **First visit offline:** You need one **online** session so the app and service worker assets can load. After that, the shell can load offline (see PWA section).
 
 More detail: [specs/001-project-setup/quickstart.md](specs/001-project-setup/quickstart.md).
+
+## Deploy (Vercel, SPA)
+
+This app is a **static SPA** (`pnpm build` → `dist/`). See **[specs/015-vercel-deployment/quickstart.md](specs/015-vercel-deployment/quickstart.md)** for Vercel project settings (Node 22, install/build/output), smoke checks, and optional `vercel.json` notes.
 
 ## Automation & CI
 
@@ -41,7 +45,7 @@ pnpm build
 pnpm exec playwright test                                     # preview on :4173
 ```
 
-GitHub Actions (`.github/workflows/ci.yml`) runs the same stages on push/PR.
+GitHub Actions (`.github/workflows/ci.yml`) runs **verify** (same checks as above) on push/PR. On **push** to `main` or `master` only, after **verify** succeeds, **deploy** runs `pnpm build` and uploads `dist/` to Vercel (production). Configure repo secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` (see **GitHub Actions** in [specs/015-vercel-deployment/quickstart.md](specs/015-vercel-deployment/quickstart.md)).
 
 ## PWA, offline, install
 

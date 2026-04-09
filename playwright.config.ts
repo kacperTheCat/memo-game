@@ -2,13 +2,13 @@ import { defineConfig, devices } from '@playwright/test'
 
 /**
  * Production-like E2E: build + vite preview on 4173 (constitution / FR-004).
- * Excludes bootstrap.spec.ts (uses playwright.bootstrap.config.ts).
+ * Excludes dev-server-only specs (see playwright.bootstrap.config.ts).
  */
 export default defineConfig({
   testDir: 'e2e',
   /** One baseline per screenshot name (regenerate on Linux for CI via Docker; see quickstart). */
   snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}{ext}',
-  testIgnore: '**/bootstrap.spec.ts',
+  testIgnore: ['**/bootstrap.spec.ts', '**/game-debug-peek-dev.spec.ts'],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
