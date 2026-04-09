@@ -8,6 +8,7 @@ import MemoSecondaryNavButton from '@/components/ui/MemoSecondaryNavButton.vue'
 import rawLibrary from '@/data/tile-library.json'
 import { useActivePlayTime } from '@/composables/useActivePlayTime'
 import { buildGridCells } from '@/game/buildGridLayout'
+import { gameShellMaxWidthStyle } from '@/game/gameShellLayout'
 import {
   clearReloadNewGameDifficulty,
   setReloadNewGameDifficulty,
@@ -140,7 +141,8 @@ async function onReturnBriefcase(): Promise<void> {
     class="relative flex min-h-screen min-w-[320px] flex-col bg-memo-bg px-4 py-6 text-memo-text"
   >
     <header
-      class="relative z-10 mb-4 flex w-full max-w-[min(100%,1200px)] items-center justify-between gap-3 self-center"
+      class="relative z-10 mb-4 mx-auto flex w-full items-center justify-between gap-3"
+      :style="gameShellMaxWidthStyle()"
     >
       <MemoSecondaryNavButton
         variant="back"
@@ -163,7 +165,10 @@ async function onReturnBriefcase(): Promise<void> {
       {{ session.storageError }}
     </p>
     <main class="relative z-10 flex flex-1 flex-col items-center justify-center">
-      <div class="relative w-full max-w-[min(100%,1200px)]">
+      <div
+        class="relative mx-auto w-full"
+        :style="gameShellMaxWidthStyle()"
+      >
         <GameCanvasShell @won="onGameWon" />
       </div>
     </main>
