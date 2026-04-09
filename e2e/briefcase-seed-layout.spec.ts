@@ -3,7 +3,7 @@ import {
   briefcaseSeedIncompleteMessage,
   briefcaseSeedLabel,
 } from '../src/constants/appCopy'
-import { STORAGE_IN_PROGRESS_KEY } from '../src/game/sessionConstants'
+import { STORAGE_IN_PROGRESS_KEY } from '../src/game/storage/sessionConstants'
 
 const goldenEasy000 = '[6,3,4,3,7,7,5,6,0,1,0,5,1,2,2,4]'
 

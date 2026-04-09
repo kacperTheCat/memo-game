@@ -1,8 +1,8 @@
 import {
   blocksPwaInstallSheet,
   readPwaInstallUiFromStorage,
-} from '@/game/pwaInstallUiStorage'
-import { SESSION_STORAGE_PWA_INSTALL_SHEET_OFFERED_KEY } from '@/game/sessionConstants'
+} from '@/game/storage/pwaInstallUiStorage'
+import { SESSION_STORAGE_PWA_INSTALL_SHEET_OFFERED_KEY } from '@/game/storage/sessionConstants'
 import { peekDeferredInstallPrompt } from '@/pwa/captureInstallPrompt'
 
 /** `true` when this tab already showed the install sheet once (sessionStorage). */

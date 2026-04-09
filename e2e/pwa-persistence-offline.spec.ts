@@ -4,7 +4,7 @@ import {
   BOARD_CANVAS_INSET_PX,
   BOARD_GAP_PX,
   boardStripLayout,
-} from '../src/game/canvasLayout'
+} from '../src/game/canvas/canvasLayout'
 
 async function waitForServiceWorkerActive(page: import('@playwright/test').Page): Promise<void> {
   await page.goto('/')

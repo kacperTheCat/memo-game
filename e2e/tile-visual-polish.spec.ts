@@ -4,7 +4,7 @@ import {
   BOARD_CANVAS_INSET_PX,
   BOARD_GAP_PX,
   boardStripLayout,
-} from '../src/game/canvasLayout'
+} from '../src/game/canvas/canvasLayout'
 
 test.describe('008 tile visual polish', () => {
   test('US1: new game starts with all tiles concealed (no pre-reveal)', async ({

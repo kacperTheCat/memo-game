@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { pwaInstallFallbackHint } from '@/constants/appCopy'
-import { usePwaInstallFallbackHint } from '@/composables/usePwaInstallFallbackHint'
+import { usePwaInstallFallbackHint } from '@/composables/pwa/usePwaInstallFallbackHint'
 
 const { showFallbackHint } = usePwaInstallFallbackHint()
 </script>

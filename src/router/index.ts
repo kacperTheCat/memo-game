@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { clearReloadNewGameDifficulty } from '@/game/reloadNewGameDifficulty'
-import { useGamePlayStore } from '@/stores/gamePlay'
-import { useGameSessionStore } from '@/stores/gameSession'
-import BriefcaseViewPage from '@/views/BriefcaseViewPage.vue'
-import GameView from '@/views/GameView.vue'
-import HomeView from '@/views/HomeView.vue'
+import { clearReloadNewGameDifficulty } from '@/game/storage/reloadNewGameDifficulty'
+import { useGamePlayStore } from '@/stores/game/gamePlay'
+import { useGameSessionStore } from '@/stores/game/gameSession'
+import BriefcaseViewPage from '@/views/briefcase/BriefcaseViewPage.vue'
+import GameView from '@/views/game/GameView.vue'
+import HomeView from '@/views/home/HomeView.vue'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

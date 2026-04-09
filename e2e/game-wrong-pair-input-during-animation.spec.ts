@@ -3,7 +3,7 @@ import {
   BOARD_CANVAS_INSET_PX,
   BOARD_GAP_PX,
   boardStripLayout,
-} from '../src/game/canvasLayout'
+} from '../src/game/canvas/canvasLayout'
 
 test.describe('wrong-pair input during mismatch animation (016)', () => {
   test('third concealed pick accepted before mismatch timer finishes', async ({

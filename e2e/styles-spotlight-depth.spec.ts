@@ -4,7 +4,7 @@ import {
   BOARD_CANVAS_INSET_PX,
   BOARD_GAP_PX,
   boardStripLayout,
-} from '../src/game/canvasLayout'
+} from '../src/game/canvas/canvasLayout'
 
 test.describe('010 ambient spotlight depth', () => {
   test('home shows ambient spotlight below main column in DOM order', async ({

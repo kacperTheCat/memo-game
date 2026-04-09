@@ -6,7 +6,7 @@ import {
   pwaInstallButtonInstall,
   pwaInstallTitle,
 } from '@/constants/appCopy'
-import { usePwaInstallPrompt } from '@/composables/usePwaInstallPrompt'
+import { usePwaInstallPrompt } from '@/composables/pwa/usePwaInstallPrompt'
 
 const { visible, confirmInstall, dismiss } = usePwaInstallPrompt()
 

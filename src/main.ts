@@ -4,8 +4,8 @@ import {
   hydrateGameSettingsFromStorage,
   persistPlayerSettingsFromStore,
   subscribeDebouncedPlayerSettingsPersistence,
-} from '@/game/playerSettingsStorage'
-import { useGameSettingsStore } from '@/stores/gameSettings'
+} from '@/game/storage/playerSettingsStorage'
+import { useGameSettingsStore } from '@/stores/game/gameSettings'
 import { registerInstallPromptCapture } from '@/pwa/captureInstallPrompt'
 import { router } from './router'
 import { pinia } from './stores'

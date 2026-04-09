@@ -4,7 +4,7 @@ import {
   BOARD_CANVAS_INSET_PX,
   BOARD_GAP_PX,
   boardStripLayout,
-} from '../src/game/canvasLayout'
+} from '../src/game/canvas/canvasLayout'
 
 test.describe('game core playthrough', () => {
   test('single tile pick reveals one face', async ({ page }) => {
