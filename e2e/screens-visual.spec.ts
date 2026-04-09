@@ -60,6 +60,7 @@ test.describe('013 screens visual', () => {
     const shell = page.getByTestId('game-canvas-shell')
     await expect(shell).toBeVisible()
     await expect(page.getByTestId('game-canvas')).toBeVisible()
+    await expect(page.getByTestId('game-canvas-assets-loading')).not.toBeVisible()
     await expect(shell).toHaveScreenshot('game-canvas-shell.png', {
       animations: 'disabled',
       maxDiffPixelRatio: 0.04,

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import { storeToRefs } from "pinia";
 import { playUiClick } from "@/audio/gameSfx";
+import { scheduleTileImageWarmup } from "@/game/tiles/tileImagePreload";
 import SessionHistoryLedger from "@/components/game/SessionHistoryLedger.vue";
 import MemoAmbientSpotlight from "@/components/ambient/MemoAmbientSpotlight.vue";
 import HubGrainLayer from "@/components/layout/HubGrainLayer.vue";
@@ -14,11 +15,17 @@ import {
   primaryHeading,
 } from "@/constants/appCopy";
 import { useGameSessionStore } from "@/stores/game/gameSession";
+import { useGameSettingsStore } from "@/stores/game/gameSettings";
 
 defineOptions({ name: "HomeView" });
 
 const session = useGameSessionStore();
+const settings = useGameSettingsStore();
 const { gameSession } = storeToRefs(session);
+
+onMounted(() => {
+  scheduleTileImageWarmup(settings.difficulty);
+});
 
 const showReturnToGame = computed(
   () => gameSession.value?.status === "in_progress",

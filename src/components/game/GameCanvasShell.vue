@@ -175,6 +175,12 @@ let observer: ResizeObserver | null = null
 let lastPaintMs = performance.now()
 let mismatchStartedAt: number | null = null
 let lastDealSig = ''
+/** Bumps when the deal identity set changes so stale image-load callbacks ignore. */
+let tileLoadEpoch = 0
+let lastTileLoadKickEpoch = -1
+
+const shellAssetsPending = ref(false)
+const tileImagesLoadFailed = ref(false)
 
 interface CollectFlightState {
   a: number
@@ -571,6 +577,9 @@ async function paint(): Promise<void> {
   const dealSig = mem.cells.map((c) => c.identityIndex).join(',')
   if (dealSig !== lastDealSig) {
     lastDealSig = dealSig
+    tileLoadEpoch++
+    lastTileLoadKickEpoch = -1
+    tileImagesLoadFailed.value = false
     seedAnimFromMemory(mem)
     mismatchStartedAt = null
     collectFlight = null
@@ -698,9 +707,40 @@ async function paint(): Promise<void> {
   for (const c of mem.cells) {
     paths.add(entryForIdentityInDeal(c.identityIndex).imagePath)
   }
-  try {
-    await Promise.all([...paths].map((p) => ensureImage(p)))
-  } catch {
+  const pathsArr = [...paths]
+  const allImagesCached =
+    pathsArr.length === 0 ||
+    pathsArr.every((p) => {
+      const img = imageCache.get(p)
+      return img?.complete && img.naturalWidth > 0
+    })
+
+  const nextPending =
+    !tileImagesLoadFailed.value &&
+    pathsArr.length > 0 &&
+    !allImagesCached
+  if (shellAssetsPending.value !== nextPending) {
+    shellAssetsPending.value = nextPending
+  }
+
+  if (!allImagesCached && lastTileLoadKickEpoch !== tileLoadEpoch) {
+    lastTileLoadKickEpoch = tileLoadEpoch
+    const epoch = tileLoadEpoch
+    void Promise.all(pathsArr.map((p) => ensureImage(p)))
+      .then(() => {
+        if (epoch === tileLoadEpoch) {
+          schedulePaint()
+        }
+      })
+      .catch(() => {
+        if (epoch === tileLoadEpoch) {
+          tileImagesLoadFailed.value = true
+          schedulePaint()
+        }
+      })
+  }
+
+  if (tileImagesLoadFailed.value) {
     ctx.fillStyle = '#1e293b'
     ctx.fillRect(0, 0, cssW, cssH)
     return
@@ -971,8 +1011,21 @@ watch(debugPeekAllFaces, () => {
       class="aspect-square max-h-[min(70vh,900px)] w-full rounded-memo-md border border-memo-border bg-memo-surface"
       role="img"
       :aria-label="ariaBoard"
+      :aria-busy="shellAssetsPending ? 'true' : 'false'"
       @click="onCanvasPick"
       @touchend.prevent="onCanvasPick"
     />
+    <div
+      v-if="shellAssetsPending"
+      data-testid="game-canvas-assets-loading"
+      class="pointer-events-none absolute inset-0 flex items-center justify-center rounded-memo-md"
+      aria-live="polite"
+    >
+      <span
+        class="rounded-memo-md border border-memo-border/80 bg-memo-surface/90 px-3 py-1.5 text-xs font-medium text-slate-400 shadow backdrop-blur-sm"
+      >
+        Loading artwork…
+      </span>
+    </div>
   </div>
 </template>

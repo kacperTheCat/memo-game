@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { playUiClick } from '@/audio/gameSfx'
 import BriefcaseGlassPanel from '@/components/briefcase/BriefcaseGlassPanel.vue'
@@ -29,6 +29,7 @@ import {
   navReturnToStartScreen,
 } from '@/constants/appCopy'
 import { isBriefcaseSeedIncompleteEntry } from '@/game/seed/seedDeal'
+import { scheduleTileImageWarmup } from '@/game/tiles/tileImagePreload'
 import { useGameSettingsStore } from '@/stores/game/gameSettings'
 
 defineOptions({ name: 'BriefcaseView' })
@@ -37,6 +38,14 @@ const gameSettings = useGameSettingsStore()
 const { difficulty, briefcaseSeedRaw } = storeToRefs(gameSettings)
 const session = useGameSessionStore()
 const { gameSession } = storeToRefs(session)
+
+onMounted(() => {
+  scheduleTileImageWarmup(difficulty.value)
+})
+
+watch(difficulty, (d) => {
+  scheduleTileImageWarmup(d)
+})
 
 const mismatchDialogOpen = ref(false)
 const mismatchDialogMessage = ref('')
