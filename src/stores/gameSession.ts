@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import type { MemoryState } from '@/game/memoryEngine'
 import type {
   CompletedSessionRecord,
   GameSession,
   SessionSnapshot,
+  SnapshotTileCell,
 } from '@/game/memoryTypes'
 import type { Difficulty } from '@/game/tileLibraryTypes'
 import {
@@ -97,7 +99,12 @@ export const useGameSessionStore = defineStore('gameSession', () => {
     return {
       schemaVersion: 1,
       session: { ...s },
-      cells: memory.cells.map((c) => ({ ...c })),
+      cells: memory.cells.map(
+        (c): SnapshotTileCell => ({
+          identityIndex: c.identityIndex,
+          phase: c.phase,
+        }),
+      ),
       pair: { ...memory.pair },
     }
   }

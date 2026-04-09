@@ -5,7 +5,14 @@ export type TilePhase = 'concealed' | 'revealed' | 'matched'
 export interface TileRuntimeState {
   identityIndex: number
   phase: TilePhase
+  /** Ephemeral; never persist to SessionSnapshot. */
   flipProgress?: number
+}
+
+/** Persisted cell shape — animation fields stripped in `buildSnapshot`. */
+export interface SnapshotTileCell {
+  identityIndex: number
+  phase: TilePhase
 }
 
 export interface PairResolutionState {
@@ -31,7 +38,7 @@ export interface GameSession {
 export interface SessionSnapshot {
   schemaVersion: number
   session: GameSession
-  cells: TileRuntimeState[]
+  cells: SnapshotTileCell[]
   pair: PairResolutionState
 }
 

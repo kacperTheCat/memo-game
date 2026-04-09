@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test'
 
-const GAP = 6
+import {
+  BOARD_CANVAS_INSET_PX,
+  BOARD_GAP_PX,
+  boardStripLayout,
+} from '../src/game/canvasLayout'
 
 async function solveSeededEasyGame(
   page: import('@playwright/test').Page,
@@ -31,14 +35,19 @@ async function solveSeededEasyGame(
 
   const box = await canvas.boundingBox()
   expect(box).toBeTruthy()
-  const cellW = (box!.width - GAP * (cols - 1)) / cols
-  const cellH = (box!.height - GAP * (rows - 1)) / rows
+  const { boardH } = boardStripLayout(box!.width, box!.height)
+  const iw = box!.width - 2 * BOARD_CANVAS_INSET_PX
+  const ih = boardH - 2 * BOARD_CANVAS_INSET_PX
+  const cellW = (iw - BOARD_GAP_PX * (cols - 1)) / cols
+  const cellH = (ih - BOARD_GAP_PX * (rows - 1)) / rows
 
   async function clickCell(cellIndex: number): Promise<void> {
     const row = Math.floor(cellIndex / cols)
     const col = cellIndex % cols
-    const x = col * (cellW + GAP) + cellW / 2
-    const y = row * (cellH + GAP) + cellH / 2
+    const x =
+      BOARD_CANVAS_INSET_PX + col * (cellW + BOARD_GAP_PX) + cellW / 2
+    const y =
+      BOARD_CANVAS_INSET_PX + row * (cellH + BOARD_GAP_PX) + cellH / 2
     await canvas.click({ position: { x, y } })
   }
 

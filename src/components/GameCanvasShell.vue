@@ -14,11 +14,34 @@ import {
   historyStateWithoutMemoDeal,
   resolveRngAndDealKindForNewShuffle,
 } from '@/game/dealInitFromNavigation'
-import { cellRectsForGrid } from '@/game/cellRect'
+import { cellRectsForGrid, type CellRect } from '@/game/cellRect'
 import { cellIndexFromPointer } from '@/game/canvasHitTest'
-import { BOARD_GAP_PX, BOARD_MAX_WIDTH_CSS } from '@/game/canvasLayout'
+import { easeOutCubic } from '@/game/animationEasing'
+import {
+  BOARD_CANVAS_INSET_PX,
+  BOARD_GAP_PX,
+  BOARD_MAX_WIDTH_CSS,
+  boardStripLayout,
+} from '@/game/canvasLayout'
+import {
+  lerpCollectRect,
+  stripChipRect,
+} from '@/game/collectStripLayout'
 import { drawTile } from '@/game/canvasTileDraw'
 import type { TilePhase } from '@/game/memoryTypes'
+import {
+  TILE_COLLECT_MS,
+  TILE_FLIP_MS,
+  TILE_MATCH_FADE_MS,
+  TILE_MISMATCH_FLIP_BACK_MS,
+  TILE_MISMATCH_SHAKE_MS,
+  TILE_SHAKE_PX_MAX,
+} from '@/game/tileMotionConstants'
+import { parallaxOffset } from '@/game/tileParallax'
+import {
+  smoothParallaxOffsets,
+  staggerFactor,
+} from '@/game/tileParallaxSmooth'
 import { consumeReloadNewGameDifficulty } from '@/game/reloadNewGameDifficulty'
 import { createSeededRandom } from '@/game/seededRng'
 import type { Difficulty, TileEntry, TileLibraryFile } from '@/game/tileLibraryTypes'
@@ -163,6 +186,239 @@ function subsetEntry(identityIndex: number): TileEntry {
 
 let raf = 0
 let observer: ResizeObserver | null = null
+let lastPaintMs = performance.now()
+let mismatchStartedAt: number | null = null
+let lastDealSig = ''
+
+interface CollectFlightState {
+  a: number
+  b: number
+  identityIndex: number
+  t: number
+  fromA: CellRect
+  fromB: CellRect
+}
+
+let collectFlight: CollectFlightState | null = null
+const collectQueue: Omit<CollectFlightState, 't'>[] = []
+
+const stripChips = ref<{ identityIndex: number }[]>([])
+const mismatchPhaseUi = ref<'idle' | 'shake' | 'flip_back'>('idle')
+
+/** Ephemeral animation buffers (not persisted). */
+const reveal01: number[] = []
+const matchFade01: number[] = []
+const prevPhases: TilePhase[] = []
+const parallaxSm: { ox: number; oy: number }[] = []
+
+function resizeAnimBuffers(n: number): void {
+  while (reveal01.length < n) {
+    reveal01.push(1)
+    matchFade01.push(0)
+    prevPhases.push('concealed')
+    parallaxSm.push({ ox: 0, oy: 0 })
+  }
+  reveal01.length = n
+  matchFade01.length = n
+  prevPhases.length = n
+  parallaxSm.length = n
+}
+
+function seedAnimFromMemory(mem: { cells: { phase: TilePhase }[] }): void {
+  const n = mem.cells.length
+  resizeAnimBuffers(n)
+  for (let i = 0; i < n; i++) {
+    const ph = mem.cells[i]!.phase
+    prevPhases[i] = ph
+    reveal01[i] = ph === 'concealed' ? 1 : 1
+    matchFade01[i] = ph === 'matched' ? 1 : 0
+  }
+}
+
+function stripChipsFromMemory(mem: {
+  cells: { phase: TilePhase; identityIndex: number }[]
+}): { identityIndex: number }[] {
+  const seen = new Set<number>()
+  const out: { identityIndex: number }[] = []
+  for (const c of mem.cells) {
+    if (c.phase === 'matched' && !seen.has(c.identityIndex)) {
+      seen.add(c.identityIndex)
+      out.push({ identityIndex: c.identityIndex })
+    }
+  }
+  return out
+}
+
+function syncAnimEdges(mem: {
+  cells: { phase: TilePhase }[]
+}): number[] {
+  const newlyMatched: number[] = []
+  const n = mem.cells.length
+  for (let i = 0; i < n; i++) {
+    const phase = mem.cells[i]!.phase
+    const prev = prevPhases[i]
+    if (prev === 'concealed' && phase === 'revealed') {
+      reveal01[i] = 0
+    }
+    if (prev !== 'matched' && phase === 'matched') {
+      matchFade01[i] = 1
+      newlyMatched.push(i)
+    }
+    prevPhases[i] = phase
+  }
+  return newlyMatched
+}
+
+function advanceAnim(
+  mem: { cells: { phase: TilePhase }[] },
+  dt: number,
+): boolean {
+  let active = false
+  const n = mem.cells.length
+  for (let i = 0; i < n; i++) {
+    const ph = mem.cells[i]!.phase
+    if (ph === 'revealed' || ph === 'matched') {
+      if (reveal01[i]! < 1) {
+        reveal01[i] = Math.min(1, reveal01[i]! + dt / TILE_FLIP_MS)
+        active = true
+      }
+    }
+    if (
+      ph === 'matched' &&
+      matchFade01[i]! < 1 &&
+      TILE_MATCH_FADE_MS > 0
+    ) {
+      matchFade01[i] = Math.min(1, matchFade01[i]! + dt / TILE_MATCH_FADE_MS)
+      active = true
+    }
+  }
+  return active
+}
+
+function mismatchShake(now: number, mem: typeof play.memory): number {
+  if (!mem || reducedMotion.value) {
+    return 0
+  }
+  const { firstIndex, secondIndex, locked } = mem.pair
+  if (!locked || firstIndex === null || secondIndex === null) {
+    mismatchStartedAt = null
+    return 0
+  }
+  const a = mem.cells[firstIndex]
+  const b = mem.cells[secondIndex]
+  if (!a || !b || a.identityIndex === b.identityIndex) {
+    mismatchStartedAt = null
+    return 0
+  }
+  if (mismatchStartedAt === null) {
+    mismatchStartedAt = now
+  }
+  const t = now - mismatchStartedAt
+  if (t >= TILE_MISMATCH_SHAKE_MS) {
+    return 0
+  }
+  const env = 1 - easeOutCubic(Math.min(1, t / TILE_MISMATCH_SHAKE_MS))
+  return Math.sin(t * 0.022) * TILE_SHAKE_PX_MAX * env
+}
+
+function mismatchConceal01ForCell(
+  now: number,
+  mem: typeof play.memory,
+  cellIndex: number,
+): number | undefined {
+  if (!mem) {
+    return undefined
+  }
+  const { firstIndex, secondIndex, locked } = mem.pair
+  if (!locked || firstIndex === null || secondIndex === null) {
+    return undefined
+  }
+  if (cellIndex !== firstIndex && cellIndex !== secondIndex) {
+    return undefined
+  }
+  const a = mem.cells[firstIndex]
+  const b = mem.cells[secondIndex]
+  if (!a || !b || a.identityIndex === b.identityIndex) {
+    return undefined
+  }
+  if (reducedMotion.value) {
+    return 1
+  }
+  if (mismatchStartedAt === null) {
+    return undefined
+  }
+  const elapsed = now - mismatchStartedAt
+  if (elapsed < TILE_MISMATCH_SHAKE_MS) {
+    return undefined
+  }
+  return Math.min(
+    1,
+    (elapsed - TILE_MISMATCH_SHAKE_MS) / TILE_MISMATCH_FLIP_BACK_MS,
+  )
+}
+
+function computeMismatchPhaseUi(
+  now: number,
+  mem: typeof play.memory,
+): 'idle' | 'shake' | 'flip_back' {
+  if (!mem) {
+    return 'idle'
+  }
+  const { firstIndex, secondIndex, locked } = mem.pair
+  if (!locked || firstIndex === null || secondIndex === null) {
+    return 'idle'
+  }
+  const a = mem.cells[firstIndex]
+  const b = mem.cells[secondIndex]
+  if (!a || !b || a.identityIndex === b.identityIndex) {
+    return 'idle'
+  }
+  if (reducedMotion.value) {
+    return 'flip_back'
+  }
+  if (mismatchStartedAt === null) {
+    return 'shake'
+  }
+  const elapsed = now - mismatchStartedAt
+  if (elapsed < TILE_MISMATCH_SHAKE_MS) {
+    return 'shake'
+  }
+  return 'flip_back'
+}
+
+function animationActive(
+  mem: typeof play.memory,
+  parallaxSettling: boolean,
+): boolean {
+  if (!mem) {
+    return false
+  }
+  if (parallaxSettling) {
+    return true
+  }
+  const n = mem.cells.length
+  for (let i = 0; i < n; i++) {
+    const ph = mem.cells[i]!.phase
+    if ((ph === 'revealed' || ph === 'matched') && reveal01[i]! < 0.999) {
+      return true
+    }
+    if (ph === 'matched' && matchFade01[i]! < 0.999) {
+      return true
+    }
+  }
+  const { locked, firstIndex, secondIndex } = mem.pair
+  if (locked && firstIndex !== null && secondIndex !== null) {
+    const a = mem.cells[firstIndex]
+    const b = mem.cells[secondIndex]
+    if (a && b && a.identityIndex !== b.identityIndex) {
+      return true
+    }
+  }
+  if (collectFlight !== null) {
+    return true
+  }
+  return false
+}
 
 function updatePointerCss(ev: MouseEvent | TouchEvent): void {
   const canvas = canvasRef.value
@@ -248,6 +504,10 @@ async function paint(): Promise<void> {
     return
   }
 
+  const now = performance.now()
+  const dt = Math.min(64, Math.max(0, now - lastPaintMs))
+  lastPaintMs = now
+
   const rect = wrap.getBoundingClientRect()
   const cssW = Math.max(1, rect.width)
   const cssH = Math.max(1, rect.height)
@@ -271,7 +531,107 @@ async function paint(): Promise<void> {
 
   const rows = gridRows.value
   const cols = gridCols.value
-  const { rects } = cellRectsForGrid(cssW, cssH, rows, cols, BOARD_GAP_PX)
+  const bs = boardStripLayout(cssW, cssH)
+  ctx.fillStyle = '#0c1329'
+  ctx.fillRect(0, bs.stripY, cssW, bs.stripH)
+  const { rects } = cellRectsForGrid(
+    cssW,
+    bs.boardH,
+    rows,
+    cols,
+    BOARD_GAP_PX,
+    BOARD_CANVAS_INSET_PX,
+  )
+  const n = mem.cells.length
+
+  const dealSig = mem.cells.map((c) => c.identityIndex).join(',')
+  if (dealSig !== lastDealSig) {
+    lastDealSig = dealSig
+    seedAnimFromMemory(mem)
+    mismatchStartedAt = null
+    collectFlight = null
+    collectQueue.length = 0
+    stripChips.value = stripChipsFromMemory(mem)
+  } else {
+    const newlyMatched = syncAnimEdges(mem)
+    if (newlyMatched.length === 2) {
+      const [i0, i1] = [...newlyMatched].sort((x, y) => x - y)
+      const id0 = mem.cells[i0]!.identityIndex
+      const id1 = mem.cells[i1]!.identityIndex
+      if (id0 === id1) {
+        const ra = rects[i0]
+        const rb = rects[i1]
+        if (ra && rb) {
+          if (reducedMotion.value) {
+            stripChips.value.push({ identityIndex: id0 })
+          } else {
+            const payload: Omit<CollectFlightState, 't'> = {
+              a: i0,
+              b: i1,
+              identityIndex: id0,
+              fromA: ra,
+              fromB: rb,
+            }
+            if (collectFlight) {
+              collectQueue.push(payload)
+            } else {
+              collectFlight = { ...payload, t: 0 }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (collectFlight && !reducedMotion.value) {
+    collectFlight.t += dt / TILE_COLLECT_MS
+    if (collectFlight.t >= 1) {
+      stripChips.value.push({ identityIndex: collectFlight.identityIndex })
+      collectFlight = null
+      const next = collectQueue.shift()
+      if (next) {
+        collectFlight = { ...next, t: 0 }
+      }
+    }
+  }
+
+  const shakeBase = mismatchShake(now, mem)
+  const animAdvancing = advanceAnim(mem, dt)
+
+  const targets: { ox: number; oy: number }[] = []
+  let parallaxEpsilon = 0
+  for (let i = 0; i < n; i++) {
+    const r = rects[i]
+    if (!r) {
+      targets.push({ ox: 0, oy: 0 })
+      continue
+    }
+    if (pointerCss.value && !reducedMotion.value) {
+      const cx = r.x + r.w / 2
+      const cy = r.y + r.h / 2
+      const p = parallaxOffset(
+        pointerCss.value.x,
+        pointerCss.value.y,
+        cx,
+        cy,
+      )
+      const g = staggerFactor(i, cols)
+      targets.push({ ox: p.ox * g, oy: p.oy * g })
+    } else {
+      targets.push({ ox: 0, oy: 0 })
+    }
+  }
+  const nextSm = smoothParallaxOffsets(parallaxSm, targets, dt)
+  for (let i = 0; i < n; i++) {
+    parallaxSm[i] = nextSm[i] ?? { ox: 0, oy: 0 }
+    const t = targets[i] ?? { ox: 0, oy: 0 }
+    const s = parallaxSm[i]!
+    parallaxEpsilon = Math.max(
+      parallaxEpsilon,
+      Math.hypot(t.ox - s.ox, t.oy - s.oy),
+    )
+  }
+  const parallaxSettling = parallaxEpsilon > 0.08 && !reducedMotion.value
 
   const paths = new Set<string>()
   for (const c of mem.cells) {
@@ -293,15 +653,98 @@ async function paint(): Promise<void> {
     }
     const entry = subsetEntry(cell.identityIndex)
     const img = imageCache.get(entry.imagePath)
-    drawTile(
-      ctx,
-      r,
-      drawPhaseForCanvas(cell.phase, debugPeekAllFaces.value),
+    const canvasPhase = drawPhaseForCanvas(cell.phase, debugPeekAllFaces.value)
+    const { firstIndex, secondIndex, locked } = mem.pair
+    const isMismatchTile =
+      locked &&
+      firstIndex !== null &&
+      secondIndex !== null &&
+      (i === firstIndex || i === secondIndex) &&
+      mem.cells[firstIndex]!.identityIndex !== mem.cells[secondIndex]!.identityIndex
+    const conceal = mismatchConceal01ForCell(now, mem, i)
+    drawTile(ctx, r, {
+      phase: canvasPhase,
       img,
-      entry.color || '#334155',
-      pointerCss.value,
-      reducedMotion.value,
-    )
+      catalogColor: entry.color || '#334155',
+      rarity: entry.rarity || '',
+      parallax: parallaxSm[i] ?? { ox: 0, oy: 0 },
+      reducedMotion: reducedMotion.value,
+      reveal01: debugPeekAllFaces.value ? 1 : (reveal01[i] ?? 1),
+      matchFade01: matchFade01[i] ?? 0,
+      shakePx:
+        isMismatchTile && conceal === undefined ? shakeBase : 0,
+      mismatchConceal01: conceal,
+      forceShowFace: debugPeekAllFaces.value,
+    })
+  }
+
+  const nStrip = stripChips.value.length
+  for (let s = 0; s < nStrip; s++) {
+    const chip = stripChips.value[s]!
+    const tr = stripChipRect(bs.stripY, bs.stripH, cssW, s, nStrip)
+    const e = subsetEntry(chip.identityIndex)
+    const simg = imageCache.get(e.imagePath)
+    drawTile(ctx, tr, {
+      phase: 'revealed',
+      img: simg,
+      catalogColor: e.color || '#334155',
+      rarity: e.rarity || '',
+      parallax: { ox: 0, oy: 0 },
+      reducedMotion: reducedMotion.value,
+      reveal01: 1,
+      matchFade01: 0,
+      shakePx: 0,
+      forceShowFace: debugPeekAllFaces.value,
+    })
+  }
+
+  if (collectFlight && !reducedMotion.value) {
+    const cf = collectFlight
+    const nextCount = stripChips.value.length + 1
+    const slot = stripChips.value.length
+    const tr = stripChipRect(bs.stripY, bs.stripH, cssW, slot, nextCount)
+    const tcx = tr.x + tr.w / 2
+    const tcy = tr.y + tr.h / 2
+    const ra = lerpCollectRect(cf.fromA, tcx, tcy, tr.w, tr.h, cf.t)
+    const rb = lerpCollectRect(cf.fromB, tcx, tcy, tr.w, tr.h, cf.t)
+    const e = subsetEntry(cf.identityIndex)
+    const simg = imageCache.get(e.imagePath)
+    drawTile(ctx, ra, {
+      phase: 'revealed',
+      img: simg,
+      catalogColor: e.color || '#334155',
+      rarity: e.rarity || '',
+      parallax: { ox: 0, oy: 0 },
+      reducedMotion: reducedMotion.value,
+      reveal01: 1,
+      matchFade01: 0,
+      shakePx: 0,
+      forceShowFace: debugPeekAllFaces.value,
+    })
+    drawTile(ctx, rb, {
+      phase: 'revealed',
+      img: simg,
+      catalogColor: e.color || '#334155',
+      rarity: e.rarity || '',
+      parallax: { ox: 0, oy: 0 },
+      reducedMotion: reducedMotion.value,
+      reveal01: 1,
+      matchFade01: 0,
+      shakePx: 0,
+      forceShowFace: debugPeekAllFaces.value,
+    })
+  }
+
+  mismatchPhaseUi.value = computeMismatchPhaseUi(now, mem)
+
+  const collectAnimating =
+    collectFlight !== null && !reducedMotion.value && collectFlight.t < 1
+  if (
+    animationActive(mem, parallaxSettling) ||
+    animAdvancing ||
+    collectAnimating
+  ) {
+    schedulePaint()
   }
 }
 
@@ -410,6 +853,7 @@ watch(debugPeekAllFaces, () => {
     class="game-canvas-shell relative mx-auto w-full max-w-[min(100%,1200px)] touch-manipulation px-2"
     :style="{ maxWidth: `${BOARD_MAX_WIDTH_CSS}px` }"
     :data-deal-init="play.dealInitKind"
+    :data-mismatch-phase="mismatchPhaseUi"
     @mousemove="onShellPointerMove"
     @touchmove.passive="onShellPointerMove"
   >
@@ -433,6 +877,12 @@ watch(debugPeekAllFaces, () => {
       data-testid="game-initial-identities"
       class="sr-only"
       :data-identities="initialIdentitiesJson"
+    />
+    <div
+      data-testid="game-collect-strip"
+      class="sr-only"
+      :data-collect-count="String(stripChips.length)"
+      :aria-label="`Collected pairs: ${stripChips.length}`"
     />
     <button
       v-if="showDebugPeekButton"

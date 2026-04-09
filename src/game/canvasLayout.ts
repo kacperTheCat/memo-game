@@ -4,6 +4,38 @@ export const BOARD_MAX_WIDTH_CSS = 1200
 /** Gap between adjacent tiles (CSS px). */
 export const BOARD_GAP_PX = 6
 
+/** Inset from canvas edge to tile grid (CSS px); breathing room inside the canvas. */
+export const BOARD_CANVAS_INSET_PX = 8
+
+/** Minimum CSS height reserved below the grid for the collection strip (FR-009). */
+export const COLLECTION_STRIP_MIN_CSS_PX = 52
+
+export interface BoardStripLayout {
+  /** Full canvas width (CSS px). */
+  cssW: number
+  /** Full canvas height (CSS px). */
+  cssH: number
+  /** Grid + inset lives in a band this tall at the top. */
+  boardH: number
+  /** Strip band starts at this Y (CSS px). */
+  stripY: number
+  stripH: number
+}
+
+/**
+ * Split canvas into board band (top) and collection strip band (bottom).
+ */
+export function boardStripLayout(cssWidth: number, cssHeight: number): BoardStripLayout {
+  const cssW = Math.max(1, cssWidth)
+  const cssH = Math.max(1, cssHeight)
+  const stripH = Math.min(
+    cssH - 1,
+    Math.max(COLLECTION_STRIP_MIN_CSS_PX, Math.round(cssH * 0.16)),
+  )
+  const boardH = Math.max(1, cssH - stripH)
+  return { cssW, cssH, boardH, stripY: boardH, stripH }
+}
+
 export interface GridLayoutMetrics {
   cellW: number
   cellH: number

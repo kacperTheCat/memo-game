@@ -10,8 +10,9 @@ import {
   type MemoryState,
 } from '@/game/memoryEngine'
 import { gridDimensions } from '@/game/buildGridLayout'
+import { MISMATCH_RESOLVE_MS } from '@/game/tileMotionConstants'
 
-const MISMATCH_MS = 850
+export { MISMATCH_RESOLVE_MS } from '@/game/tileMotionConstants'
 
 export type DealInitKind = 'seeded' | 'random'
 
@@ -92,7 +93,7 @@ export const useGamePlayStore = defineStore('gamePlay', () => {
             memory.value = clearMismatch(memory.value)
           }
           mismatchTimer = null
-        }, MISMATCH_MS)
+        }, MISMATCH_RESOLVE_MS)
       }
     }
 
