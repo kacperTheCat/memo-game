@@ -37,7 +37,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['**/*.spec.ts', 'src/game/validateTileLibrary.ts'],
+    files: ['**/*.spec.ts', 'src/game/library/validateTileLibrary.ts'],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
     },

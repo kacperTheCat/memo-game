@@ -1,6 +1,6 @@
 # Contract: seeded deal derivation
 
-**Consumers**: `src/game/seedDeal.ts` (implementation), `src/stores/gamePlay.ts` (caller supplies `rng`), Vitest **`seedDeal.spec.ts`**.
+**Consumers**: `src/game/seed/seedDeal.ts` (implementation), `src/stores/game/gamePlay.ts` (caller supplies `rng`), Vitest **`seedDeal.spec.ts`**.
 
 ## `hashSeedKey(key: string): number`
 
@@ -47,7 +47,7 @@
 
 Recorded in Vitest (examples—**replace with actual values** after first failing test captures them):
 
-| `nineDigits` | `difficulty` | `n` (pairs) | Full `identityIndex[]` after shuffle (row-major) — locked by `src/game/seedDeal.spec.ts` |
+| `nineDigits` | `difficulty` | `n` (pairs) | Full `identityIndex[]` after shuffle (row-major) — locked by `src/game/seed/seedDeal.spec.ts` |
 |--------------|--------------|-------------|----------------------------------------------------------------------------------------|
 | `000000000` | `easy` | 8 | `[6,3,4,3,7,7,5,6,0,1,0,5,1,2,2,4]` |
 | `123456789` | `medium` | 18 | `[10,12,11,16,7,9,4,17,1,13,12,14,14,16,8,0,15,3,11,2,15,13,5,17,9,8,2,7,6,3,4,0,10,6,1,5]` |

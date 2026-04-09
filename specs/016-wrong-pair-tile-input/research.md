@@ -2,8 +2,8 @@
 
 ## 1. Current behavior (codebase)
 
-- **`pickCell`** (`src/game/memoryEngine.ts`) rejects any pick when **`pair.locked`** is true (lines 35–37). A wrong second tile sets **`locked: true`** (lines 89–98).
-- **`useGamePlayStore.tryPick`** starts a **`setTimeout(..., MISMATCH_RESOLVE_MS)`** to call **`clearMismatch`** and **`playSfx('fail')`** when a wrong pair is complete (`src/stores/gamePlay.ts`). Constants are shared with the canvas via **`src/game/tileMotionConstants.ts`** (`TILE_MISMATCH_SHAKE_MS`, `TILE_MISMATCH_FLIP_BACK_MS`, `MISMATCH_RESOLVE_MS`).
+- **`pickCell`** (`src/game/memory/memoryEngine.ts`) rejects any pick when **`pair.locked`** is true (lines 35–37). A wrong second tile sets **`locked: true`** (lines 89–98).
+- **`useGamePlayStore.tryPick`** starts a **`setTimeout(..., MISMATCH_RESOLVE_MS)`** to call **`clearMismatch`** and **`playSfx('fail')`** when a wrong pair is complete (`src/stores/game/gamePlay.ts`). Constants are shared with the canvas via **`src/game/tiles/tileMotionConstants.ts`** (`TILE_MISMATCH_SHAKE_MS`, `TILE_MISMATCH_FLIP_BACK_MS`, `MISMATCH_RESOLVE_MS`).
 - **`GameCanvasShell.vue`** drives shake / flip-back using **`pair.locked`** plus mismatch indices and a local **`mismatchStartedAt`** clock (`mismatchShake`, `mismatchConceal01ForCell`, `computeMismatchPhaseUi`, **`animationActive`**). **`onCanvasPick`** does not gate on **`animationActive`**; rejection is entirely from **`pickCell`** / store.
 
 ## 2. Decision: how to allow input without dropping mismatch feedback for players who wait

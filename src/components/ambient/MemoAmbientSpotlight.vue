@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useAmbientChaseLight } from '@/composables/useAmbientChaseLight'
+import { useAmbientChaseLight } from '@/composables/game/useAmbientChaseLight'
 
 defineOptions({ name: 'MemoAmbientSpotlight' })
 

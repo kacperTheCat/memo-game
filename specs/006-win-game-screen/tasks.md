@@ -31,11 +31,11 @@ description: "Task list for 006 post-match win debrief (in-route on /game)"
 
 **⚠️ CRITICAL**: No user story implementation until foundational tasks complete.
 
-- [x] T002 [P] Add deterministic seeded RNG `createSeededRandom(seed: string): () => number` in `src/game/seededRng.ts` with Vitest in `src/game/seededRng.spec.ts`
-- [x] T003 [P] Add debrief format helpers (`MM:SS` from ms, local `YYYY-MM-DD` from ISO, difficulty labels) in `src/game/winDebriefFormat.ts` with Vitest in `src/game/winDebriefFormat.spec.ts`
-- [x] T004 [P] Add `filterWonSessionsNewestFirst` (or equivalent) in `src/game/winDebriefHistory.ts` with Vitest in `src/game/winDebriefHistory.spec.ts` per [`data-model.md`](./data-model.md)
-- [x] T005 Wire optional deal seed into `src/views/GameView.vue`: read `useRoute().query.seed` (Playwright) and/or integrate existing `briefcase-seed-input` from `src/components/briefcase/BriefcaseView.vue` so `play.startNewRound(buildGridCells(...), rng)` uses `createSeededRandom` when a seed is present, else `Math.random`
-- [x] T006 Update `src/components/GameCanvasShell.vue` so on win: `session.finalizeSession('won')`, `session.flushSave`, **emit** a `won` event (or equivalent callback prop); **remove** immediate `session.beginSession` and `play.startNewRound` from that branch
+- [x] T002 [P] Add deterministic seeded RNG `createSeededRandom(seed: string): () => number` in `src/game/seed/seededRng.ts` with Vitest in `src/game/seed/seededRng.spec.ts`
+- [x] T003 [P] Add debrief format helpers (`MM:SS` from ms, local `YYYY-MM-DD` from ISO, difficulty labels) in `src/game/win/winDebriefFormat.ts` with Vitest in `src/game/win/winDebriefFormat.spec.ts`
+- [x] T004 [P] Add `filterWonSessionsNewestFirst` (or equivalent) in `src/game/win/winDebriefHistory.ts` with Vitest in `src/game/win/winDebriefHistory.spec.ts` per [`data-model.md`](./data-model.md)
+- [x] T005 Wire optional deal seed into `src/views/game/GameView.vue`: read `useRoute().query.seed` (Playwright) and/or integrate existing `briefcase-seed-input` from `src/components/briefcase/BriefcaseView.vue` so `play.startNewRound(buildGridCells(...), rng)` uses `createSeededRandom` when a seed is present, else `Math.random`
+- [x] T006 Update `src/components/game/GameCanvasShell.vue` so on win: `session.finalizeSession('won')`, `session.flushSave`, **emit** a `won` event (or equivalent callback prop); **remove** immediate `session.beginSession` and `play.startNewRound` from that branch
 
 **Checkpoint**: Seeded deals reproducible; win no longer auto-starts a new round.
 
@@ -51,17 +51,17 @@ description: "Task list for 006 post-match win debrief (in-route on /game)"
 
 > Write these tests **first**; they MUST **fail** before implementation.
 
-- [x] T007 [P] [US1] Add failing-first Vitest for `src/components/WinDebriefPanel.vue` in `src/components/WinDebriefPanel.spec.ts` (summary props / store mocks, `data-testid` contract keys `win-summary-time`, `win-summary-moves`, `win-play-again`)
+- [x] T007 [P] [US1] Add failing-first Vitest for `src/components/game/WinDebriefPanel.vue` in `src/components/game/WinDebriefPanel.spec.ts` (summary props / store mocks, `data-testid` contract keys `win-summary-time`, `win-summary-moves`, `win-play-again`)
 - [x] T008 [P] [US1] Add failing-first Playwright `e2e/win-game-screen.spec.ts`: navigate to `/game` with **easy** difficulty + fixed **`?seed=`**, complete game to win using known pair clicks, assert URL stays `/game`, `win-debrief-root`, `win-summary-time`, `win-summary-moves` (**FR-012**)
 - [x] T021 [P] [US1] Extend failing-first Playwright `e2e/win-game-screen.spec.ts`: after debrief is visible, call `page.reload()`, assert URL still matches `/game`, `win-debrief-root` is **hidden**, and `game-canvas` is **visible** (**FR-013**, **SC-006**)
 
 ### Implementation for User Story 1
 
-- [x] T009 [US1] Create `src/components/WinDebriefPanel.vue` with Stitch-aligned copy (**Post-Match Debrief**, **Operation Complete**), gold ambient + grain overlay + liquid-glass stat cards, and normative `data-testid`s from [`contracts/README.md`](./contracts/README.md)
-- [x] T010 [US1] Update `src/views/GameView.vue` to toggle **board** (`GameCanvasShell`) vs **`WinDebriefPanel`** when session is **`won`**; handle `GameCanvasShell` **won** emit; guard against orphan debrief per [`spec.md`](./spec.md) edge cases
+- [x] T009 [US1] Create `src/components/game/WinDebriefPanel.vue` with Stitch-aligned copy (**Post-Match Debrief**, **Operation Complete**), gold ambient + grain overlay + liquid-glass stat cards, and normative `data-testid`s from [`contracts/README.md`](./contracts/README.md)
+- [x] T010 [US1] Update `src/views/game/GameView.vue` to toggle **board** (`GameCanvasShell`) vs **`WinDebriefPanel`** when session is **`won`**; handle `GameCanvasShell` **won** emit; guard against orphan debrief per [`spec.md`](./spec.md) edge cases
 - [x] T011 [US1] Implement **Play Again** in `WinDebriefPanel.vue` (emit or injected handlers): `session.beginSession(priorDifficulty)`, return to board, `play.startNewRound(..., Math.random)` for **new random** deal (**FR-003**)
 - [x] T012 [US1] Green: `pnpm test` (Vitest including `WinDebriefPanel.spec.ts`) and Playwright US1 path in `e2e/win-game-screen.spec.ts`
-- [x] T027 [US1] **N/A (closed):** Reload-on-debrief covered by **T021** + `src/game/reloadNewGameDifficulty.ts` + `GameCanvasShell` `initRoundIfNeeded()`; regression checklist is [`research.md`](./research.md) §2 / §9
+- [x] T027 [US1] **N/A (closed):** Reload-on-debrief covered by **T021** + `src/game/storage/reloadNewGameDifficulty.ts` + `GameCanvasShell` `initRoundIfNeeded()`; regression checklist is [`research.md`](./research.md) §2 / §9
 
 **Checkpoint**: MVP debrief + Play Again + seeded e2e win path green; reload-on-debrief matches **FR-013**.
 
@@ -75,12 +75,12 @@ description: "Task list for 006 post-match win debrief (in-route on /game)"
 
 ### Tests for User Story 2 (mandatory) ⚠️
 
-- [x] T013 [P] [US2] Extend Vitest in `src/components/WinDebriefPanel.spec.ts` or `src/game/winDebriefHistory.spec.ts` with fixture `CompletedSessionRecord[]` for multi-row ordering and column projection
+- [x] T013 [P] [US2] Extend Vitest in `src/components/game/WinDebriefPanel.spec.ts` or `src/game/win/winDebriefHistory.spec.ts` with fixture `CompletedSessionRecord[]` for multi-row ordering and column projection
 - [x] T014 [P] [US2] Extend `e2e/win-game-screen.spec.ts`: assert `win-history-table` headers (**Date**, **Difficulty**, **Time**, **Moves**), at least one data row after win, and `win-history-empty` when appropriate (e.g. cleared **`memo-game.v1.completedSessions`** + first win)
 
 ### Implementation for User Story 2
 
-- [x] T015 [US2] Implement ledger table + difficulty chips + **Local Data** hint in `src/components/WinDebriefPanel.vue` using `useGameSessionStore().readCompletedList()` + `filterWonSessionsNewestFirst` + formatters
+- [x] T015 [US2] Implement ledger table + difficulty chips + **Local Data** hint in `src/components/game/WinDebriefPanel.vue` using `useGameSessionStore().readCompletedList()` + `filterWonSessionsNewestFirst` + formatters
 - [x] T016 [US2] Add responsive horizontal scroll (or equivalent) so all four columns stay usable on narrow viewports per [`spec.md`](./spec.md) edge cases
 
 **Checkpoint**: US1 + US2 both testable independently.
@@ -97,14 +97,14 @@ description: "Task list for 006 post-match win debrief (in-route on /game)"
 
 - [x] T017 [P] [US3] Extend failing-first `e2e/win-game-screen.spec.ts`: after win, click `win-return-briefcase`, expect navigation to **`/briefcase`**
 - [x] T022 [P] [US3] Extend failing-first `e2e/win-game-screen.spec.ts`: after debrief visible, navigate with `page.goto('/briefcase')` (simulate hub entry without Return), then `page.goto('/game?difficulty=easy&seed=e2e-memo-win')`, assert `win-debrief-root` is **not** visible and `game-canvas` **is** visible (**FR-014**, **SC-006**)
-- [x] T023 [P] [US3] Vitest regression in `src/stores/gameSession.spec.ts`: after `finalizeSession('won')`, `clearSession()` leaves `gameSession` **null**, **`memo-game.v1.completedSessions` length unchanged**, and last row remains **`outcome === 'won'`** (hub dismiss must not delete history — **FR-014**)
+- [x] T023 [P] [US3] Vitest regression in `src/stores/game/gameSession.spec.ts`: after `finalizeSession('won')`, `clearSession()` leaves `gameSession` **null**, **`memo-game.v1.completedSessions` length unchanged**, and last row remains **`outcome === 'won'`** (hub dismiss must not delete history — **FR-014**)
 
 ### Implementation for User Story 3
 
-- [x] T018 [US3] Add **Return to Briefcase** control with `data-testid="win-return-briefcase"` in `src/components/WinDebriefPanel.vue`, `router.push({ name: 'briefcase' })`, and session cleanup per [`research.md`](./research.md) §8 / [`data-model.md`](./data-model.md)
+- [x] T018 [US3] Add **Return to Briefcase** control with `data-testid="win-return-briefcase"` in `src/components/game/WinDebriefPanel.vue`, `router.push({ name: 'briefcase' })`, and session cleanup per [`research.md`](./research.md) §8 / [`data-model.md`](./data-model.md)
 - [x] T024 [US3] Register `router.beforeEach` in `src/router/index.ts` so when navigation **commits** to **`briefcase`** and `useGameSessionStore().gameSession?.status === 'won'`, call `session.clearSession()` and `useGamePlayStore().resetRound()` per [`research.md`](./research.md) §9
-- [x] T025 [US3] Update `onReturnBriefcase` in `src/views/GameView.vue` to call `play.resetRound()` after `session.clearSession()` so Return matches router guard behavior (**FR-014**)
-- [x] T028 [US3] Fix misleading comment in `src/composables/useBriefcaseNavigateToGame.ts` that cites **FR-014** for difficulty-mismatch abandon (reference correct requirement or neutral wording)
+- [x] T025 [US3] Update `onReturnBriefcase` in `src/views/game/GameView.vue` to call `play.resetRound()` after `session.clearSession()` so Return matches router guard behavior (**FR-014**)
+- [x] T028 [US3] Fix misleading comment in `src/composables/game/useBriefcaseNavigateToGame.ts` that cites **FR-014** for difficulty-mismatch abandon (reference correct requirement or neutral wording)
 
 **Checkpoint**: US3 + **FR-014** covered; **T022** green.
 
@@ -114,7 +114,7 @@ description: "Task list for 006 post-match win debrief (in-route on /game)"
 
 **Purpose**: Visual parity, docs, quality gates.
 
-- [x] T019 [P] Refine debrief styling (radial gold, noise opacity, glass ledger container) against `designs/stitch_gablota_kolekcjonera_premium_glassmorphism_prd/inspection_summary_history/code.html` in `src/components/WinDebriefPanel.vue`
+- [x] T019 [P] Refine debrief styling (radial gold, noise opacity, glass ledger container) against `designs/stitch_gablota_kolekcjonera_premium_glassmorphism_prd/inspection_summary_history/code.html` in `src/components/game/WinDebriefPanel.vue`
 - [x] T020 Run manual validation per [`quickstart.md`](./quickstart.md); run `pnpm run lint`, `pnpm test`, and `pnpm test:e2e:preview` at repo root
 
 ### Post-clarify polish (FR-013 / FR-014 completion)
@@ -159,7 +159,7 @@ description: "Task list for 006 post-match win debrief (in-route on /game)"
 # After core 006 is green (T012), in parallel:
 # Playwright reload: e2e/win-game-screen.spec.ts (T021)
 # Playwright briefcase→game: e2e/win-game-screen.spec.ts (T022)
-# Vitest: src/stores/gameSession.spec.ts (T023)
+# Vitest: src/stores/game/gameSession.spec.ts (T023)
 ```
 
 ---

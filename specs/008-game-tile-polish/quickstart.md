@@ -33,11 +33,11 @@ Add **`e2e/tile-visual-polish.spec.ts`** as specified in `spec.md` (map to stori
 
 ## Key files (current)
 
-- `src/components/GameCanvasShell.vue` — canvas size, paint loop, pointer, images
-- `src/game/canvasTileDraw.ts` — per-tile draw
-- `src/game/tileParallax.ts` — raw offset (to be smoothed)
-- `src/stores/gamePlay.ts` — `tryPick`, mismatch timer
-- `src/game/memoryEngine.ts` — phase transitions
+- `src/components/game/GameCanvasShell.vue` — canvas size, paint loop, pointer, images
+- `src/game/canvas/canvasTileDraw.ts` — per-tile draw
+- `src/game/tiles/tileParallax.ts` — raw offset (to be smoothed)
+- `src/stores/game/gamePlay.ts` — `tryPick`, mismatch timer
+- `src/game/memory/memoryEngine.ts` — phase transitions
 
 ## Spec links
 

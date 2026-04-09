@@ -50,14 +50,14 @@ description: "Task list for 011-game-sound-effects"
 
 > Write these tests **first**; they MUST **fail** before implementation lands
 
-- [x] T004 [P] [US1] Add failing Vitest `src/game/sfxPickOutcomes.spec.ts` for pure helpers that derive **flip** / **success** flags from pre/post `MemoryState` and picked index (types from `src/game/memoryTypes.ts` / `memoryEngine.ts`)
+- [x] T004 [P] [US1] Add failing Vitest `src/game/memory/sfxPickOutcomes.spec.ts` for pure helpers that derive **flip** / **success** flags from pre/post `MemoryState` and picked index (types from `src/game/memory/memoryTypes.ts`, `src/game/memory/memoryEngine.ts`)
 - [x] T005 [P] [US1] Add failing Playwright `e2e/game-sound-effects.spec.ts` exercising gameplay flow (tile picks, mismatch, match, win) with **no console errors**; map to spec acceptance scenarios 1–4 (optional `window.__MEMO_SFX` hook only if needed per [contracts/sound-cues.md](./contracts/sound-cues.md))
 
 ### Implementation for User Story 1
 
-- [x] T006 [US1] Add `src/game/sfxPickOutcomes.ts` implementing pick-outcome logic tested in T004
-- [x] T007 [US1] Wire `playSfx('flip'|'success'|'winRandom')` and `ensureSfxAudioUnlocked` in `src/components/GameCanvasShell.vue` (`onCanvasPick` / `tryPick` path) with **exactly one** `winRandom` per `won: true` per contract
-- [x] T008 [US1] Wire `playSfx('fail')` in `src/stores/gamePlay.ts` inside mismatch `setTimeout` **after** `clearMismatch` applies (tiles concealed again), matching [research.md](./research.md) §5
+- [x] T006 [US1] Add `src/game/memory/sfxPickOutcomes.ts` implementing pick-outcome logic tested in T004
+- [x] T007 [US1] Wire `playSfx('flip'|'success'|'winRandom')` and `ensureSfxAudioUnlocked` in `src/components/game/GameCanvasShell.vue` (`onCanvasPick` / `tryPick` path) with **exactly one** `winRandom` per `won: true` per contract
+- [x] T008 [US1] Wire `playSfx('fail')` in `src/stores/game/gamePlay.ts` inside mismatch `setTimeout` **after** `clearMismatch` applies (tiles concealed again), matching [research.md](./research.md) §5
 - [x] T009 [US1] Re-run `pnpm test` and `e2e/game-sound-effects.spec.ts`; fix until green for US1 scope
 
 **Checkpoint**: User Story 1 fully testable alone; MVP demo = P1 complete
@@ -79,7 +79,7 @@ description: "Task list for 011-game-sound-effects"
 
 - [x] T012 [US2] Wire `playSfx('click')` + unlock on user activation in `src/components/ui/AppButton.vue` (native `<button>` and `<RouterLink>`)
 - [x] T013 [US2] Wire `playSfx('click')` in `src/components/ui/MemoSecondaryNavButton.vue` for both button and link variants
-- [x] T014 [US2] Audit and wire shared UI click sound for remaining primary actions in `src/components/ui/MemoConfirmDialog.vue`, `src/components/WinDebriefPanel.vue`, `src/components/briefcase/BriefcaseView.vue`, and any non-`AppButton` control buttons in `src/components/GameCanvasShell.vue` (e.g. dev peek) per [plan.md](./plan.md) implementation notes
+- [x] T014 [US2] Audit and wire shared UI click sound for remaining primary actions in `src/components/ui/MemoConfirmDialog.vue`, `src/components/game/WinDebriefPanel.vue`, `src/components/briefcase/BriefcaseView.vue`, and any non-`AppButton` control buttons in `src/components/game/GameCanvasShell.vue` (e.g. dev peek) per [plan.md](./plan.md) implementation notes
 - [x] T015 [US2] Confirm Vitest + Playwright green for US2 scope
 
 **Checkpoint**: US1 and US2 both pass tests independently
@@ -127,7 +127,7 @@ description: "Task list for 011-game-sound-effects"
 
 ```bash
 # Together after Phase 2:
-# - Implement/strengthen src/game/sfxPickOutcomes.spec.ts (T004)
+# - Implement/strengthen src/game/memory/sfxPickOutcomes.spec.ts (T004)
 # - Scaffold e2e/game-sound-effects.spec.ts (T005)
 ```
 

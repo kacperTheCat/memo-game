@@ -42,7 +42,7 @@ Single package at repo root: `src/`, `e2e/project-setup/`, `playwright.config.ts
 
 - [x] T006 Install and wire Vue 3 + `src/main.ts` mounting the root app with **Pinia** registered using `src/stores/index.ts` (export `pinia` instance; empty store modules OK)
 - [x] T007 [P] Add `src/App.vue` with a single English heading placeholder (replace with spec copy in US1)
-- [x] T008 [P] Add `src/components/GameCanvasShell.vue` with explicit canvas dimensions (CSS + attributes) per [data-model.md](./data-model.md)
+- [x] T008 [P] Add `src/components/game/GameCanvasShell.vue` with explicit canvas dimensions (CSS + attributes) per [data-model.md](./data-model.md)
 - [x] T009 [P] Add Tailwind (`tailwind.config.*`, `postcss.config.js` if required) and `src/style.css` entry imported from `main.ts`
 - [x] T010 [P] Add `vitest.config.ts`, `@vue/test-utils`, and `src/test/setup.ts` (or inline) with **happy-dom** / **jsdom**
 - [x] T011 Integrate `GameCanvasShell` into `App.vue` with responsive layout (min width ~320px)
@@ -63,7 +63,7 @@ Single package at repo root: `src/`, `e2e/project-setup/`, `playwright.config.ts
 ### Tests for User Story 1 (write first, expect FAIL then GREEN)
 
 - [x] T013 [P] [US1] Add `e2e/project-setup/bootstrap.spec.ts` asserting root URL loads and visible text matches strings imported from `src/constants/appCopy.ts` (use `playwright.config.ts` **dev** `webServer` for this file or project dependency)
-- [x] T014 [P] [US1] Add `src/components/GameCanvasShell.spec.ts` asserting component mounts and `<canvas>` exists with expected size attributes
+- [x] T014 [P] [US1] Add `src/components/game/GameCanvasShell.spec.ts` asserting component mounts and `<canvas>` exists with expected size attributes
 
 ### Implementation for User Story 1
 
@@ -159,7 +159,7 @@ Single package at repo root: `src/`, `e2e/project-setup/`, `playwright.config.ts
 ```bash
 # Together after Phase 2:
 Task: "e2e/project-setup/bootstrap.spec.ts"   # T013
-Task: "src/components/GameCanvasShell.spec.ts" # T014
+Task: "src/components/game/GameCanvasShell.spec.ts" # T014
 ```
 
 ---

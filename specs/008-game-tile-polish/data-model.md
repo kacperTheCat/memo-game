@@ -2,7 +2,7 @@
 
 ## Persistent / snapshot domain (unchanged schema version)
 
-Aligned with `SessionSnapshot` / `TileRuntimeState` in `src/game/memoryTypes.ts`:
+Aligned with `SessionSnapshot` / `TileRuntimeState` in `src/game/memory/memoryTypes.ts`:
 
 | Field | Type | Notes |
 |-------|------|-------|
@@ -17,7 +17,7 @@ Aligned with `SessionSnapshot` / `TileRuntimeState` in `src/game/memoryTypes.ts`
 
 ## Catalog entity (existing)
 
-`TileEntry` (`src/game/tileLibraryTypes.ts`):
+`TileEntry` (`src/game/library/tileLibraryTypes.ts`):
 
 | Field | Use in this feature |
 |-------|---------------------|

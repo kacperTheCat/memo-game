@@ -17,7 +17,7 @@
 
 **Purpose**: Align on scope and copy before code changes.
 
-- [x] T001 Review current implementation against [`spec.md`](./spec.md) in `src/views/GameView.vue`, `src/views/HomeView.vue`, `src/views/BriefcaseViewPage.vue`, `src/components/briefcase/BriefcaseView.vue`, `src/components/WinDebriefPanel.vue`
+- [x] T001 Review current implementation against [`spec.md`](./spec.md) in `src/views/game/GameView.vue`, `src/views/home/HomeView.vue`, `src/views/briefcase/BriefcaseViewPage.vue`, `src/components/briefcase/BriefcaseView.vue`, `src/components/game/WinDebriefPanel.vue`
 - [x] T002 [P] Add English strings for new navigation labels (Return to Start Screen, Configure New Game, Return to Game, Return to Briefcase / Abandon labels as needed) in `src/constants/appCopy.ts`
 
 ---
@@ -29,10 +29,10 @@
 **⚠️ CRITICAL**: Completes before **Phase 3+** user story work in this file.
 
 - [x] T003 [P] Failing-first Vitest: `src/components/ui/MemoSecondaryNavButton.spec.ts` — `back` vs `dismiss` variants, click / `to` navigation props
-- [x] T004 [P] Failing-first Vitest: `src/components/SessionHistoryLedger.spec.ts` — empty state vs rows (props or mocked `useGameSessionStore`)
-- [x] T005 Implement `src/components/ui/MemoSecondaryNavButton.vue` (Tailwind classes aligned with `src/components/WinDebriefPanel.vue` header button)
-- [x] T006 Refactor `src/components/WinDebriefPanel.vue` header **Return to Briefcase** to use `MemoSecondaryNavButton.vue` (preserve `data-testid="win-return-briefcase"` behavior)
-- [x] T007 Extract `src/components/SessionHistoryLedger.vue` from ledger table markup in `src/components/WinDebriefPanel.vue`; integrate so debrief uses the shared component (canonical `data-testid="session-history-table"` per `specs/007-home-nav-briefcase-ui/contracts/README.md`)
+- [x] T004 [P] Failing-first Vitest: `src/components/game/SessionHistoryLedger.spec.ts` — empty state vs rows (props or mocked `useGameSessionStore`)
+- [x] T005 Implement `src/components/ui/MemoSecondaryNavButton.vue` (Tailwind classes aligned with `src/components/game/WinDebriefPanel.vue` header button)
+- [x] T006 Refactor `src/components/game/WinDebriefPanel.vue` header **Return to Briefcase** to use `MemoSecondaryNavButton.vue` (preserve `data-testid="win-return-briefcase"` behavior)
+- [x] T007 Extract `src/components/game/SessionHistoryLedger.vue` from ledger table markup in `src/components/game/WinDebriefPanel.vue`; integrate so debrief uses the shared component (canonical `data-testid="session-history-table"` per `specs/007-home-nav-briefcase-ui/contracts/README.md`)
 - [x] T008 Run `pnpm test` and fix until Vitest is green for T003–T004 and any new component specs
 
 **Checkpoint**: Foundational ready — user story work may start (US1 can use T005; US2 needs T007).
@@ -50,12 +50,12 @@
 > Write **before** implementation; ensure **red** first.
 
 - [x] T009 [P] [US1] Playwright: `e2e/game-view-chrome.spec.ts` — two `data-testid`s, no legacy `nav-to-home` / heading copy in active-play chrome (maps to spec US1 scenarios 1–3)
-- [x] T010 [P] [US1] Vitest: `src/views/GameView.activeNav.spec.ts` (or `src/composables/useReturnToBriefcaseDuringPlay.spec.ts`) — asserts `flushSave` + `router.push` briefcase without `clearSession` when stubbing Pinia/router
+- [x] T010 [P] [US1] Vitest: `src/views/game/GameView.activeNav.spec.ts` (or `src/composables/useReturnToBriefcaseDuringPlay.spec.ts`) — asserts `flushSave` + `router.push` briefcase without `clearSession` when stubbing Pinia/router
 
 ### Implementation for User Story 1
 
-- [x] T011 [US1] Replace active-play header in `src/views/GameView.vue` with flex row: `MemoSecondaryNavButton` **Return to Briefcase** (`data-testid="game-return-briefcase"`) calling `session.flushSave(play.memory)` then `router.push({ name: 'briefcase' })`
-- [x] T012 [US1] Add right-aligned **Abandon Game** (`dismiss` variant, keep `data-testid="game-abandon-game"`) reusing existing `finalizeSession` / reset / `router.push` flow in `src/views/GameView.vue`
+- [x] T011 [US1] Replace active-play header in `src/views/game/GameView.vue` with flex row: `MemoSecondaryNavButton` **Return to Briefcase** (`data-testid="game-return-briefcase"`) calling `session.flushSave(play.memory)` then `router.push({ name: 'briefcase' })`
+- [x] T012 [US1] Add right-aligned **Abandon Game** (`dismiss` variant, keep `data-testid="game-abandon-game"`) reusing existing `finalizeSession` / reset / `router.push` flow in `src/views/game/GameView.vue`
 - [x] T013 [US1] Remove `gamePageHeading`, `gamePageSubline`, and `AppButton` **Home** nav from active-play branch; keep `storageError` **outside** the two-control row per `specs/007-home-nav-briefcase-ui/plan.md`
 
 **Checkpoint**: US1 green — `pnpm exec playwright test e2e/game-view-chrome.spec.ts` + relevant Vitest
@@ -71,12 +71,12 @@
 ### Tests for User Story 2 (mandatory) ⚠️
 
 - [x] T014 [P] [US2] Playwright: `e2e/home-hub-layout.spec.ts` — ledger table/empty, `home-configure-game`, conditional `home-return-game` (maps to spec US2)
-- [x] T015 [P] [US2] Vitest: `src/views/HomeView.spec.ts` — conditional rendering of **Return to Game** when session `in_progress`
+- [x] T015 [P] [US2] Vitest: `src/views/home/HomeView.spec.ts` — conditional rendering of **Return to Game** when session `in_progress`
 
 ### Implementation for User Story 2
 
-- [x] T016 [US2] Rebuild `src/views/HomeView.vue`: backdrop wrapper with `HubGrainLayer`, top action row, embed `SessionHistoryLedger.vue`
-- [x] T017 [US2] Wire **Configure New Game** → `/briefcase` and **Return to Game** → `/game` (resume path per [`research.md`](./research.md) §3) in `src/views/HomeView.vue`
+- [x] T016 [US2] Rebuild `src/views/home/HomeView.vue`: backdrop wrapper with `HubGrainLayer`, top action row, embed `SessionHistoryLedger.vue`
+- [x] T017 [US2] Wire **Configure New Game** → `/briefcase` and **Return to Game** → `/game` (resume path per [`research.md`](./research.md) §3) in `src/views/home/HomeView.vue`
 
 **Checkpoint**: US2 green — `pnpm exec playwright test e2e/home-hub-layout.spec.ts` + HomeView Vitest
 
@@ -96,8 +96,8 @@
 ### Implementation for User Story 3
 
 - [x] T020 [US3] Add top hub nav row to `src/components/briefcase/BriefcaseView.vue` using `MemoSecondaryNavButton` (**Return to Start Screen** → `/`, **Return to Game** when `in_progress`, right of home)
-- [x] T021 [US3] Remove duplicate nav `AppButton` block from `src/views/BriefcaseViewPage.vue` (keep `data-testid="briefcase-backdrop"` and layout wrapper)
-- [x] T022 [US3] Expose **resume-only** navigation (`resumeToGame()` in `src/composables/useBriefcaseNavigateToGame.ts`) and wire **Return to Game** on briefcase + home
+- [x] T021 [US3] Remove duplicate nav `AppButton` block from `src/views/briefcase/BriefcaseViewPage.vue` (keep `data-testid="briefcase-backdrop"` and layout wrapper)
+- [x] T022 [US3] Expose **resume-only** navigation (`resumeToGame()` in `src/composables/game/useBriefcaseNavigateToGame.ts`) and wire **Return to Game** on briefcase + home
 - [x] T023 [US3] Run `pnpm exec playwright test e2e/briefcase-view.spec.ts` and relevant Vitest until User Story 3 is green
 
 **Checkpoint**: US3 complete at **T023**
@@ -117,7 +117,7 @@
 ### Implementation for User Story 4
 
 - [x] T025 [US4] Add `src/components/layout/HubGrainLayer.vue` (grain + vignette) with **`data-testid="hub-grain-layer"`**, modeled on debrief noise patterns with **cool** navy palette per Stitch briefcase reference
-- [x] T026 [US4] Apply shared backdrop via `HubGrainLayer` in `src/views/HomeView.vue` and `src/views/BriefcaseViewPage.vue`; verify contrast for `BriefcaseGlassPanel` and home table
+- [x] T026 [US4] Apply shared backdrop via `HubGrainLayer` in `src/views/home/HomeView.vue` and `src/views/briefcase/BriefcaseViewPage.vue`; verify contrast for `BriefcaseGlassPanel` and home table
 
 **Checkpoint**: US4 — relevant Playwright green; manual check vs Stitch PNG
 
@@ -147,7 +147,7 @@
 
 - [x] T031 [P] Add icon assets: e.g. `src/assets/icons/NavBackIcon.vue` and `src/assets/icons/NavDismissIcon.vue` (inline SVG, MIT-compatible paths) **or** equivalent under `public/icons/`; add `designs/README.md` **or** `src/assets/icons/README.md` with **license / source** if copied from Heroicons, Lucide, etc.
 - [x] T032 Wire icons into `src/components/ui/MemoSecondaryNavButton.vue` with **`aria-hidden="true"`** on decorative graphics; preserve visible **English** labels
-- [x] T033 [US1] Re-run `pnpm exec vitest run src/components/ui/MemoSecondaryNavButton.spec.ts` and spot-check `src/views/GameView.vue`, `src/components/WinDebriefPanel.vue`, `src/views/HomeView.vue`, `src/components/briefcase/BriefcaseView.vue` nav rows
+- [x] T033 [US1] Re-run `pnpm exec vitest run src/components/ui/MemoSecondaryNavButton.spec.ts` and spot-check `src/views/game/GameView.vue`, `src/components/game/WinDebriefPanel.vue`, `src/views/home/HomeView.vue`, `src/components/briefcase/BriefcaseView.vue` nav rows
 
 **Checkpoint**: MemoSecondaryNavButton spec green; icons visible in browser on `/game`, `/`, `/briefcase`, debrief
 
@@ -161,12 +161,12 @@
 
 ### Tests (mandatory) ⚠️
 
-- [x] T034 [P] [US2] Extend `src/views/HomeView.spec.ts` — **Configure New Game** control uses primary accent classes or dedicated `data-testid` + class contract (e.g. `bg-memo-accent` / `memo-cta`)
+- [x] T034 [P] [US2] Extend `src/views/home/HomeView.spec.ts` — **Configure New Game** control uses primary accent classes or dedicated `data-testid` + class contract (e.g. `bg-memo-accent` / `memo-cta`)
 - [x] T035 [P] [US2] Extend `e2e/home-hub-layout.spec.ts` — assert **Configure New Game** (`home-configure-game`) has **primary** gold treatment vs **Return to Game** (`home-return-game`) **secondary** treatment (e.g. `toHaveClass` on expected Tailwind tokens)
 
 ### Implementation
 
-- [x] T036 [US2] Refactor `src/views/HomeView.vue` so **Configure New Game** is **not** `MemoSecondaryNavButton`; use `RouterLink` or shared primary button pattern matching `WinDebriefPanel` **Play Again** / `memo-accent` tokens
+- [x] T036 [US2] Refactor `src/views/home/HomeView.vue` so **Configure New Game** is **not** `MemoSecondaryNavButton`; use `RouterLink` or shared primary button pattern matching `WinDebriefPanel` **Play Again** / `memo-accent` tokens
 
 **Checkpoint**: US2 tests green; Configure reads as gold CTA per spec
 
@@ -180,7 +180,7 @@
 
 ### Implementation
 
-- [x] T037 [US4] Adjust opacity / `mix-blend-mode` / SVG `feTurbulence` parameters in `src/components/layout/HubGrainLayer.vue` (and, if needed, shared CSS variables in `src/style.css`) using `src/components/WinDebriefPanel.vue` as the **reference bar**
+- [x] T037 [US4] Adjust opacity / `mix-blend-mode` / SVG `feTurbulence` parameters in `src/components/layout/HubGrainLayer.vue` (and, if needed, shared CSS variables in `src/style.css`) using `src/components/game/WinDebriefPanel.vue` as the **reference bar**
 - [x] T038 [P] Update `specs/007-home-nav-briefcase-ui/quickstart.md` **Design spot-check** with explicit **debrief vs home vs briefcase** grain comparison step (sign-off note for reviewers)
 
 **Checkpoint**: Design review satisfied per **SC-004** grain clause
@@ -208,9 +208,9 @@
 
 - [x] T042 Add **Material Symbols Outlined** stylesheet to `index.html` (Google Fonts URL with **`display=swap`**, opsz/wght per [`research.md`](./research.md) §5)
 - [x] T043 Refactor `src/components/ui/MemoSecondaryNavButton.vue`: extend **`variant`** to **`'back' | 'forward' | 'dismiss'`**; render Material spans ( **`aria-hidden="true"`** ); apply **`group`** on **RouterLink** / **button**; remove **`NavBackIcon` / `NavDismissIcon`** imports
-- [x] T044 [US2] Set **`variant="forward"`** on **Return to Game** `MemoSecondaryNavButton` in `src/views/HomeView.vue` (keep **`to`** / **`data-testid="home-return-game"`**)
+- [x] T044 [US2] Set **`variant="forward"`** on **Return to Game** `MemoSecondaryNavButton` in `src/views/home/HomeView.vue` (keep **`to`** / **`data-testid="home-return-game"`**)
 - [x] T045 [US3] Set **`variant="forward"`** on **Return to Game** in `src/components/briefcase/BriefcaseView.vue` (**`data-testid="briefcase-return-game"`**)
-- [x] T046 [US1] Verify `src/views/GameView.vue` (**Return to Briefcase** = **`back`**, **Abandon** = **`dismiss`**) and `src/components/WinDebriefPanel.vue` (**Return to Briefcase** = **`back`**) use updated component; **`Return to Start Screen`** in Briefcase stays **`back`**
+- [x] T046 [US1] Verify `src/views/game/GameView.vue` (**Return to Briefcase** = **`back`**, **Abandon** = **`dismiss`**) and `src/components/game/WinDebriefPanel.vue` (**Return to Briefcase** = **`back`**) use updated component; **`Return to Start Screen`** in Briefcase stays **`back`**
 - [x] T047 [P] Remove unused `src/assets/icons/NavBackIcon.vue`, `NavDismissIcon.vue` **or** mark deprecated in `src/assets/icons/README.md`; delete if nothing imports them
 - [x] T048 [P] Run `pnpm test` and `pnpm exec playwright test e2e/game-view-chrome.spec.ts e2e/home-hub-layout.spec.ts e2e/briefcase-view.spec.ts` (or full `pnpm test:e2e:preview`); fix regressions
 
@@ -247,7 +247,7 @@
 
 ```bash
 pnpm exec vitest run src/components/ui/MemoSecondaryNavButton.spec.ts
-pnpm exec vitest run src/views/HomeView.spec.ts
+pnpm exec vitest run src/views/home/HomeView.spec.ts
 ```
 
 ### Parallel Example: Phase 12 (Material)

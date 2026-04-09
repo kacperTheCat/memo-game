@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-/** Matches `STORAGE_COMPLETED_SESSIONS_KEY` in `src/game/sessionConstants.ts`. */
+/** Matches `STORAGE_COMPLETED_SESSIONS_KEY` in `src/game/storage/sessionConstants.ts`. */
 const COMPLETED_SESSIONS_KEY = 'memo-game.v1.completedSessions'
 
 /** Deterministic won rows so the History Ledger table is non-empty in the baseline. */

@@ -54,12 +54,12 @@ specs/016-wrong-pair-tile-input/
 ### Source Code (repository root)
 
 ```text
-src/game/memoryEngine.ts          # Wrong-pair pending + interrupt pick
-src/game/memoryEngine.spec.ts
-src/game/tileMotionConstants.ts   # Unchanged values; keep store/shell aligned
-src/stores/gamePlay.ts            # Timer arms on wrong pair; cancel / no-op
-src/stores/gamePlay.spec.ts
-src/components/GameCanvasShell.vue  # isMismatchTile / shake / mismatchActive use wrong-pair predicate
+src/game/memory/memoryEngine.ts          # Wrong-pair pending + interrupt pick
+src/game/memory/memoryEngine.spec.ts
+src/game/tiles/tileMotionConstants.ts   # Unchanged values; keep store/shell aligned
+src/stores/game/gamePlay.ts            # Timer arms on wrong pair; cancel / no-op
+src/stores/game/gamePlay.spec.ts
+src/components/game/GameCanvasShell.vue  # isMismatchTile / shake / mismatchActive use wrong-pair predicate
 e2e/game-wrong-pair-input-during-animation.spec.ts
 ```
 

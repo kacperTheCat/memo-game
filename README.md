@@ -2,6 +2,15 @@
 
 Non-commercial **recruitment / portfolio** project: a Counter-Strike 2–themed memory game. This repository follows [.specify/memory/constitution.md](.specify/memory/constitution.md) (Vue 3, HTML Canvas board, PWA, TDD, Playwright).
 
+## Source layout (`src/`)
+
+- **`views/`** — route screens: `home/`, `game/`, `briefcase/`
+- **`components/`** — `game/` (board, ledger, debrief), `briefcase/`, `layout/`, `ui/`, `pwa/`, `ambient/`
+- **`composables/`** — `game/` (play time, briefcase nav, ambient chase), `pwa/` (install prompt / fallback)
+- **`stores/`** — `game/` (play, session, settings); root `index.ts` = Pinia instance
+- **`game/`** — pure TS: canvas, memory engine, seed, tiles, animation, storage, win, shell, library
+- **`audio/`**, **`pwa/`**, **`constants/`**, **`data/`**, **`env/`**, **`router/`**, **`test/`**
+
 ## Getting started
 
 **Prerequisites:** [Node.js 22](https://nodejs.org/) and [pnpm](https://pnpm.io/) (`corepack enable` recommended).
@@ -74,6 +83,8 @@ Vendored tile art and `src/data/tile-library.json` come from a **one-time** inge
 | `pnpm test:e2e` | Full Playwright pipeline (see above)         |
 | `pnpm test:e2e:preview` | Playwright against preview only (after `pnpm build`) |
 | `pnpm lint`   | ESLint                                           |
+
+Maintainer: after moving files under `src/`, run `node scripts/sync-doc-paths.mjs` to refresh path strings in `specs/` and `.cursor/plans/`.
 
 ## License
 

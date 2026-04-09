@@ -3,7 +3,7 @@ import {
   BOARD_CANVAS_INSET_PX,
   BOARD_GAP_PX,
   boardStripLayout,
-} from '../src/game/canvasLayout'
+} from '../src/game/canvas/canvasLayout'
 
 function attachConsoleErrorCollector(page: Page): { assertClean: () => void } {
   const errors: string[] = []

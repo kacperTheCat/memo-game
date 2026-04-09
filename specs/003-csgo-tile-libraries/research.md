@@ -54,7 +54,7 @@
 
 ## 6. Library validation (FR-005 / P3)
 
-**Decision:** **Vitest** tests importing `src/game/validateTileLibrary.ts` (pure functions) asserting **exactly 32** entries, required fields, **file exists** under `public/` (using `fs` in test or path check relative to repo root). Run in **`pnpm test`**. Optional **JSON Schema** in `specs/003-csgo-tile-libraries/contracts/tile-library.schema.json` duplicated or referenced from `src/` for documentation.
+**Decision:** **Vitest** tests importing `src/game/library/validateTileLibrary.ts` (pure functions) asserting **exactly 32** entries, required fields, **file exists** under `public/` (using `fs` in test or path check relative to repo root). Run in **`pnpm test`**. Optional **JSON Schema** in `specs/003-csgo-tile-libraries/contracts/tile-library.schema.json` duplicated or referenced from `src/` for documentation.
 
 **Rationale:** P3 acceptance; TDD; no Playwright required for schema.
 

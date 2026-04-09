@@ -28,8 +28,8 @@ import {
   navReturnToGame,
   navReturnToStartScreen,
 } from '@/constants/appCopy'
-import { useGameSessionStore } from '@/stores/gameSession'
-import { useGameSettingsStore } from '@/stores/gameSettings'
+import { useGameSessionStore } from '@/stores/game/gameSession'
+import { useGameSettingsStore } from '@/stores/game/gameSettings'
 
 function createTestRouter() {
   return createRouter({

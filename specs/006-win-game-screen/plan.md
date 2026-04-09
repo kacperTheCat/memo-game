@@ -13,7 +13,7 @@ Deliver a **post-match win debrief** on **`/game`** (no URL change): after **`wo
 
 **Language/Version**: TypeScript **5.7** (see root `package.json`), Node **22.x**  
 **Primary Dependencies**: Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa`  
-**Storage**: **`localStorage`** versioned keys (**004**): `memo-game.v1.completedSessions`, `memo-game.v1.inProgress`; no new **localStorage** key for 006 v1. **FR-013:** tab-scoped **`sessionStorage`** key **`memo-game.v1.reloadNewGameDifficulty`** (see `src/game/reloadNewGameDifficulty.ts`) holds the completed round’s **difficulty** only until the next fresh deal on **`/game`** or until cleared on Play Again / Return / briefcase navigation—**not** a “debrief visible” flag.  
+**Storage**: **`localStorage`** versioned keys (**004**): `memo-game.v1.completedSessions`, `memo-game.v1.inProgress`; no new **localStorage** key for 006 v1. **FR-013:** tab-scoped **`sessionStorage`** key **`memo-game.v1.reloadNewGameDifficulty`** (see `src/game/storage/reloadNewGameDifficulty.ts`) holds the completed round’s **difficulty** only until the next fresh deal on **`/game`** or until cleared on Play Again / Return / briefcase navigation—**not** a “debrief visible” flag.  
 **Testing**: Vitest **3**, Playwright **1.49**, `@vue/test-utils`  
 **Target Platform**: Modern browsers (Chromium in CI; manual Firefox/Safari on preview)—see [`research.md`](./research.md) §7  
 **Project Type**: Single-package **responsive PWA** (Vue SPA)  

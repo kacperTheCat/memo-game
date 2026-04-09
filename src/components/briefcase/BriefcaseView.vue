@@ -5,9 +5,9 @@ import { playUiClick } from '@/audio/gameSfx'
 import BriefcaseGlassPanel from '@/components/briefcase/BriefcaseGlassPanel.vue'
 import MemoConfirmDialog from '@/components/ui/MemoConfirmDialog.vue'
 import MemoSecondaryNavButton from '@/components/ui/MemoSecondaryNavButton.vue'
-import { useBriefcaseNavigateToGame } from '@/composables/useBriefcaseNavigateToGame'
-import { formatMaskedNineDigitsFromRawInput } from '@/game/seedMaskFormat'
-import { useGameSessionStore } from '@/stores/gameSession'
+import { useBriefcaseNavigateToGame } from '@/composables/game/useBriefcaseNavigateToGame'
+import { formatMaskedNineDigitsFromRawInput } from '@/game/seed/seedMaskFormat'
+import { useGameSessionStore } from '@/stores/game/gameSession'
 import {
   briefcaseDescription,
   briefcaseDifficultyEasy,
@@ -28,8 +28,8 @@ import {
   navReturnToGame,
   navReturnToStartScreen,
 } from '@/constants/appCopy'
-import { isBriefcaseSeedIncompleteEntry } from '@/game/seedDeal'
-import { useGameSettingsStore } from '@/stores/gameSettings'
+import { isBriefcaseSeedIncompleteEntry } from '@/game/seed/seedDeal'
+import { useGameSettingsStore } from '@/stores/game/gameSettings'
 
 defineOptions({ name: 'BriefcaseView' })
 

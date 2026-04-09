@@ -58,8 +58,8 @@ specs/009-abandon-game-dialog/
 ```text
 src/
 ├── components/ui/MemoConfirmDialog.vue
-├── composables/useBriefcaseNavigateToGame.ts   # in_progress + Unlock → requestConfirm (all matches)
-├── views/GameView.vue
+├── composables/game/useBriefcaseNavigateToGame.ts   # in_progress + Unlock → requestConfirm (all matches)
+├── views/game/GameView.vue
 ├── components/briefcase/BriefcaseView.vue
 ├── constants/appCopy.ts                         # optional second Unlock message (matching case)
 e2e/abandon-confirmation-dialog.spec.ts

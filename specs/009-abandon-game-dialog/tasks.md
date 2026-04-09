@@ -28,7 +28,7 @@ description: "Task list — Abandon confirmation app dialog (009), incl. FR-002 
 
 **Purpose**: Confirm shared dialog + US1 path still valid before changing composable.
 
-- [x] T002 Run `pnpm exec vitest run src/components/ui/MemoConfirmDialog.spec.ts src/views/GameView.abandonDialog.spec.ts` and fix failures if any.
+- [x] T002 Run `pnpm exec vitest run src/components/ui/MemoConfirmDialog.spec.ts src/views/game/GameView.abandonDialog.spec.ts` and fix failures if any.
 
 **Checkpoint**: US1 Vitest green.
 
@@ -42,11 +42,11 @@ description: "Task list — Abandon confirmation app dialog (009), incl. FR-002 
 
 ### Tests for User Story 1
 
-- [x] T003 [P] [US1] After **T008** (composable change), re-run `src/views/GameView.abandonDialog.spec.ts`; update only if US2 work accidentally breaks imports/globals.
+- [x] T003 [P] [US1] After **T008** (composable change), re-run `src/views/game/GameView.abandonDialog.spec.ts`; update only if US2 work accidentally breaks imports/globals.
 
 ### Implementation for User Story 1
 
-- [x] T004 [US1] No functional change expected for `src/views/GameView.vue` for FR-002; if drift appears, align only with **FR-001**.
+- [x] T004 [US1] No functional change expected for `src/views/game/GameView.vue` for FR-002; if drift appears, align only with **FR-001**.
 
 **Checkpoint**: US1 remains independently testable.
 
@@ -60,13 +60,13 @@ description: "Task list — Abandon confirmation app dialog (009), incl. FR-002 
 
 ### Tests for User Story 2 (write/adjust first) ⚠️
 
-- [x] T005 [P] [US2] Vitest: extend `src/composables/useBriefcaseNavigateToGame.spec.ts` — **`in_progress`** + **matching** difficulty **`dealBriefcaseSeedRaw`** → `requestConfirm` called with **`briefcaseUnlockSameSettingsNewDeal`** (or final chosen export from **T001**); `false` → no `router.push`; `true` → `finalizeSession('abandoned')`, `resetRound`, `push` with `memoDealInit`.
+- [x] T005 [P] [US2] Vitest: extend `src/composables/game/useBriefcaseNavigateToGame.spec.ts` — **`in_progress`** + **matching** difficulty **`dealBriefcaseSeedRaw`** → `requestConfirm` called with **`briefcaseUnlockSameSettingsNewDeal`** (or final chosen export from **T001**); `false` → no `router.push`; `true` → `finalizeSession('abandoned')`, `resetRound`, `push` with `memoDealInit`.
 - [x] T006 [P] [US2] Vitest: add case in `src/components/briefcase/BriefcaseView.spec.ts` — `beginSession('easy')`, Briefcase shows **easy** + matching seed vs `dealBriefcaseSeedRaw`, click **Unlock showcase** → `memo-confirm-dialog` → cancel stays briefcase `in_progress`; confirm → `game` route (use `attachTo: document.body` for Teleport).
 - [x] T007 [P] [US2] Playwright: extend `e2e/abandon-confirmation-dialog.spec.ts` for **spec** scenario **5** (in progress, **matching** Briefcase, Unlock → dialog visible → confirm → `/game`; optionally assert fresh-deal signal if stable in suite).
 
 ### Implementation for User Story 2
 
-- [x] T008 [US2] Refactor `src/composables/useBriefcaseNavigateToGame.ts`: after seed-incomplete guard, if **`gs?.status === 'in_progress'`**, compute `const mismatch = difficultyMismatch || seedMismatch`, `message = mismatch ? briefcaseUnlockAbandonInProgress : briefcaseUnlockSameSettingsNewDeal`, **`await requestConfirm(message)`**; on `false` return; on `true` **`finalizeSession('abandoned')`**, **`play.resetRound`**, then **`router.push`**. Remove “confirm only on mismatch” branching. Update file JSDoc to cite **FR-002** / spec **Unlock** semantics (**not** **resumeToGame**).
+- [x] T008 [US2] Refactor `src/composables/game/useBriefcaseNavigateToGame.ts`: after seed-incomplete guard, if **`gs?.status === 'in_progress'`**, compute `const mismatch = difficultyMismatch || seedMismatch`, `message = mismatch ? briefcaseUnlockAbandonInProgress : briefcaseUnlockSameSettingsNewDeal`, **`await requestConfirm(message)`**; on `false` return; on `true` **`finalizeSession('abandoned')`**, **`play.resetRound`**, then **`router.push`**. Remove “confirm only on mismatch” branching. Update file JSDoc to cite **FR-002** / spec **Unlock** semantics (**not** **resumeToGame**).
 - [x] T009 [US2] Ensure `src/components/briefcase/BriefcaseView.vue` still passes `requestConfirm` only; no UI change unless `memoConfirmBriefcaseMismatchTitle` should vary by case (optional polish — defer unless spec requires).
 
 **Checkpoint**: US2 scenarios **4–6** covered by automated tests.
@@ -96,7 +96,7 @@ description: "Task list — Abandon confirmation app dialog (009), incl. FR-002 
 ### Parallel example (US2)
 
 ```bash
-pnpm exec vitest run src/composables/useBriefcaseNavigateToGame.spec.ts &
+pnpm exec vitest run src/composables/game/useBriefcaseNavigateToGame.spec.ts &
 pnpm exec vitest run src/components/briefcase/BriefcaseView.spec.ts &
 wait
 ```
