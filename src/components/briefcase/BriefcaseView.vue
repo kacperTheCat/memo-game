@@ -6,7 +6,7 @@ import BriefcaseGlassPanel from '@/components/briefcase/BriefcaseGlassPanel.vue'
 import MemoConfirmDialog from '@/components/ui/MemoConfirmDialog.vue'
 import MemoSecondaryNavButton from '@/components/ui/MemoSecondaryNavButton.vue'
 import { useBriefcaseNavigateToGame } from '@/composables/useBriefcaseNavigateToGame'
-import { formatMaskedNineDigitsFromRawInput } from '@/composables/useNineDigitSeedMask'
+import { formatMaskedNineDigitsFromRawInput } from '@/game/seedMaskFormat'
 import { useGameSessionStore } from '@/stores/gameSession'
 import {
   briefcaseDescription,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatMaskedNineDigitsFromRawInput } from '@/composables/useNineDigitSeedMask'
+import { formatMaskedNineDigitsFromRawInput } from '@/game/seedMaskFormat'
 
 describe('formatMaskedNineDigitsFromRawInput', () => {
   it('caps digit run at nine (typing path)', () => {

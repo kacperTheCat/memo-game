@@ -10,10 +10,8 @@ import {
 import { useRoute, useRouter } from 'vue-router'
 import rawLibrary from '@/data/tile-library.json'
 import { buildGridCells, gridDimensions } from '@/game/buildGridLayout'
-import {
-  historyStateWithoutMemoDeal,
-  resolveRngAndDealKindForNewShuffle,
-} from '@/game/dealInitFromNavigation'
+import { historyStateWithoutMemoDeal } from '@/game/dealInitFromNavigation'
+import { createCanvasShellImageCache } from '@/game/canvasShellAssets'
 import { cellRectsForGrid, type CellRect } from '@/game/cellRect'
 import { normalizedPointerInFaceRect } from '@/game/tileFaceGradientPointer'
 import { cellIndexFromPointer } from '@/game/canvasHitTest'
@@ -43,6 +41,7 @@ import {
   smoothParallaxOffsets,
   staggerFactor,
 } from '@/game/tileParallaxSmooth'
+import { startNewRoundFromBriefcaseNavigation } from '@/game/gameCanvasFreshDeal'
 import { consumeReloadNewGameDifficulty } from '@/game/reloadNewGameDifficulty'
 import { createSeededRandom } from '@/game/seededRng'
 import {
@@ -152,37 +151,11 @@ async function stripMemoDealFromHistory(): Promise<void> {
   })
 }
 
-function assetUrl(imagePath: string): string {
-  const base = import.meta.env.BASE_URL.endsWith('/')
-    ? import.meta.env.BASE_URL
-    : `${import.meta.env.BASE_URL}/`
-  const p = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath
-  return `${base}${p}`
-}
+const { imageCache, ensureImage } = createCanvasShellImageCache(
+  () => import.meta.env.BASE_URL,
+)
 
-const imageCache = new Map<string, HTMLImageElement>()
-
-function loadImage(url: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.onload = () => resolve(img)
-    img.onerror = () => reject(new Error(`Image failed to load: ${url}`))
-    img.src = url
-  })
-}
-
-async function ensureImage(imagePath: string): Promise<HTMLImageElement> {
-  const cached = imageCache.get(imagePath)
-  if (cached?.complete && cached.naturalWidth > 0) {
-    return cached
-  }
-  const url = assetUrl(imagePath)
-  const img = await loadImage(url)
-  imageCache.set(imagePath, img)
-  return img
-}
-
-function subsetEntry(identityIndex: number): TileEntry {
+function entryForIdentityInDeal(identityIndex: number): TileEntry {
   const m = play.memory
   const n =
     m && m.cells.length > 0
@@ -682,7 +655,7 @@ async function paint(): Promise<void> {
   }
   const parallaxSettling = parallaxEpsilon > 0.08 && !reducedMotion.value
 
-  const hk = 1 - Math.exp(-dt / HIGHLIGHT_SMOOTH_TAU_MS)
+  const highlightSmoothK = 1 - Math.exp(-dt / HIGHLIGHT_SMOOTH_TAU_MS)
   let highlightSettling = false
   for (let i = 0; i < n; i++) {
     const cell = mem.cells[i]
@@ -695,8 +668,8 @@ async function paint(): Promise<void> {
       cell.phase === 'matched' ||
       debugPeekAllFaces.value
     if (reducedMotion.value || !faceActive) {
-      highlightSmNx[i] = 0.5 + (0.5 - highlightSmNx[i]!) * hk
-      highlightSmNy[i] = 0.5 + (0.5 - highlightSmNy[i]!) * hk
+      highlightSmNx[i] = 0.5 + (0.5 - highlightSmNx[i]!) * highlightSmoothK
+      highlightSmNy[i] = 0.5 + (0.5 - highlightSmNy[i]!) * highlightSmoothK
       continue
     }
     if (pointerCss.value) {
@@ -705,8 +678,8 @@ async function paint(): Promise<void> {
         pointerCss.value.y,
         r,
       )
-      highlightSmNx[i] += (nx - highlightSmNx[i]!) * hk
-      highlightSmNy[i] += (ny - highlightSmNy[i]!) * hk
+      highlightSmNx[i] += (nx - highlightSmNx[i]!) * highlightSmoothK
+      highlightSmNy[i] += (ny - highlightSmNy[i]!) * highlightSmoothK
       if (
         Math.abs((highlightSmNx[i] ?? 0.5) - nx) > 0.014 ||
         Math.abs((highlightSmNy[i] ?? 0.5) - ny) > 0.014
@@ -714,14 +687,14 @@ async function paint(): Promise<void> {
         highlightSettling = true
       }
     } else {
-      highlightSmNx[i] += (0.5 - highlightSmNx[i]!) * hk
-      highlightSmNy[i] += (0.5 - highlightSmNy[i]!) * hk
+      highlightSmNx[i] += (0.5 - highlightSmNx[i]!) * highlightSmoothK
+      highlightSmNy[i] += (0.5 - highlightSmNy[i]!) * highlightSmoothK
     }
   }
 
   const paths = new Set<string>()
   for (const c of mem.cells) {
-    paths.add(subsetEntry(c.identityIndex).imagePath)
+    paths.add(entryForIdentityInDeal(c.identityIndex).imagePath)
   }
   try {
     await Promise.all([...paths].map((p) => ensureImage(p)))
@@ -737,7 +710,7 @@ async function paint(): Promise<void> {
     if (!cell || !r) {
       continue
     }
-    const entry = subsetEntry(cell.identityIndex)
+    const entry = entryForIdentityInDeal(cell.identityIndex)
     const img = imageCache.get(entry.imagePath)
     const canvasPhase = drawPhaseForCanvas(cell.phase, debugPeekAllFaces.value)
     const { firstIndex, secondIndex, locked } = mem.pair
@@ -776,7 +749,7 @@ async function paint(): Promise<void> {
   for (let s = 0; s < nStrip; s++) {
     const chip = stripChips.value[s]!
     const tr = stripChipRect(bs.stripY, bs.stripH, cssW, s, nStrip)
-    const e = subsetEntry(chip.identityIndex)
+    const e = entryForIdentityInDeal(chip.identityIndex)
     const simg = imageCache.get(e.imagePath)
     drawTile(ctx, tr, {
       phase: 'revealed',
@@ -802,7 +775,7 @@ async function paint(): Promise<void> {
     const tcy = tr.y + tr.h / 2
     const ra = lerpCollectRect(cf.fromA, tcx, tcy, tr.w, tr.h, cf.t)
     const rb = lerpCollectRect(cf.fromB, tcx, tcy, tr.w, tr.h, cf.t)
-    const e = subsetEntry(cf.identityIndex)
+    const e = entryForIdentityInDeal(cf.identityIndex)
     const simg = imageCache.get(e.imagePath)
     drawTile(ctx, ra, {
       phase: 'revealed',
@@ -862,6 +835,21 @@ function difficultyForFreshRound(): Difficulty {
   return settings.difficulty
 }
 
+function beginFreshDealFromBriefcaseNavigation(): void {
+  const d = difficultyForFreshRound()
+  session.beginSession(d, {
+    dealBriefcaseSeedRaw: settings.briefcaseSeedRaw,
+  })
+  startNewRoundFromBriefcaseNavigation(
+    layout.value,
+    d,
+    window.history.state,
+    takeDealRng,
+    (grid, rng, opts) => play.startNewRound(grid, rng, opts),
+  )
+  void stripMemoDealFromHistory()
+}
+
 function initRoundIfNeeded(): void {
   const snap = session.loadInProgressSnapshot()
   if (snap && snap.session.status === 'in_progress') {
@@ -870,48 +858,22 @@ function initRoundIfNeeded(): void {
     play.hydrateFromSnapshot(snap.cells, snap.pair, snap.session.difficulty)
     void stripMemoDealFromHistory()
   } else if (!play.memory) {
-    const d = difficultyForFreshRound()
-    session.beginSession(d, {
-      dealBriefcaseSeedRaw: settings.briefcaseSeedRaw,
-    })
-    const memo = resolveRngAndDealKindForNewShuffle(
-      d,
-      window.history.state,
-      'briefcase-navigation',
-    )
-    let rng = memo.rng
-    let dealKind = memo.dealKind
-    if (memo.dealKind === 'random') {
-      rng = takeDealRng()
-      dealKind = rng === Math.random ? 'random' : 'seeded'
-    }
-    play.startNewRound(layout.value, rng, { dealInitKind: dealKind })
-    void stripMemoDealFromHistory()
+    beginFreshDealFromBriefcaseNavigation()
   } else if (play.memory.cells.length !== layout.value.totalCells) {
-    const d = difficultyForFreshRound()
-    session.beginSession(d, {
-      dealBriefcaseSeedRaw: settings.briefcaseSeedRaw,
-    })
-    const memo = resolveRngAndDealKindForNewShuffle(
-      d,
-      window.history.state,
-      'briefcase-navigation',
-    )
-    let rng = memo.rng
-    let dealKind = memo.dealKind
-    if (memo.dealKind === 'random') {
-      rng = takeDealRng()
-      dealKind = rng === Math.random ? 'random' : 'seeded'
-    }
-    play.startNewRound(layout.value, rng, { dealInitKind: dealKind })
-    void stripMemoDealFromHistory()
+    beginFreshDealFromBriefcaseNavigation()
   }
 }
 
+let reducedMotionMq: MediaQueryList | null = null
+let onReducedMotionChange: (() => void) | null = null
+
 onMounted(() => {
-  reducedMotion.value = window.matchMedia(
-    '(prefers-reduced-motion: reduce)',
-  ).matches
+  reducedMotionMq = window.matchMedia('(prefers-reduced-motion: reduce)')
+  reducedMotion.value = reducedMotionMq.matches
+  onReducedMotionChange = () => {
+    reducedMotion.value = reducedMotionMq?.matches ?? false
+  }
+  reducedMotionMq.addEventListener('change', onReducedMotionChange)
   initRoundIfNeeded()
 
   const wrap = shellRef.value
@@ -923,6 +885,11 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  if (reducedMotionMq && onReducedMotionChange) {
+    reducedMotionMq.removeEventListener('change', onReducedMotionChange)
+  }
+  reducedMotionMq = null
+  onReducedMotionChange = null
   observer?.disconnect()
   observer = null
   cancelAnimationFrame(raf)

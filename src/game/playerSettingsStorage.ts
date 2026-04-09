@@ -1,4 +1,5 @@
 import type { Pinia } from 'pinia'
+import { isDifficulty } from '@/game/isDifficulty'
 import type { Difficulty } from '@/game/tileLibraryTypes'
 import { STORAGE_PLAYER_SETTINGS_KEY } from '@/game/sessionConstants'
 import { useGameSettingsStore } from '@/stores/gameSettings'
@@ -9,10 +10,6 @@ export type PlayerSettingsV1 = {
   schemaVersion: typeof PLAYER_SETTINGS_SCHEMA_VERSION
   difficulty: Difficulty
   briefcaseSeedRaw: string
-}
-
-function isDifficulty(x: unknown): x is Difficulty {
-  return x === 'easy' || x === 'medium' || x === 'hard'
 }
 
 export function parsePlayerSettingsJson(raw: string | null): PlayerSettingsV1 | null {
