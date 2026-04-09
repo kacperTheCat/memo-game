@@ -28,6 +28,7 @@ import {
 } from '@/game/collectStripLayout'
 import { drawTile } from '@/game/canvasTileDraw'
 import type { TilePhase } from '@/game/memoryTypes'
+import { isWrongPairPending } from '@/game/memoryEngine'
 import {
   TILE_COLLECT_MS,
   TILE_FLIP_MS,
@@ -294,14 +295,14 @@ function mismatchShake(now: number, mem: typeof play.memory): number {
   if (!mem || reducedMotion.value) {
     return 0
   }
-  const { firstIndex, secondIndex, locked } = mem.pair
-  if (!locked || firstIndex === null || secondIndex === null) {
+  const { firstIndex, secondIndex } = mem.pair
+  if (!isWrongPairPending(mem) || firstIndex === null || secondIndex === null) {
     mismatchStartedAt = null
     return 0
   }
   const a = mem.cells[firstIndex]
   const b = mem.cells[secondIndex]
-  if (!a || !b || a.identityIndex === b.identityIndex) {
+  if (!a || !b) {
     mismatchStartedAt = null
     return 0
   }
@@ -324,8 +325,8 @@ function mismatchConceal01ForCell(
   if (!mem) {
     return undefined
   }
-  const { firstIndex, secondIndex, locked } = mem.pair
-  if (!locked || firstIndex === null || secondIndex === null) {
+  const { firstIndex, secondIndex } = mem.pair
+  if (!isWrongPairPending(mem) || firstIndex === null || secondIndex === null) {
     return undefined
   }
   if (cellIndex !== firstIndex && cellIndex !== secondIndex) {
@@ -333,7 +334,7 @@ function mismatchConceal01ForCell(
   }
   const a = mem.cells[firstIndex]
   const b = mem.cells[secondIndex]
-  if (!a || !b || a.identityIndex === b.identityIndex) {
+  if (!a || !b) {
     return undefined
   }
   if (reducedMotion.value) {
@@ -359,13 +360,13 @@ function computeMismatchPhaseUi(
   if (!mem) {
     return 'idle'
   }
-  const { firstIndex, secondIndex, locked } = mem.pair
-  if (!locked || firstIndex === null || secondIndex === null) {
+  const { firstIndex, secondIndex } = mem.pair
+  if (!isWrongPairPending(mem) || firstIndex === null || secondIndex === null) {
     return 'idle'
   }
   const a = mem.cells[firstIndex]
   const b = mem.cells[secondIndex]
-  if (!a || !b || a.identityIndex === b.identityIndex) {
+  if (!a || !b) {
     return 'idle'
   }
   if (reducedMotion.value) {
@@ -401,13 +402,13 @@ function animationActive(
       return true
     }
   }
-  const { locked, firstIndex, secondIndex } = mem.pair
-  if (locked && firstIndex !== null && secondIndex !== null) {
-    const a = mem.cells[firstIndex]
-    const b = mem.cells[secondIndex]
-    if (a && b && a.identityIndex !== b.identityIndex) {
-      return true
-    }
+  const { firstIndex, secondIndex } = mem.pair
+  if (
+    isWrongPairPending(mem) &&
+    firstIndex !== null &&
+    secondIndex !== null
+  ) {
+    return true
   }
   if (collectFlight !== null) {
     return true
@@ -714,13 +715,12 @@ async function paint(): Promise<void> {
     const entry = entryForIdentityInDeal(cell.identityIndex)
     const img = imageCache.get(entry.imagePath)
     const canvasPhase = drawPhaseForCanvas(cell.phase, debugPeekAllFaces.value)
-    const { firstIndex, secondIndex, locked } = mem.pair
+    const { firstIndex, secondIndex } = mem.pair
     const isMismatchTile =
-      locked &&
+      isWrongPairPending(mem) &&
       firstIndex !== null &&
       secondIndex !== null &&
-      (i === firstIndex || i === secondIndex) &&
-      mem.cells[firstIndex]!.identityIndex !== mem.cells[secondIndex]!.identityIndex
+      (i === firstIndex || i === secondIndex)
     const conceal = mismatchConceal01ForCell(now, mem, i)
     const hl =
       reducedMotion.value || canvasPhase === 'concealed'
@@ -953,7 +953,7 @@ watch(debugPeekAllFaces, () => {
     <button
       v-if="showDebugPeekButton"
       type="button"
-      class="absolute right-2 top-0 z-10 rounded border border-amber-600/80 bg-amber-950/90 px-2 py-1 text-xs font-medium text-amber-100 shadow hover:bg-amber-900/90"
+      class="absolute right-2 top-0 z-10 rounded border border-amber-600/80 bg-amber-950/90 px-2 py-1 font-sans text-xs font-medium text-amber-100 shadow hover:bg-amber-900/90"
       data-testid="game-debug-peek-faces"
       :aria-pressed="debugPeekAllFaces ? 'true' : 'false'"
       :aria-label="

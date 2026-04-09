@@ -33,6 +33,10 @@
   --color-memo-cta-text: var(--memo-cta-text);
   --radius-memo-md: var(--memo-radius-md);
   --radius-memo-glass: var(--memo-radius-glass);
+  /* Match Stitch: Clash Display (headings/CTA), Satoshi (UI body), Space Grotesk (mono labels) */
+  --font-display: "Clash Display", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Space Grotesk", ui-monospace, monospace;
 }
 
 html,
@@ -43,12 +47,22 @@ body,
 
 body {
   margin: 0;
-  font-family:
-    system-ui,
-    -apple-system,
-    Segoe UI,
-    Roboto,
-    sans-serif;
+  font-family: var(--font-sans);
+}
+
+/* Global Stitch roles: display for headings & primary actions; body = Satoshi via body; `font-mono` = Space Grotesk from @theme */
+@layer base {
+  :where(h1, h2, h3, h4, h5, h6) {
+    font-family: var(--font-display);
+  }
+
+  :where(button) {
+    font-family: var(--font-display);
+  }
+
+  :where(code, kbd, samp, pre) {
+    font-family: var(--font-mono);
+  }
 }
 
 .memo-backdrop-noise {

@@ -162,20 +162,18 @@ function onDifficultyChange(): void {
         <div class="space-y-4">
           <fieldset
             data-testid="briefcase-difficulty"
-            class="m-0 border-0 p-0"
+            class="m-0 min-w-0 border-0 p-0"
           >
             <legend
               class="text-[12px] font-medium uppercase tracking-[0.05em] text-memo-muted"
             >
               {{ briefcaseDifficultyLabel }}
             </legend>
-            <div
-              class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3"
-            >
+            <div class="mt-4 grid min-w-0 grid-cols-3 gap-2 md:gap-3">
               <label
                 v-for="opt in difficultyOptions"
                 :key="opt.value"
-                class="memo-radio-card cursor-pointer"
+                class="memo-radio-card min-w-0 cursor-pointer"
               >
                 <input
                   v-model="difficulty"
@@ -186,19 +184,23 @@ function onDifficultyChange(): void {
                   @change="onDifficultyChange"
                 >
                 <div
-                  class="flex flex-col rounded-[var(--memo-radius-md)] border border-memo-border bg-white/5 p-4 transition-all duration-200 peer-checked:border-memo-accent peer-checked:shadow-[0_0_15px_rgba(228,168,52,0.2)] peer-checked:[&_.memo-radio-title]:text-memo-accent peer-checked:[&_.memo-radio-indicator]:border-memo-accent peer-checked:[&_.memo-radio-indicator]:bg-memo-accent motion-safe:hover:border-white/20"
+                  class="flex h-full min-h-0 flex-col items-center gap-1 rounded-[var(--memo-radius-md)] border border-memo-border bg-white/5 p-2 text-center transition-all duration-200 peer-checked:border-memo-accent peer-checked:shadow-[0_0_15px_rgba(228,168,52,0.2)] peer-checked:[&_.memo-radio-title]:text-memo-accent peer-checked:[&_.memo-radio-indicator]:border-memo-accent peer-checked:[&_.memo-radio-indicator]:bg-memo-accent motion-safe:hover:border-white/20 md:items-stretch md:gap-0 md:p-4 md:text-left"
                 >
-                  <div class="mb-2 flex items-center justify-between">
+                  <div
+                    class="flex w-full min-w-0 items-center justify-center gap-1.5 md:mb-2 md:justify-between"
+                  >
                     <span
-                      class="memo-radio-title text-base font-semibold text-memo-text transition-colors"
+                      class="memo-radio-title font-display text-xs font-semibold leading-tight text-memo-text transition-colors md:text-base"
                     >
                       {{ opt.label }}
                     </span>
                     <div
-                      class="memo-radio-indicator h-4 w-4 shrink-0 rounded-full border border-memo-muted transition-colors"
+                      class="memo-radio-indicator h-3 w-3 shrink-0 rounded-full border border-memo-muted transition-colors md:h-4 md:w-4"
                     />
                   </div>
-                  <span class="font-mono text-sm text-memo-muted">
+                  <span
+                    class="w-full min-w-0 break-words font-mono text-[11px] leading-snug text-memo-muted md:text-sm"
+                  >
                     {{ opt.subtitle }}
                   </span>
                 </div>
@@ -232,7 +234,7 @@ function onDifficultyChange(): void {
                 : undefined
             "
             :class="[
-              'w-full rounded-[var(--memo-radius-md)] border bg-black/30 px-4 py-3 text-sm text-memo-text placeholder:text-memo-muted/50 focus:outline-none focus:ring-1',
+              'w-full rounded-[var(--memo-radius-md)] border bg-black/30 px-4 py-3 font-mono text-sm text-memo-text placeholder:text-memo-muted/50 focus:outline-none focus:ring-1',
               seedShowIncompleteChrome
                 ? 'border-red-400/70 focus:border-red-400/80 focus:ring-red-400/40'
                 : 'border-memo-border focus:border-memo-accent/50 focus:ring-memo-accent/50',

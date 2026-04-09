@@ -98,80 +98,86 @@ const summary = computed(() => {
     >
       <MemoAmbientSpotlight />
     </div>
-    <header class="relative z-[2] mx-auto flex w-full max-w-7xl items-center p-6">
-      <MemoSecondaryNavButton
-        variant="back"
-        :label="navReturnToBriefcase"
-        data-testid="win-return-briefcase"
-        @click="emit('return-briefcase')"
-      />
-    </header>
-    <main
-      class="relative z-[2] mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-8 sm:px-6 lg:px-8"
+    <!-- Same shell as BriefcaseViewPage (`px-4 py-8`) + BriefcaseView hub nav (`gap-3`, `mb-6` vs `gap-6` to panel) -->
+    <div
+      class="relative z-[2] mx-auto flex w-full max-w-7xl flex-col px-4 py-8"
     >
-      <div class="flex flex-col items-start gap-12 lg:flex-row lg:gap-16">
-        <div class="flex w-full flex-col gap-8 lg:w-5/12">
-          <div class="space-y-2">
-            <h2 class="text-sm font-bold uppercase tracking-[0.2em] text-[#e5aa34]">
-              Post-Match Debrief
-            </h2>
-            <h1
-              data-testid="operation-complete-heading"
-              class="operation-complete-title text-4xl font-bold leading-tight drop-shadow-[0_0_15px_rgba(229,170,52,0.3)] sm:text-5xl"
-            >
-              <span
-                v-for="(ch, i) in operationChars"
-                :key="`${i}-${ch}`"
-                class="operation-complete-char operation-complete-char-gradient motion-reduce:!translate-y-0 motion-reduce:!opacity-100"
-                :class="prefersReducedMotion ? '' : 'operation-complete-char--animate'"
-                :style="{ animationDelay: charDelayMs(i) }"
-              >{{ ch === ' ' ? '\u00a0' : ch }}</span>
-            </h1>
-          </div>
-          <div
-            v-if="summary"
-            class="grid grid-cols-2 gap-4"
-          >
-            <div
-              class="glass-panel relative overflow-hidden rounded-2xl p-6"
-            >
-              <span class="relative z-10 mb-2 block text-xs font-medium uppercase tracking-[0.1em] text-gray-400">Time Elapsed</span>
-              <div
-                data-testid="win-summary-time"
-                class="relative z-10 font-mono text-3xl font-bold tracking-tight text-white sm:text-4xl"
-              >
-                {{ summary.time }}
-              </div>
-            </div>
-            <div
-              class="glass-panel relative overflow-hidden rounded-2xl p-6"
-            >
-              <span class="relative z-10 mb-2 block text-xs font-medium uppercase tracking-[0.1em] text-gray-400">Moves Taken</span>
-              <div
-                data-testid="win-summary-moves"
-                class="relative z-10 font-mono text-3xl font-bold tracking-tight text-white sm:text-4xl"
-              >
-                {{ summary.moves }}
-              </div>
-            </div>
-          </div>
-          <div class="pt-4">
-            <button
-              type="button"
-              data-testid="win-play-again"
-              class="flex h-16 w-full items-center justify-center gap-3 rounded-xl bg-[#e5aa34] font-bold text-lg text-[#211c11] shadow-[0_0_30px_rgba(229,170,52,0.2)] transition-all hover:scale-[1.02] hover:brightness-110"
-              @click="onPlayAgainClick"
-            >
-              <span aria-hidden="true">↻</span>
-              Play Again
-            </button>
-          </div>
-        </div>
-        <div class="flex w-full flex-col gap-6 lg:w-7/12">
-          <SessionHistoryLedger />
-        </div>
+      <div
+        class="mb-6 flex flex-wrap items-center gap-3"
+        data-testid="win-debrief-hub-nav"
+      >
+        <MemoSecondaryNavButton
+          variant="back"
+          :label="navReturnToBriefcase"
+          data-testid="win-return-briefcase"
+          @click="emit('return-briefcase')"
+        />
       </div>
-    </main>
+      <main class="flex flex-1 flex-col">
+        <div class="flex flex-col items-start gap-12 lg:flex-row lg:gap-16">
+          <div class="flex w-full flex-col gap-8 lg:w-5/12">
+            <div class="space-y-2">
+              <h2 class="text-sm font-bold uppercase tracking-[0.2em] text-[#e5aa34]">
+                Post-Match Debrief
+              </h2>
+              <h1
+                data-testid="operation-complete-heading"
+                class="operation-complete-title whitespace-nowrap font-bold leading-tight drop-shadow-[0_0_15px_rgba(229,170,52,0.3)]"
+              >
+                <span
+                  v-for="(ch, i) in operationChars"
+                  :key="`${i}-${ch}`"
+                  class="operation-complete-char operation-complete-char-gradient motion-reduce:!translate-y-0 motion-reduce:!opacity-100"
+                  :class="prefersReducedMotion ? '' : 'operation-complete-char--animate'"
+                  :style="{ animationDelay: charDelayMs(i) }"
+                >{{ ch === ' ' ? '\u00a0' : ch }}</span>
+              </h1>
+            </div>
+            <div
+              v-if="summary"
+              class="grid grid-cols-2 gap-4"
+            >
+              <div
+                class="glass-panel relative overflow-hidden rounded-2xl p-6"
+              >
+                <span class="relative z-10 mb-2 block text-xs font-medium uppercase tracking-[0.1em] text-gray-400">Time Elapsed</span>
+                <div
+                  data-testid="win-summary-time"
+                  class="relative z-10 font-mono text-3xl font-bold tracking-tight text-white sm:text-4xl"
+                >
+                  {{ summary.time }}
+                </div>
+              </div>
+              <div
+                class="glass-panel relative overflow-hidden rounded-2xl p-6"
+              >
+                <span class="relative z-10 mb-2 block text-xs font-medium uppercase tracking-[0.1em] text-gray-400">Moves Taken</span>
+                <div
+                  data-testid="win-summary-moves"
+                  class="relative z-10 font-mono text-3xl font-bold tracking-tight text-white sm:text-4xl"
+                >
+                  {{ summary.moves }}
+                </div>
+              </div>
+            </div>
+            <div class="pt-4">
+              <button
+                type="button"
+                data-testid="win-play-again"
+                class="flex h-16 w-full items-center justify-center gap-3 rounded-xl bg-[#e5aa34] font-bold text-lg text-[#211c11] shadow-[0_0_30px_rgba(229,170,52,0.2)] transition-all hover:scale-[1.02] hover:brightness-110"
+                @click="onPlayAgainClick"
+              >
+                <span aria-hidden="true">↻</span>
+                Play Again
+              </button>
+            </div>
+          </div>
+          <div class="flex w-full flex-col gap-6 lg:w-7/12">
+            <SessionHistoryLedger />
+          </div>
+        </div>
+      </main>
+    </div>
   </div>
 </template>
 
@@ -195,8 +201,10 @@ const summary = computed(() => {
 
 .operation-complete-title {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.02em;
+  /* ~text-2xl on narrow phones → ~text-5xl on large screens; scales with viewport */
+  font-size: clamp(1.5rem, 0.95rem + 3.25vw, 3rem);
 }
 
 .operation-complete-char {

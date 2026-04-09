@@ -36,6 +36,14 @@ function chipClass(d: Difficulty): string {
       return 'border border-blue-500/20 bg-blue-500/10 text-blue-400'
   }
 }
+
+/** Same horizontal + vertical rhythm for thead/tbody so columns align and density matches. */
+const tableCellPad =
+  'px-3 py-2.5 md:px-4 md:py-3 lg:px-6 lg:py-4'
+
+/** Empty state: same horizontal as cells; vertical ~4× cell py per breakpoint. */
+const tableEmptyPad =
+  'px-3 py-10 text-center text-sm text-gray-500 md:px-4 md:py-12 lg:px-6 lg:py-16'
 </script>
 
 <template>
@@ -47,7 +55,6 @@ function chipClass(d: Difficulty): string {
       <h3 class="text-xl font-semibold text-white">
         History Ledger
       </h3>
-      <span class="font-mono text-xs uppercase tracking-widest text-gray-500">Local Data</span>
     </div>
     <div class="ledger-glass overflow-hidden rounded-2xl">
       <!-- min-height stabilizes cross-OS table metrics (Linux vs macOS) for Playwright screenshots -->
@@ -61,16 +68,36 @@ function chipClass(d: Difficulty): string {
         >
           <thead>
             <tr class="border-b border-white/10 bg-black/40">
-              <th class="px-6 py-4 text-xs font-medium uppercase tracking-[0.1em] text-gray-400">
+              <th
+                :class="[
+                  tableCellPad,
+                  'text-xs font-medium uppercase tracking-[0.1em] text-gray-400',
+                ]"
+              >
                 Date
               </th>
-              <th class="px-6 py-4 text-xs font-medium uppercase tracking-[0.1em] text-gray-400">
+              <th
+                :class="[
+                  tableCellPad,
+                  'text-xs font-medium uppercase tracking-[0.1em] text-gray-400',
+                ]"
+              >
                 Difficulty
               </th>
-              <th class="px-6 py-4 text-xs font-medium uppercase tracking-[0.1em] text-gray-400">
+              <th
+                :class="[
+                  tableCellPad,
+                  'text-xs font-medium uppercase tracking-[0.1em] text-gray-400',
+                ]"
+              >
                 Time
               </th>
-              <th class="px-6 py-4 text-xs font-medium uppercase tracking-[0.1em] text-gray-400">
+              <th
+                :class="[
+                  tableCellPad,
+                  'text-xs font-medium uppercase tracking-[0.1em] text-gray-400',
+                ]"
+              >
                 Moves
               </th>
             </tr>
@@ -80,7 +107,7 @@ function chipClass(d: Difficulty): string {
               <tr>
                 <td
                   colspan="4"
-                  class="px-6 py-12 text-center text-sm text-gray-500"
+                  :class="tableEmptyPad"
                 >
                   <span data-testid="session-history-empty">No operational data found.</span>
                 </td>
@@ -93,10 +120,12 @@ function chipClass(d: Difficulty): string {
                 class="transition-colors hover:bg-white/[0.02]"
                 :class="{ 'bg-white/[0.01]': idx % 2 === 1 }"
               >
-                <td class="px-6 py-5 font-mono text-sm text-gray-300">
+                <td
+                  :class="[tableCellPad, 'font-mono text-sm text-gray-300']"
+                >
                   {{ formatCompletedAtDateLocalYyyyMmDd(row.completedAt) }}
                 </td>
-                <td class="px-6 py-5">
+                <td :class="tableCellPad">
                   <span
                     class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium"
                     :class="chipClass(row.difficulty)"
@@ -104,10 +133,20 @@ function chipClass(d: Difficulty): string {
                     {{ difficultyDisplayLabel(row.difficulty) }}
                   </span>
                 </td>
-                <td class="px-6 py-5 font-mono text-sm font-medium text-white">
+                <td
+                  :class="[
+                    tableCellPad,
+                    'font-mono text-sm font-medium text-white',
+                  ]"
+                >
                   {{ formatActivePlayMsAsMmSs(row.activePlayMs) }}
                 </td>
-                <td class="px-6 py-5 font-mono text-sm font-medium text-gray-300">
+                <td
+                  :class="[
+                    tableCellPad,
+                    'font-mono text-sm font-medium text-gray-300',
+                  ]"
+                >
                   {{ row.clickCount }}
                 </td>
               </tr>
