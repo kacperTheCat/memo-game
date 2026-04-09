@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import BriefcaseGlassPanel from '@/components/briefcase/BriefcaseGlassPanel.vue'
+import MemoConfirmDialog from '@/components/ui/MemoConfirmDialog.vue'
 import MemoSecondaryNavButton from '@/components/ui/MemoSecondaryNavButton.vue'
 import { useBriefcaseNavigateToGame } from '@/composables/useBriefcaseNavigateToGame'
 import { formatMaskedNineDigitsFromRawInput } from '@/composables/useNineDigitSeedMask'
@@ -20,6 +21,9 @@ import {
   briefcaseSeedPlaceholder,
   briefcaseTitle,
   briefcaseUnlockShowcase,
+  memoConfirmBriefcaseMismatchTitle,
+  memoConfirmButtonCancel,
+  memoConfirmButtonContinue,
   navReturnToGame,
   navReturnToStartScreen,
 } from '@/constants/appCopy'
@@ -30,9 +34,39 @@ defineOptions({ name: 'BriefcaseView' })
 
 const gameSettings = useGameSettingsStore()
 const { difficulty, briefcaseSeedRaw } = storeToRefs(gameSettings)
-const { navigateToGame } = useBriefcaseNavigateToGame()
 const session = useGameSessionStore()
 const { gameSession } = storeToRefs(session)
+
+const mismatchDialogOpen = ref(false)
+const mismatchDialogMessage = ref('')
+const mismatchDialogResolve = ref<((value: boolean) => void) | null>(null)
+
+function requestMismatchConfirm(message: string): Promise<boolean> {
+  if (mismatchDialogResolve.value) {
+    return Promise.resolve(false)
+  }
+  return new Promise((resolve) => {
+    mismatchDialogMessage.value = message
+    mismatchDialogResolve.value = resolve
+    mismatchDialogOpen.value = true
+  })
+}
+
+function onMismatchDialogConfirm(): void {
+  mismatchDialogOpen.value = false
+  const r = mismatchDialogResolve.value
+  mismatchDialogResolve.value = null
+  r?.(true)
+}
+
+function onMismatchDialogCancel(): void {
+  mismatchDialogOpen.value = false
+  const r = mismatchDialogResolve.value
+  mismatchDialogResolve.value = null
+  r?.(false)
+}
+
+const { navigateToGame } = useBriefcaseNavigateToGame(requestMismatchConfirm)
 
 const showReturnToGame = computed(
   () => gameSession.value?.status === 'in_progress',
@@ -79,8 +113,8 @@ function onSeedInput(ev: Event): void {
   gameSettings.clearBriefcaseSeedIncompleteAfterBlurIfResolved()
 }
 
-function onUnlockShowcase(): void {
-  navigateToGame()
+async function onUnlockShowcase(): Promise<void> {
+  await navigateToGame()
 }
 </script>
 
@@ -216,7 +250,7 @@ function onUnlockShowcase(): void {
           <button
             type="button"
             data-testid="briefcase-unlock-showcase"
-            :disabled="seedShowIncompleteChrome"
+            :disabled="seedShowIncompleteChrome || mismatchDialogOpen"
             class="w-full rounded-[var(--memo-radius-md)] bg-memo-accent px-4 py-4 text-base font-semibold text-memo-cta-text shadow-[0_0_20px_rgb(228_168_52/0.3)] transition-all duration-300 hover:brightness-110 motion-safe:hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-memo-accent/80 focus:ring-offset-2 focus:ring-offset-memo-bg disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
             @click="onUnlockShowcase"
           >
@@ -225,5 +259,14 @@ function onUnlockShowcase(): void {
         </div>
       </div>
     </BriefcaseGlassPanel>
+    <MemoConfirmDialog
+      :open="mismatchDialogOpen"
+      :title="memoConfirmBriefcaseMismatchTitle"
+      :message="mismatchDialogMessage"
+      :confirm-label="memoConfirmButtonContinue"
+      :cancel-label="memoConfirmButtonCancel"
+      @confirm="onMismatchDialogConfirm"
+      @cancel="onMismatchDialogCancel"
+    />
   </div>
 </template>

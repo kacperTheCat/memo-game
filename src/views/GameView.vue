@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import GameCanvasShell from '@/components/GameCanvasShell.vue'
 import WinDebriefPanel from '@/components/WinDebriefPanel.vue'
+import MemoConfirmDialog from '@/components/ui/MemoConfirmDialog.vue'
 import MemoSecondaryNavButton from '@/components/ui/MemoSecondaryNavButton.vue'
 import rawLibrary from '@/data/tile-library.json'
 import { useActivePlayTime } from '@/composables/useActivePlayTime'
@@ -12,7 +13,14 @@ import {
   setReloadNewGameDifficulty,
 } from '@/game/reloadNewGameDifficulty'
 import type { Difficulty, TileLibraryFile } from '@/game/tileLibraryTypes'
-import { abandonGameConfirm, navAbandonGame, navReturnToBriefcase } from '@/constants/appCopy'
+import {
+  abandonGameConfirm,
+  memoConfirmAbandonTitle,
+  memoConfirmButtonAbandon,
+  memoConfirmButtonCancel,
+  navAbandonGame,
+  navReturnToBriefcase,
+} from '@/constants/appCopy'
 import { useGamePlayStore } from '@/stores/gamePlay'
 import { useGameSessionStore } from '@/stores/gameSession'
 import { useGameSettingsStore } from '@/stores/gameSettings'
@@ -27,6 +35,7 @@ const route = useRoute()
 const router = useRouter()
 
 const showDebrief = ref(false)
+const showAbandonDialog = ref(false)
 
 useActivePlayTime((ms) => session.addActiveMs(ms))
 
@@ -69,10 +78,16 @@ function returnToBriefcaseDuringPlay(): void {
   void router.push({ name: 'briefcase' })
 }
 
-function confirmAbandon(): void {
-  if (!window.confirm(abandonGameConfirm)) {
-    return
-  }
+function onAbandonClick(): void {
+  showAbandonDialog.value = true
+}
+
+function onAbandonDialogCancel(): void {
+  showAbandonDialog.value = false
+}
+
+function onAbandonDialogConfirm(): void {
+  showAbandonDialog.value = false
   session.finalizeSession('abandoned')
   clearReloadNewGameDifficulty()
   play.resetRound()
@@ -135,7 +150,7 @@ async function onReturnBriefcase(): Promise<void> {
         variant="dismiss"
         :label="navAbandonGame"
         data-testid="game-abandon-game"
-        @click="confirmAbandon"
+        @click="onAbandonClick"
       />
     </header>
     <p
@@ -150,5 +165,15 @@ async function onReturnBriefcase(): Promise<void> {
         <GameCanvasShell @won="onGameWon" />
       </div>
     </main>
+    <MemoConfirmDialog
+      :open="showAbandonDialog"
+      variant="danger"
+      :title="memoConfirmAbandonTitle"
+      :message="abandonGameConfirm"
+      :confirm-label="memoConfirmButtonAbandon"
+      :cancel-label="memoConfirmButtonCancel"
+      @confirm="onAbandonDialogConfirm"
+      @cancel="onAbandonDialogCancel"
+    />
   </div>
 </template>

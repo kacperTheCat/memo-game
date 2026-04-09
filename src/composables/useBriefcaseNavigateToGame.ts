@@ -1,5 +1,8 @@
 import { useRouter } from 'vue-router'
-import { briefcaseUnlockAbandonInProgress } from '@/constants/appCopy'
+import {
+  briefcaseUnlockAbandonInProgress,
+  briefcaseUnlockSameSettingsNewDeal,
+} from '@/constants/appCopy'
 import {
   isBriefcaseSeedIncompleteEntry,
   parseNineDigitSeedOrNull,
@@ -8,30 +11,35 @@ import { useGamePlayStore } from '@/stores/gamePlay'
 import { useGameSessionStore } from '@/stores/gameSession'
 import { useGameSettingsStore } from '@/stores/gameSettings'
 
+export type BriefcaseRequestConfirm = (message: string) => Promise<boolean>
+
 /**
- * Start /game from The Briefcase: confirm abandon if an in-progress session’s difficulty
- * differs from the selected preset (hub UX; not FR-014 win-debrief reset).
+ * Start `/game` from The Briefcase (**Unlock showcase**).
+ *
+ * **FR-002 / spec 009:** If a session is **in_progress**, always **`requestConfirm`** before navigating—
+ * whether Briefcase settings match or mismatch the session—so **Unlock** means a deliberate **new** deal,
+ * not silent resume. **`resumeToGame`** (Return to Game) does not use this path.
  */
-export function useBriefcaseNavigateToGame() {
+export function useBriefcaseNavigateToGame(requestConfirm: BriefcaseRequestConfirm) {
   const router = useRouter()
   const session = useGameSessionStore()
   const play = useGamePlayStore()
   const settings = useGameSettingsStore()
 
-  function navigateToGame(): void {
+  async function navigateToGame(): Promise<void> {
     if (isBriefcaseSeedIncompleteEntry(settings.briefcaseSeedRaw)) {
       return
     }
-    const selected = settings.difficulty
     const gs = session.gameSession
-    const difficultyMismatch =
-      gs?.status === 'in_progress' && gs.difficulty !== selected
-    const seedMismatch =
-      gs?.status === 'in_progress' &&
-      settings.briefcaseSeedRaw !== gs.dealBriefcaseSeedRaw
-
-    if (difficultyMismatch || seedMismatch) {
-      if (!window.confirm(briefcaseUnlockAbandonInProgress)) {
+    if (gs?.status === 'in_progress') {
+      const difficultyMismatch = gs.difficulty !== settings.difficulty
+      const seedMismatch = settings.briefcaseSeedRaw !== gs.dealBriefcaseSeedRaw
+      const mismatch = difficultyMismatch || seedMismatch
+      const message = mismatch
+        ? briefcaseUnlockAbandonInProgress
+        : briefcaseUnlockSameSettingsNewDeal
+      const ok = await requestConfirm(message)
+      if (!ok) {
         return
       }
       session.finalizeSession('abandoned')

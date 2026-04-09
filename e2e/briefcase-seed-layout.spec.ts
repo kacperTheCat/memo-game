@@ -140,10 +140,9 @@ test.describe('FR-006a in-progress seed change', () => {
     await selectDifficulty(page, 'easy')
     await page.getByTestId('briefcase-seed-input').fill('123456789')
 
-    page.once('dialog', (d) => {
-      void d.accept()
-    })
     await page.getByTestId('briefcase-unlock-showcase').click()
+    await expect(page.getByTestId('memo-confirm-dialog')).toBeVisible()
+    await page.getByTestId('memo-confirm-confirm').click()
     await expect(page).toHaveURL(/\/game$/)
 
     await expect(page.getByTestId('game-canvas-shell')).toHaveAttribute(
