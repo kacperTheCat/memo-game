@@ -18,15 +18,33 @@ test.describe('tile library validation (preview)', () => {
     page,
   }) => {
     const meta = page.getByTestId('game-grid-meta')
-
-    for (const { level, cells } of [
+    const steps = [
       { level: 'easy' as const, cells: '16' },
       { level: 'medium' as const, cells: '36' },
       { level: 'hard' as const, cells: '64' },
-    ]) {
-      await page.goto('/briefcase')
+    ]
+
+    for (let i = 0; i < steps.length; i++) {
+      const { level, cells } = steps[i]!
+      if (i === 0) {
+        await page.goto('/briefcase')
+      } else {
+        await page.getByTestId('game-return-briefcase').click()
+        await expect(page).toHaveURL(/\/briefcase$/)
+      }
+
       await selectDifficulty(page, level)
       await page.getByTestId('briefcase-unlock-showcase').click()
+
+      const mismatchDialog = page.getByTestId('memo-confirm-dialog')
+      const dialogShown = await mismatchDialog
+        .waitFor({ state: 'visible', timeout: 2500 })
+        .then(() => true)
+        .catch(() => false)
+      if (dialogShown) {
+        await page.getByTestId('memo-confirm-confirm').click()
+      }
+
       await expect(page).toHaveURL(/\/game$/)
       await expect(meta).toHaveAttribute('data-cells', cells)
     }

@@ -30,7 +30,7 @@ A player opens **The Briefcase**, enters **nine decimal digits** in the seed fie
 
 **Independent Test**: Set a known nine-digit seed and difficulty, start the game, record the initial concealed grid’s underlying pair placements (or an equivalent canonical description); repeat on another session or device and compare.
 
-**Playwright coverage**: `e2e/briefcase-seed-layout.spec.ts` — scenarios 1–3 in this story (seed entry, navigation to game, observable consistency checks at the level the product exposes in the DOM or test hooks).
+**Playwright coverage**: `e2e/briefcase-seed-layout.spec.ts` — scenarios 1–3 in this story (seed entry, navigation to game, observable consistency checks at the level the product exposes in the DOM or test hooks). For **`localStorage` debounce**, full **`goto` reloads**, and **`data-deal-init`** vs snapshot restore, see **004** [`specs/004-game-core-logic/contracts/README.md`](../004-game-core-logic/contracts/README.md) § *Playwright / integration notes*.
 
 **Acceptance Scenarios**:
 

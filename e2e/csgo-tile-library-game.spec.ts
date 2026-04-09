@@ -81,10 +81,19 @@ test.describe('CSGO tile library game grid (preview)', () => {
     await expect(meta).toHaveAttribute('data-cols', '8')
     await expect(meta).toHaveAttribute('data-cells', '64')
 
-    await page.goto('/briefcase')
+    // SPA back to briefcase keeps in-memory `gameSession` in_progress so Unlock
+    // runs the real abandon/new-deal flow. Full `page.goto('/briefcase')` reloads
+    // without hydrating session in Pinia but leaves localStorage snapshot; `/game`
+    // then restores the old hard grid and ignores briefcase easy (flaky / wrong).
+    await page.getByTestId('game-return-briefcase').click()
+    await expect(page).toHaveURL(/\/briefcase$/)
+
     await selectDifficulty(page, 'easy')
-    page.once('dialog', (d) => d.accept())
     await page.getByTestId('briefcase-unlock-showcase').click()
+    const abandonDialog = page.getByTestId('memo-confirm-dialog')
+    await expect(abandonDialog).toBeVisible()
+    await page.getByTestId('memo-confirm-confirm').click()
+    await expect(page).toHaveURL(/\/game$/)
     await expect(meta).toHaveAttribute('data-rows', '4')
     await expect(meta).toHaveAttribute('data-cols', '4')
     await expect(meta).toHaveAttribute('data-cells', '16')
@@ -107,10 +116,15 @@ test.describe('CSGO tile library game grid (preview)', () => {
     const meta = page.getByTestId('game-grid-meta')
     await expect(meta).toHaveAttribute('data-cells', '64')
 
-    await page.goto('/briefcase')
+    await page.getByTestId('game-return-briefcase').click()
+    await expect(page).toHaveURL(/\/briefcase$/)
+
     await selectDifficulty(page, 'medium')
-    page.once('dialog', (d) => d.accept())
     await page.getByTestId('briefcase-unlock-showcase').click()
+    const abandonDialog = page.getByTestId('memo-confirm-dialog')
+    await expect(abandonDialog).toBeVisible()
+    await page.getByTestId('memo-confirm-confirm').click()
+    await expect(page).toHaveURL(/\/game$/)
     await expect(meta).toHaveAttribute('data-rows', '6')
     await expect(meta).toHaveAttribute('data-cols', '6')
     await expect(meta).toHaveAttribute('data-cells', '36')

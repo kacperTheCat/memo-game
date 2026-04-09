@@ -39,13 +39,26 @@ test.describe('010 ambient spotlight depth', () => {
     await page.evaluate(() => {
       document.documentElement.style.minWidth = '2400px'
     })
-    await page.mouse.move(320, 240)
     const spot = page.locator('[data-testid="ambient-spotlight"]')
-    await expect(spot).toHaveAttribute('data-ambient-spotlight-active', 'true', {
-      timeout: 6000,
-    })
-    await expect(spot).toHaveAttribute('data-memo-spotlight-vp-x', '50')
-    await expect(spot).toHaveAttribute('data-memo-spotlight-vp-y', '50')
+    // Spring + `driftOffset2d` (~14px) means viewport % rarely lands exactly on 50/50.
+    // Mouse-idle fade (400ms) needs repeated moves while the spring settles (parallel
+    // workers amplify timing). Assert near-center, not exact pixels.
+    await expect
+      .poll(
+        async () => {
+          await page.mouse.move(320, 240)
+          const active = await spot.getAttribute('data-ambient-spotlight-active')
+          const x = Number(await spot.getAttribute('data-memo-spotlight-vp-x'))
+          const y = Number(await spot.getAttribute('data-memo-spotlight-vp-y'))
+          return (
+            active === 'true' &&
+            Math.abs(x - 50) <= 5 &&
+            Math.abs(y - 50) <= 5
+          )
+        },
+        { timeout: 10_000 },
+      )
+      .toBe(true)
     await page.evaluate(() => {
       document.documentElement.style.minWidth = ''
     })
@@ -56,10 +69,15 @@ test.describe('010 ambient spotlight depth', () => {
   }) => {
     await page.goto('/')
     const spot = page.locator('[data-testid="ambient-spotlight"]')
-    await page.mouse.move(120, 140)
-    await expect(spot).toHaveAttribute('data-ambient-spotlight-active', 'true', {
-      timeout: 5000,
-    })
+    await expect
+      .poll(
+        async () => {
+          await page.mouse.move(120, 140)
+          return (await spot.getAttribute('data-ambient-spotlight-active')) === 'true'
+        },
+        { timeout: 8000 },
+      )
+      .toBe(true)
     await page.waitForTimeout(1400)
     await expect(spot).toHaveAttribute('data-ambient-spotlight-active', 'false')
     await page.mouse.move(125, 145)
