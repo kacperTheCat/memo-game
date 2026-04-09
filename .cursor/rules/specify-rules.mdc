@@ -40,6 +40,8 @@ Auto-generated from all feature plans. Last updated: 2026-04-09
 - N/A for this feature — no new client persistence ([`data-model.md`](./data-model.md)) (015-vercel-deployment)
 - TypeScript **5.7**, Node **22.x** (root `package.json` `engines`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), **`vite-plugin-pwa`** (016-wrong-pair-tile-input)
 - **N/A** — no new client persistence ([`data-model.md`](./data-model.md), [`contracts/README.md`](./contracts/README.md)) (016-wrong-pair-tile-input)
+- TypeScript 5.7, Node 22.x (see root `package.json` `engines`) + Vue 3.5, Vite 6, Pinia 3, Vue Router 4, Tailwind 4 (`@tailwindcss/vite`), `vite-plugin-pwa` (018-tile-asset-warmup)
+- N/A for this feature (browser cache + in-memory `Image` elements only) (018-tile-asset-warmup)
 
 - **Stack** (see root `package.json`): TypeScript **5.7**, Node **22.x**, Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), Vitest **3**, Playwright **~1.49**, `vite-plugin-pwa`. **Package manager**: `pnpm` (declared in `package.json`).
 - **Routes**: **`/`** (home), **`/game`**, **`/briefcase`** (002-stitch-theme-briefcase).
@@ -75,9 +77,9 @@ memo-game/                 # single root package.json
 TypeScript **5.7**, Node **22.x** for local and CI: follow repository ESLint / team conventions.
 
 ## Recent Changes
+- 018-tile-asset-warmup: Added TypeScript 5.7, Node 22.x (see root `package.json` `engines`) + Vue 3.5, Vite 6, Pinia 3, Vue Router 4, Tailwind 4 (`@tailwindcss/vite`), `vite-plugin-pwa`
 - 016-wrong-pair-tile-input: Added TypeScript **5.7**, Node **22.x** (root `package.json` `engines`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), **`vite-plugin-pwa`**
 - 015-vercel-deployment: Added TypeScript **5.7**, Node **22.x** (root `package.json` `engines`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), **`vite-plugin-pwa`**
-- 013-layout-refactor-e2e: Added TypeScript 5.7, Node.js ^22 (see root `package.json`) + Vue 3.5, Vite 6, Pinia 3, Vue Router 4, Tailwind 4 (`@tailwindcss/vite`), `vite-plugin-pwa`, Vitest 3, Playwright ~1.49
 
 
 <!-- MANUAL ADDITIONS START -->
