@@ -6,12 +6,19 @@ import { defineConfig, devices } from '@playwright/test'
  */
 export default defineConfig({
   testDir: 'e2e',
+  /** One baseline per screenshot name (regenerate on Linux for CI via Docker; see quickstart). */
+  snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}{ext}',
   testIgnore: '**/bootstrap.spec.ts',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'list',
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.04,
+    },
+  },
   use: {
     ...devices['Desktop Chrome'],
     baseURL: 'http://127.0.0.1:4173',

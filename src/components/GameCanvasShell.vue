@@ -948,7 +948,7 @@ watch(debugPeekAllFaces, () => {
   <div
     ref="shellRef"
     data-testid="game-canvas-shell"
-    class="game-canvas-shell relative mx-auto w-full max-w-[min(100%,1200px)] touch-manipulation px-2"
+    class="game-canvas-shell relative mx-auto w-full max-w-[min(100%,1200px)] touch-manipulation"
     :style="{ maxWidth: `${BOARD_MAX_WIDTH_CSS}px` }"
     :data-deal-init="play.dealInitKind"
     :data-mismatch-phase="mismatchPhaseUi"

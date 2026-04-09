@@ -50,7 +50,11 @@ function chipClass(d: Difficulty): string {
       <span class="font-mono text-xs uppercase tracking-widest text-gray-500">Local Data</span>
     </div>
     <div class="ledger-glass overflow-hidden rounded-2xl">
-      <div class="w-full overflow-x-auto">
+      <!-- min-height stabilizes cross-OS table metrics (Linux vs macOS) for Playwright screenshots -->
+      <div
+        class="w-full min-h-[184px] overflow-x-auto"
+        data-testid="session-history-table-wrap"
+      >
         <table
           data-testid="session-history-table"
           class="w-full whitespace-nowrap text-left"
