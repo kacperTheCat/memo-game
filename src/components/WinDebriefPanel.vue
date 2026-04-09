@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import MemoAmbientSpotlight from '@/components/ambient/MemoAmbientSpotlight.vue'
 import SessionHistoryLedger from '@/components/SessionHistoryLedger.vue'
 import MemoSecondaryNavButton from '@/components/ui/MemoSecondaryNavButton.vue'
 import {
@@ -17,6 +18,38 @@ const emit = defineEmits<{
 }>()
 
 const session = useGameSessionStore()
+
+const operationCompleteText = 'Operation Complete'
+const operationChars = operationCompleteText.split('')
+
+const prefersReducedMotion = ref(
+  typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+)
+let motionMq: MediaQueryList | null = null
+let onMotionChange: (() => void) | null = null
+
+onMounted(() => {
+  motionMq = window.matchMedia('(prefers-reduced-motion: reduce)')
+  prefersReducedMotion.value = motionMq.matches
+  onMotionChange = () => {
+    prefersReducedMotion.value = motionMq?.matches ?? false
+  }
+  motionMq.addEventListener('change', onMotionChange)
+})
+
+onUnmounted(() => {
+  if (motionMq && onMotionChange) {
+    motionMq.removeEventListener('change', onMotionChange)
+  }
+})
+
+function charDelayMs(index: number): string {
+  if (prefersReducedMotion.value) {
+    return '0ms'
+  }
+  return `${index * 48}ms`
+}
 
 const summary = computed(() => {
   const gs = session.gameSession
@@ -53,6 +86,12 @@ const summary = computed(() => {
       class="noise-bg pointer-events-none fixed inset-0 z-[1]"
       aria-hidden="true"
     />
+    <div
+      class="pointer-events-none fixed inset-0 z-[1] overflow-hidden"
+      aria-hidden="true"
+    >
+      <MemoAmbientSpotlight />
+    </div>
     <header class="relative z-[2] mx-auto flex w-full max-w-7xl items-center p-6">
       <MemoSecondaryNavButton
         variant="back"
@@ -71,14 +110,16 @@ const summary = computed(() => {
               Post-Match Debrief
             </h2>
             <h1
-              class="text-4xl font-bold leading-tight text-transparent drop-shadow-[0_0_15px_rgba(229,170,52,0.3)] sm:text-5xl"
-              style="
-                background: linear-gradient(135deg, #e5aa34 0%, #ffdf99 100%);
-                -webkit-background-clip: text;
-                background-clip: text;
-              "
+              data-testid="operation-complete-heading"
+              class="operation-complete-title text-4xl font-bold leading-tight drop-shadow-[0_0_15px_rgba(229,170,52,0.3)] sm:text-5xl"
             >
-              Operation Complete
+              <span
+                v-for="(ch, i) in operationChars"
+                :key="`${i}-${ch}`"
+                class="operation-complete-char operation-complete-char-gradient motion-reduce:!translate-y-0 motion-reduce:!opacity-100"
+                :class="prefersReducedMotion ? '' : 'operation-complete-char--animate'"
+                :style="{ animationDelay: charDelayMs(i) }"
+              >{{ ch === ' ' ? '\u00a0' : ch }}</span>
             </h1>
           </div>
           <div
@@ -144,6 +185,37 @@ const summary = computed(() => {
   opacity: 0.07;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
+}
+
+.operation-complete-title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.02em;
+}
+
+.operation-complete-char {
+  display: inline-block;
+}
+
+/* Per-glyph gradient so stagger animation is not clipped by parent background-clip */
+.operation-complete-char-gradient {
+  background: linear-gradient(135deg, #e5aa34 0%, #ffdf99 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.operation-complete-char--animate {
+  opacity: 0;
+  transform: translateY(0.2em);
+  animation: memo-operation-complete-in 0.42s ease-out forwards;
+}
+
+@keyframes memo-operation-complete-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .glass-panel {

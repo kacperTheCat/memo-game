@@ -15,6 +15,7 @@ import {
   resolveRngAndDealKindForNewShuffle,
 } from '@/game/dealInitFromNavigation'
 import { cellRectsForGrid, type CellRect } from '@/game/cellRect'
+import { normalizedPointerInFaceRect } from '@/game/tileFaceGradientPointer'
 import { cellIndexFromPointer } from '@/game/canvasHitTest'
 import { easeOutCubic } from '@/game/animationEasing'
 import {
@@ -210,6 +211,10 @@ const reveal01: number[] = []
 const matchFade01: number[] = []
 const prevPhases: TilePhase[] = []
 const parallaxSm: { ox: number; oy: number }[] = []
+const highlightSmNx: number[] = []
+const highlightSmNy: number[] = []
+
+const HIGHLIGHT_SMOOTH_TAU_MS = 95
 
 function resizeAnimBuffers(n: number): void {
   while (reveal01.length < n) {
@@ -217,11 +222,15 @@ function resizeAnimBuffers(n: number): void {
     matchFade01.push(0)
     prevPhases.push('concealed')
     parallaxSm.push({ ox: 0, oy: 0 })
+    highlightSmNx.push(0.5)
+    highlightSmNy.push(0.5)
   }
   reveal01.length = n
   matchFade01.length = n
   prevPhases.length = n
   parallaxSm.length = n
+  highlightSmNx.length = n
+  highlightSmNy.length = n
 }
 
 function seedAnimFromMemory(mem: { cells: { phase: TilePhase }[] }): void {
@@ -232,6 +241,8 @@ function seedAnimFromMemory(mem: { cells: { phase: TilePhase }[] }): void {
     prevPhases[i] = ph
     reveal01[i] = ph === 'concealed' ? 1 : 1
     matchFade01[i] = ph === 'matched' ? 1 : 0
+    highlightSmNx[i] = 0.5
+    highlightSmNy[i] = 0.5
   }
 }
 
@@ -447,6 +458,20 @@ function onShellPointerMove(ev: MouseEvent | TouchEvent): void {
   schedulePaint()
 }
 
+function faceHighlightForRect(r: CellRect): { nx: number; ny: number } | null {
+  if (reducedMotion.value) {
+    return null
+  }
+  if (!pointerCss.value) {
+    return { nx: 0.5, ny: 0.5 }
+  }
+  return normalizedPointerInFaceRect(
+    pointerCss.value.x,
+    pointerCss.value.y,
+    r,
+  )
+}
+
 function onCanvasPick(ev: MouseEvent | TouchEvent): void {
   const canvas = canvasRef.value
   if (!canvas || !play.memory) {
@@ -633,6 +658,43 @@ async function paint(): Promise<void> {
   }
   const parallaxSettling = parallaxEpsilon > 0.08 && !reducedMotion.value
 
+  const hk = 1 - Math.exp(-dt / HIGHLIGHT_SMOOTH_TAU_MS)
+  let highlightSettling = false
+  for (let i = 0; i < n; i++) {
+    const cell = mem.cells[i]
+    const r = rects[i]
+    if (!cell || !r) {
+      continue
+    }
+    const faceActive =
+      cell.phase === 'revealed' ||
+      cell.phase === 'matched' ||
+      debugPeekAllFaces.value
+    if (reducedMotion.value || !faceActive) {
+      highlightSmNx[i] = 0.5 + (0.5 - highlightSmNx[i]!) * hk
+      highlightSmNy[i] = 0.5 + (0.5 - highlightSmNy[i]!) * hk
+      continue
+    }
+    if (pointerCss.value) {
+      const { nx, ny } = normalizedPointerInFaceRect(
+        pointerCss.value.x,
+        pointerCss.value.y,
+        r,
+      )
+      highlightSmNx[i] += (nx - highlightSmNx[i]!) * hk
+      highlightSmNy[i] += (ny - highlightSmNy[i]!) * hk
+      if (
+        Math.abs((highlightSmNx[i] ?? 0.5) - nx) > 0.014 ||
+        Math.abs((highlightSmNy[i] ?? 0.5) - ny) > 0.014
+      ) {
+        highlightSettling = true
+      }
+    } else {
+      highlightSmNx[i] += (0.5 - highlightSmNx[i]!) * hk
+      highlightSmNy[i] += (0.5 - highlightSmNy[i]!) * hk
+    }
+  }
+
   const paths = new Set<string>()
   for (const c of mem.cells) {
     paths.add(subsetEntry(c.identityIndex).imagePath)
@@ -662,6 +724,13 @@ async function paint(): Promise<void> {
       (i === firstIndex || i === secondIndex) &&
       mem.cells[firstIndex]!.identityIndex !== mem.cells[secondIndex]!.identityIndex
     const conceal = mismatchConceal01ForCell(now, mem, i)
+    const hl =
+      reducedMotion.value || canvasPhase === 'concealed'
+        ? null
+        : {
+            nx: highlightSmNx[i] ?? 0.5,
+            ny: highlightSmNy[i] ?? 0.5,
+          }
     drawTile(ctx, r, {
       phase: canvasPhase,
       img,
@@ -675,6 +744,7 @@ async function paint(): Promise<void> {
         isMismatchTile && conceal === undefined ? shakeBase : 0,
       mismatchConceal01: conceal,
       forceShowFace: debugPeekAllFaces.value,
+      faceHighlight: hl,
     })
   }
 
@@ -695,6 +765,7 @@ async function paint(): Promise<void> {
       matchFade01: 0,
       shakePx: 0,
       forceShowFace: debugPeekAllFaces.value,
+      faceHighlight: faceHighlightForRect(tr),
     })
   }
 
@@ -720,6 +791,7 @@ async function paint(): Promise<void> {
       matchFade01: 0,
       shakePx: 0,
       forceShowFace: debugPeekAllFaces.value,
+      faceHighlight: faceHighlightForRect(ra),
     })
     drawTile(ctx, rb, {
       phase: 'revealed',
@@ -732,6 +804,7 @@ async function paint(): Promise<void> {
       matchFade01: 0,
       shakePx: 0,
       forceShowFace: debugPeekAllFaces.value,
+      faceHighlight: faceHighlightForRect(rb),
     })
   }
 
@@ -742,7 +815,8 @@ async function paint(): Promise<void> {
   if (
     animationActive(mem, parallaxSettling) ||
     animAdvancing ||
-    collectAnimating
+    collectAnimating ||
+    highlightSettling
   ) {
     schedulePaint()
   }

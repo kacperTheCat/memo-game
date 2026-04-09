@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import { storeToRefs } from "pinia";
 import SessionHistoryLedger from "@/components/SessionHistoryLedger.vue";
+import MemoAmbientSpotlight from "@/components/ambient/MemoAmbientSpotlight.vue";
 import HubGrainLayer from "@/components/layout/HubGrainLayer.vue";
 import MemoSecondaryNavButton from "@/components/ui/MemoSecondaryNavButton.vue";
 import {
@@ -31,6 +32,12 @@ const showReturnToGame = computed(
       aria-hidden="true"
     >
       <HubGrainLayer />
+    </div>
+    <div
+      class="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      aria-hidden="true"
+    >
+      <MemoAmbientSpotlight />
     </div>
     <div class="relative z-10 mx-auto flex w-full max-w-4xl flex-col gap-8">
       <header class="text-center">
