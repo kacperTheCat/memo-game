@@ -16,12 +16,13 @@ import {
   briefcaseSeedLabel,
   briefcaseSeedPlaceholder,
   briefcaseTitle,
-  briefcaseUnlockAbandonInProgress,
+  briefcaseUnlockSameSettingsNewDeal,
   briefcaseUnlockShowcase,
   navReturnToGame,
   navReturnToStartScreen,
 } from '@/constants/appCopy'
 import { useGameSessionStore } from '@/stores/gameSession'
+import { useGameSettingsStore } from '@/stores/gameSettings'
 
 function createTestRouter() {
   return createRouter({
@@ -170,11 +171,12 @@ describe('BriefcaseView unlock abandon confirm', () => {
   })
 
   afterEach(() => {
+    document.body.innerHTML = ''
     vi.restoreAllMocks()
   })
 
   it('confirms abandon and navigates to game when hub difficulty mismatches in-progress session', async () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+    const confirmSpy = vi.spyOn(window, 'confirm')
     const pinia = createPinia()
     setActivePinia(pinia)
     const session = useGameSessionStore()
@@ -191,20 +193,33 @@ describe('BriefcaseView unlock abandon confirm', () => {
     await router.push('/briefcase')
     await router.isReady()
 
-    const wrapper = mount(BriefcaseView, { global: { plugins: [pinia, router] } })
+    const wrapper = mount(BriefcaseView, {
+      attachTo: document.body,
+      global: { plugins: [pinia, router] },
+    })
     await flushPromises()
 
     await wrapper.get('[data-testid="briefcase-unlock-showcase"]').trigger('click')
     await flushPromises()
 
-    expect(confirmSpy).toHaveBeenCalledWith(briefcaseUnlockAbandonInProgress)
+    expect(confirmSpy).not.toHaveBeenCalled()
+    expect(
+      document.body.querySelector('[data-testid="memo-confirm-dialog"]'),
+    ).toBeTruthy()
+    ;(
+      document.body.querySelector(
+        '[data-testid="memo-confirm-confirm"]',
+      ) as HTMLButtonElement
+    ).click()
+    await flushPromises()
+
     expect(router.currentRoute.value.name).toBe('game')
     expect(session.gameSession?.status).toBe('abandoned')
     wrapper.unmount()
   })
 
   it('cancels abandon and stays on briefcase when user dismisses confirm', async () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
+    const confirmSpy = vi.spyOn(window, 'confirm')
     const pinia = createPinia()
     setActivePinia(pinia)
     const session = useGameSessionStore()
@@ -221,15 +236,141 @@ describe('BriefcaseView unlock abandon confirm', () => {
     await router.push('/briefcase')
     await router.isReady()
 
-    const wrapper = mount(BriefcaseView, { global: { plugins: [pinia, router] } })
+    const wrapper = mount(BriefcaseView, {
+      attachTo: document.body,
+      global: { plugins: [pinia, router] },
+    })
     await flushPromises()
 
     await wrapper.get('[data-testid="briefcase-unlock-showcase"]').trigger('click')
     await flushPromises()
 
-    expect(confirmSpy).toHaveBeenCalledWith(briefcaseUnlockAbandonInProgress)
+    expect(confirmSpy).not.toHaveBeenCalled()
+    ;(
+      document.body.querySelector(
+        '[data-testid="memo-confirm-cancel"]',
+      ) as HTMLButtonElement
+    ).click()
+    await flushPromises()
+
     expect(router.currentRoute.value.name).toBe('briefcase')
     expect(session.gameSession?.status).toBe('in_progress')
+    wrapper.unmount()
+  })
+
+  it('shows same-settings copy when Unlock matches in-progress difficulty and seed', async () => {
+    const pinia = createPinia()
+    setActivePinia(pinia)
+    const session = useGameSessionStore()
+    const settings = useGameSettingsStore()
+    settings.difficulty = 'easy'
+    settings.briefcaseSeedRaw = '111-222-333'
+    session.beginSession('easy', { dealBriefcaseSeedRaw: '111-222-333' })
+
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: '/briefcase', name: 'briefcase', component: { template: '<div/>' } },
+        { path: '/', name: 'home', component: { template: '<div/>' } },
+        { path: '/game', name: 'game', component: { template: '<div/>' } },
+      ],
+    })
+    await router.push('/briefcase')
+    await router.isReady()
+
+    const wrapper = mount(BriefcaseView, {
+      attachTo: document.body,
+      global: { plugins: [pinia, router] },
+    })
+    await flushPromises()
+
+    await wrapper.get('[data-testid="briefcase-unlock-showcase"]').trigger('click')
+    await flushPromises()
+
+    const msg = document.body.querySelector('[data-testid="memo-confirm-message"]')
+    expect(msg?.textContent).toContain(
+      briefcaseUnlockSameSettingsNewDeal.slice(0, 40),
+    )
+    wrapper.unmount()
+  })
+
+  it('cancels Unlock when matching settings and user dismisses confirm', async () => {
+    const pinia = createPinia()
+    setActivePinia(pinia)
+    const session = useGameSessionStore()
+    const settings = useGameSettingsStore()
+    settings.difficulty = 'easy'
+    settings.briefcaseSeedRaw = '111-222-333'
+    session.beginSession('easy', { dealBriefcaseSeedRaw: '111-222-333' })
+
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: '/briefcase', name: 'briefcase', component: { template: '<div/>' } },
+        { path: '/', name: 'home', component: { template: '<div/>' } },
+        { path: '/game', name: 'game', component: { template: '<div/>' } },
+      ],
+    })
+    await router.push('/briefcase')
+    await router.isReady()
+
+    const wrapper = mount(BriefcaseView, {
+      attachTo: document.body,
+      global: { plugins: [pinia, router] },
+    })
+    await flushPromises()
+
+    await wrapper.get('[data-testid="briefcase-unlock-showcase"]').trigger('click')
+    await flushPromises()
+    ;(
+      document.body.querySelector(
+        '[data-testid="memo-confirm-cancel"]',
+      ) as HTMLButtonElement
+    ).click()
+    await flushPromises()
+
+    expect(router.currentRoute.value.name).toBe('briefcase')
+    expect(session.gameSession?.status).toBe('in_progress')
+    wrapper.unmount()
+  })
+
+  it('confirms Unlock and navigates to game when matching in-progress session', async () => {
+    const pinia = createPinia()
+    setActivePinia(pinia)
+    const session = useGameSessionStore()
+    const settings = useGameSettingsStore()
+    settings.difficulty = 'easy'
+    settings.briefcaseSeedRaw = '111-222-333'
+    session.beginSession('easy', { dealBriefcaseSeedRaw: '111-222-333' })
+
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: '/briefcase', name: 'briefcase', component: { template: '<div/>' } },
+        { path: '/', name: 'home', component: { template: '<div/>' } },
+        { path: '/game', name: 'game', component: { template: '<div/>' } },
+      ],
+    })
+    await router.push('/briefcase')
+    await router.isReady()
+
+    const wrapper = mount(BriefcaseView, {
+      attachTo: document.body,
+      global: { plugins: [pinia, router] },
+    })
+    await flushPromises()
+
+    await wrapper.get('[data-testid="briefcase-unlock-showcase"]').trigger('click')
+    await flushPromises()
+    ;(
+      document.body.querySelector(
+        '[data-testid="memo-confirm-confirm"]',
+      ) as HTMLButtonElement
+    ).click()
+    await flushPromises()
+
+    expect(router.currentRoute.value.name).toBe('game')
+    expect(session.gameSession?.status).toBe('abandoned')
     wrapper.unmount()
   })
 })

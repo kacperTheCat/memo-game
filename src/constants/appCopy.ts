@@ -17,6 +17,15 @@ export const navReturnToGame = 'Return to Game'
 export const abandonGameConfirm =
   'Abandon this game? A record will be saved for statistics (outcome: abandoned).'
 
+/** In-app confirm dialog (009): title + buttons; body uses `abandonGameConfirm`. */
+export const memoConfirmAbandonTitle = 'Abandon game?'
+export const memoConfirmButtonAbandon = 'Abandon game'
+export const memoConfirmButtonCancel = 'Cancel'
+
+/** Briefcase mismatch flow: title + continue; body uses `briefcaseUnlockAbandonInProgress`. */
+export const memoConfirmBriefcaseMismatchTitle = 'Start new game?'
+export const memoConfirmButtonContinue = 'Continue'
+
 export const gamePageHeading = 'Memory game'
 export const gamePageSubline =
   'Display-only tile grid from The Briefcase difficulty (no match play yet).'
@@ -49,6 +58,13 @@ export const briefcaseUnlockShowcase = 'Unlock showcase'
  */
 export const briefcaseUnlockAbandonInProgress =
   'You have a game in progress that does not match your current Briefcase settings (difficulty or seed). Continue to abandon it and start with your selection? A record will be saved for statistics (outcome: abandoned).'
+
+/**
+ * Unlock showcase while a game is **in progress** and Briefcase **difficulty + seed** match that session (**FR-002**):
+ * user must confirm abandoning the current board for a **new** deal with the same settings.
+ */
+export const briefcaseUnlockSameSettingsNewDeal =
+  'You have a game in progress. Unlock showcase will abandon it and start a new deal with your current Briefcase settings (same difficulty and seed). A record will be saved for statistics (outcome: abandoned). Continue?'
 
 /** @deprecated Use `briefcaseUnlockAbandonInProgress` (same string; kept for spec / doc grep parity). */
 export const briefcaseUnlockAbandonDifferentDifficulty =
