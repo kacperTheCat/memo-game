@@ -4,7 +4,15 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'node_modules/**', 'coverage/**', 'playwright-report/**'] },
+  {
+    ignores: [
+      'dist/**',
+      'dev-dist/**',
+      'node_modules/**',
+      'coverage/**',
+      'playwright-report/**',
+    ],
+  },
   eslint.configs.recommended,
   {
     files: ['**/*.mjs'],
@@ -32,6 +40,12 @@ export default tseslint.config(
     files: ['**/*.spec.ts', 'src/game/validateTileLibrary.ts'],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
+    },
+  },
+  {
+    files: ['**/*.spec.ts'],
+    rules: {
+      'vue/one-component-per-file': 'off',
     },
   },
 )

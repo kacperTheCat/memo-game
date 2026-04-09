@@ -1,4 +1,14 @@
 /** Single source of truth for visible English copy (spec FR-004 / FR-008 / FR-009). */
+/** PWA install bottom sheet (012) */
+export const pwaInstallTitle = 'Install CS2 Memory'
+export const pwaInstallBody =
+  'Add this app to your device for quick access and a fuller screen experience.'
+export const pwaInstallButtonInstall = 'Install'
+export const pwaInstallButtonDismiss = 'Not now'
+/** Shown on home when install UI is still pending but the browser never fired `beforeinstallprompt`. */
+export const pwaInstallFallbackHint =
+  'Install: use Chrome or Edge and look for the install icon in the address bar or use the browser menu. DevTools Offline mode does not trigger the install prompt by itself.'
+
 export const documentTitle = 'CS2 Memory'
 export const primaryHeading = 'CS2 Memory'
 export const homeTagline = 'Counter-Strike 2 themed memory game - setup milestone'
