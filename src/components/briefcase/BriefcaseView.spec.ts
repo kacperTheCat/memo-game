@@ -2,6 +2,13 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+const { playUiClick } = vi.hoisted(() => ({ playUiClick: vi.fn() }))
+
+vi.mock('@/audio/gameSfx', () => ({
+  playUiClick,
+}))
+
 import BriefcaseView from '@/components/briefcase/BriefcaseView.vue'
 import {
   briefcaseDescription,
@@ -46,6 +53,10 @@ async function mountBriefcase() {
 }
 
 describe('BriefcaseView', () => {
+  beforeEach(() => {
+    playUiClick.mockClear()
+  })
+
   it('renders English Main Menu title (h1), tagline, and difficulty heading', async () => {
     const { wrapper } = await mountBriefcase()
     const h1 = wrapper.get('h1')
@@ -140,6 +151,15 @@ describe('BriefcaseView', () => {
     await wrapper.get('[data-testid="briefcase-unlock-showcase"]').trigger('click')
     await flushPromises()
     expect(router.currentRoute.value.name).toBe('game')
+  })
+
+  it('plays UI click when difficulty selection changes (FR-005a)', async () => {
+    const { wrapper } = await mountBriefcase()
+    const settings = useGameSettingsStore()
+    settings.difficulty = 'medium'
+    await flushPromises()
+    await wrapper.get('input[type="radio"][value="easy"]').setValue(true)
+    expect(playUiClick).toHaveBeenCalledTimes(1)
   })
 
   it('does not navigate on Unlock when seed is incomplete before blur (composable guard)', async () => {

@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import MemoAmbientSpotlight from '@/components/ambient/MemoAmbientSpotlight.vue'
 import SessionHistoryLedger from '@/components/SessionHistoryLedger.vue'
 import MemoSecondaryNavButton from '@/components/ui/MemoSecondaryNavButton.vue'
+import { playUiClick } from '@/audio/gameSfx'
 import {
   formatActivePlayMsAsMmSs,
 } from '@/game/winDebriefFormat'
@@ -18,6 +19,11 @@ const emit = defineEmits<{
 }>()
 
 const session = useGameSessionStore()
+
+function onPlayAgainClick(): void {
+  playUiClick()
+  emit('play-again')
+}
 
 const operationCompleteText = 'Operation Complete'
 const operationChars = operationCompleteText.split('')
@@ -154,7 +160,7 @@ const summary = computed(() => {
               type="button"
               data-testid="win-play-again"
               class="flex h-16 w-full items-center justify-center gap-3 rounded-xl bg-[#e5aa34] font-bold text-lg text-[#211c11] shadow-[0_0_30px_rgba(229,170,52,0.2)] transition-all hover:scale-[1.02] hover:brightness-110"
-              @click="emit('play-again')"
+              @click="onPlayAgainClick"
             >
               <span aria-hidden="true">↻</span>
               Play Again

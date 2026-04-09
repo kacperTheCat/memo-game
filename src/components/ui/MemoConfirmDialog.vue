@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
+import { playUiClick } from '@/audio/gameSfx'
 
 defineOptions({ name: 'MemoConfirmDialog' })
 
@@ -24,14 +25,17 @@ const descId = 'memo-confirm-desc'
 const cancelBtnRef = ref<HTMLButtonElement | null>(null)
 
 function onBackdropClick(): void {
+  playUiClick()
   emit('cancel')
 }
 
 function onConfirmClick(): void {
+  playUiClick()
   emit('confirm')
 }
 
 function onCancelClick(): void {
+  playUiClick()
   emit('cancel')
 }
 

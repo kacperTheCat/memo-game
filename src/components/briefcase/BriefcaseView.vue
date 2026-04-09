@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
+import { playUiClick } from '@/audio/gameSfx'
 import BriefcaseGlassPanel from '@/components/briefcase/BriefcaseGlassPanel.vue'
 import MemoConfirmDialog from '@/components/ui/MemoConfirmDialog.vue'
 import MemoSecondaryNavButton from '@/components/ui/MemoSecondaryNavButton.vue'
@@ -114,7 +115,12 @@ function onSeedInput(ev: Event): void {
 }
 
 async function onUnlockShowcase(): Promise<void> {
+  playUiClick()
   await navigateToGame()
+}
+
+function onDifficultyChange(): void {
+  playUiClick()
 }
 </script>
 
@@ -177,6 +183,7 @@ async function onUnlockShowcase(): Promise<void> {
                   class="peer sr-only"
                   :name="difficultyRadiosName"
                   :value="opt.value"
+                  @change="onDifficultyChange"
                 >
                 <div
                   class="flex flex-col rounded-[var(--memo-radius-md)] border border-memo-border bg-white/5 p-4 transition-all duration-200 peer-checked:border-memo-accent peer-checked:shadow-[0_0_15px_rgba(228,168,52,0.2)] peer-checked:[&_.memo-radio-title]:text-memo-accent peer-checked:[&_.memo-radio-indicator]:border-memo-accent peer-checked:[&_.memo-radio-indicator]:bg-memo-accent motion-safe:hover:border-white/20"

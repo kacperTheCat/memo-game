@@ -45,7 +45,12 @@ import {
 } from '@/game/tileParallaxSmooth'
 import { consumeReloadNewGameDifficulty } from '@/game/reloadNewGameDifficulty'
 import { createSeededRandom } from '@/game/seededRng'
+import {
+  cloneMemoryStateShallow,
+  sfxOutcomesForPick,
+} from '@/game/sfxPickOutcomes'
 import type { Difficulty, TileEntry, TileLibraryFile } from '@/game/tileLibraryTypes'
+import { ensureSfxAudioUnlocked, playSfx, playUiClick } from '@/audio/gameSfx'
 import { useGamePlayStore } from '@/stores/gamePlay'
 import { useGameSessionStore } from '@/stores/gameSession'
 import { useGameSettingsStore } from '@/stores/gameSettings'
@@ -80,6 +85,11 @@ const reducedMotion = ref(false)
 /** Dev-only: paint all tile faces (concealed + matched) as revealed for asset inspection. */
 const debugPeekAllFaces = ref(false)
 const showDebugPeekButton = import.meta.env.DEV
+
+function onDebugPeekToggle(): void {
+  playUiClick()
+  debugPeekAllFaces.value = !debugPeekAllFaces.value
+}
 
 function drawPhaseForCanvas(cellPhase: TilePhase, peekAll: boolean): TilePhase {
   if (!peekAll) {
@@ -504,11 +514,25 @@ function onCanvasPick(ev: MouseEvent | TouchEvent): void {
     return
   }
 
+  void ensureSfxAudioUnlocked()
+  const memBefore =
+    play.memory !== null ? cloneMemoryStateShallow(play.memory) : null
   const { accepted, won } = play.tryPick(idx)
+  const memAfter = play.memory
+  if (accepted && memBefore && memAfter) {
+    const { flip, success } = sfxOutcomesForPick(memBefore, memAfter, idx)
+    if (flip) {
+      playSfx('flip')
+    }
+    if (success) {
+      playSfx('success')
+    }
+  }
   if (accepted) {
     session.incrementClick()
   }
   if (won) {
+    playSfx('winRandom')
     session.finalizeSession('won')
     emit('won')
   }
@@ -969,7 +993,7 @@ watch(debugPeekAllFaces, () => {
           ? 'Hide all tile faces (debug)'
           : 'Show all tile faces (debug)'
       "
-      @click="debugPeekAllFaces = !debugPeekAllFaces"
+      @click="onDebugPeekToggle"
     >
       {{ debugPeekAllFaces ? 'Hide faces' : 'Debug: faces' }}
     </button>

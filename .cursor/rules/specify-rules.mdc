@@ -30,6 +30,8 @@ Auto-generated from all feature plans. Last updated: 2026-04-09
 - N/A for this feature (no new `localStorage` keys) (010-styles-improvements)
 - TypeScript **5.7**, Node **22.x** (root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa` (010-styles-improvements)
 - TypeScript **5.7**, Node **22.x** (root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa` (010-styles-improvements)
+- TypeScript **5.7**, Node **22.x** (root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa` (011-game-sound-effects)
+- **N/A** — no new `localStorage` keys (spec FR-007); audio assets under `public/audio/*.mp3` (011-game-sound-effects)
 
 - **Stack** (see root `package.json`): TypeScript **5.7**, Node **22.x**, Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), Vitest **3**, Playwright **~1.49**, `vite-plugin-pwa`. **Package manager**: `pnpm` (declared in `package.json`).
 - **Routes**: **`/`** (home), **`/game`**, **`/briefcase`** (002-stitch-theme-briefcase).
@@ -65,7 +67,7 @@ memo-game/                 # single root package.json
 TypeScript **5.7**, Node **22.x** for local and CI: follow repository ESLint / team conventions.
 
 ## Recent Changes
-- 010-styles-improvements: Added TypeScript **5.7**, Node **22.x** (root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa`
+- 011-game-sound-effects: Added TypeScript **5.7**, Node **22.x** (root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa`
 - 010-styles-improvements: Added TypeScript **5.7**, Node **22.x** (root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa`
 - 010-styles-improvements: Added TypeScript **5.7**, Node **22.x** (root `package.json`) + Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa`
 
