@@ -117,7 +117,7 @@ const summary = computed(() => {
             </h2>
             <h1
               data-testid="operation-complete-heading"
-              class="operation-complete-title text-4xl font-bold leading-tight drop-shadow-[0_0_15px_rgba(229,170,52,0.3)] sm:text-5xl"
+              class="operation-complete-title whitespace-nowrap font-bold leading-tight drop-shadow-[0_0_15px_rgba(229,170,52,0.3)]"
             >
               <span
                 v-for="(ch, i) in operationChars"
@@ -195,8 +195,10 @@ const summary = computed(() => {
 
 .operation-complete-title {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.02em;
+  /* ~text-2xl on narrow phones → ~text-5xl on large screens; scales with viewport */
+  font-size: clamp(1.5rem, 0.95rem + 3.25vw, 3rem);
 }
 
 .operation-complete-char {
