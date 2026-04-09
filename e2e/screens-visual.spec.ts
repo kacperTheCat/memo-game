@@ -35,10 +35,11 @@ test.describe('013 screens visual', () => {
       [COMPLETED_SESSIONS_KEY, SAMPLE_WON_SESSIONS],
     )
     await page.goto('/')
-    const table = page.getByTestId('session-history-table')
-    await expect(table).toBeVisible()
+    const wrap = page.getByTestId('session-history-table-wrap')
+    await expect(wrap).toBeVisible()
+    await expect(page.getByTestId('session-history-table')).toBeVisible()
     await expect(page.getByTestId('session-history-empty')).not.toBeVisible()
-    await expect(table).toHaveScreenshot('home-session-history-table.png', {
+    await expect(wrap).toHaveScreenshot('home-session-history-table.png', {
       animations: 'disabled',
       maxDiffPixelRatio: 0.04,
     })

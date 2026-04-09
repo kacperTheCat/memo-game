@@ -34,7 +34,7 @@ pnpm exec playwright test e2e/screens-visual.spec.ts --update-snapshots
 
 Commit updated PNGs with the PR.
 
-The home baseline (`home-session-history-table.png`) seeds `memo-game.v1.completedSessions` in the spec so the History Ledger table shows sample won rows; see `e2e/screens-visual.spec.ts`.
+The home baseline (`home-session-history-table.png`) targets `session-history-table-wrap` (stable `min-height` for Linux vs macOS), seeds `memo-game.v1.completedSessions` so the ledger shows sample won rows; see `e2e/screens-visual.spec.ts`.
 
 ## Lint
 
