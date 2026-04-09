@@ -6,10 +6,13 @@ import {
   clearMismatch,
   createInitialState,
   isWin,
+  isWrongPairPending,
+  normalizePairForHydration,
   pickCell,
   shuffleIdentities,
   type MemoryState,
 } from '@/game/memoryEngine'
+import { cloneMemoryStateShallow } from '@/game/sfxPickOutcomes'
 import { gridDimensions } from '@/game/buildGridLayout'
 import { MISMATCH_RESOLVE_MS } from '@/game/tileMotionConstants'
 
@@ -30,6 +33,20 @@ export const useGamePlayStore = defineStore('gamePlay', () => {
       clearTimeout(mismatchTimer)
       mismatchTimer = null
     }
+  }
+
+  function armMismatchTimerIfNeeded(): void {
+    const st = memory.value
+    if (!st || !isWrongPairPending(st)) {
+      return
+    }
+    mismatchTimer = setTimeout(() => {
+      if (memory.value && isWrongPairPending(memory.value)) {
+        memory.value = clearMismatch(memory.value)
+        playSfx('fail')
+      }
+      mismatchTimer = null
+    }, MISMATCH_RESOLVE_MS)
   }
 
   function startNewRound(
@@ -59,13 +76,15 @@ export const useGamePlayStore = defineStore('gamePlay', () => {
       memory.value = null
       return
     }
-    memory.value = {
+    const mem: MemoryState = {
       cells: cells.map((x) => ({ ...x })),
       pair: { ...pair },
     }
+    memory.value = normalizePairForHydration(mem)
     rows.value = r
     cols.value = c
     dealInitKind.value = 'random'
+    armMismatchTimerIfNeeded()
   }
 
   /**
@@ -75,29 +94,26 @@ export const useGamePlayStore = defineStore('gamePlay', () => {
     if (!memory.value) {
       return { accepted: false, won: false }
     }
+    const memBefore = cloneMemoryStateShallow(memory.value)
+    const hadWrongPair = isWrongPairPending(memBefore)
     const result = pickCell(memory.value, index)
     if (!result.accepted) {
       return { accepted: false, won: false }
     }
     // Only clear after an accepted pick: clearing on every tryPick would cancel the
-    // mismatch flip-back when the user taps again while the pair is locked (FR-002).
+    // mismatch timer when the user taps a rejected cell.
     clearMismatchTimer()
     memory.value = result.state
 
-    const st = memory.value
-    if (st.pair.locked && st.pair.firstIndex !== null && st.pair.secondIndex !== null) {
-      const a = st.cells[st.pair.firstIndex]
-      const b = st.cells[st.pair.secondIndex]
-      if (a && b && a.identityIndex !== b.identityIndex) {
-        mismatchTimer = setTimeout(() => {
-          if (memory.value) {
-            memory.value = clearMismatch(memory.value)
-            playSfx('fail')
-          }
-          mismatchTimer = null
-        }, MISMATCH_RESOLVE_MS)
-      }
+    if (
+      hadWrongPair &&
+      memory.value &&
+      !isWrongPairPending(memory.value)
+    ) {
+      playSfx('fail')
     }
+
+    armMismatchTimerIfNeeded()
 
     const won = isWin(memory.value)
     return { accepted: true, won }
