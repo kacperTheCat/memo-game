@@ -1,6 +1,6 @@
 # CS2 Memory
 
-Non-commercial **recruitment / portfolio** project: a Counter-Strike 2–themed memory game. This repository follows [.specify/memory/constitution.md](.specify/memory/constitution.md) (Vue 3, Canvas gameplay later, PWA, TDD, Playwright).
+Non-commercial **recruitment / portfolio** project: a Counter-Strike 2–themed memory game. This repository follows [.specify/memory/constitution.md](.specify/memory/constitution.md) (Vue 3, HTML Canvas board, PWA, TDD, Playwright).
 
 ## Getting started
 
@@ -30,8 +30,9 @@ This app is a **static SPA** (`pnpm build` → `dist/`). See **[specs/015-vercel
 Order matches project constitution (Vitest → build → preview → Playwright):
 
 ```bash
-pnpm test              # Vitest (unit / component + tile-library validation)
-pnpm test:e2e          # Playwright: bootstrap on dev server, then build + preview suite
+pnpm test               # Vitest (unit / component + tile-library validation)
+pnpm test:e2e           # Playwright: bootstrap on dev server, then build + preview suite
+pnpm test:e2e:preview   # Playwright: build + preview only (no dev-server bootstrap)
 ```
 
 **Tile library:** `pnpm test` fails if `src/data/tile-library.json` is invalid or files under `public/tiles/` are missing. Regenerate with `pnpm run fetch-tiles` (requires network; see [ATTRIBUTION.md](ATTRIBUTION.md)).
@@ -71,6 +72,7 @@ Vendored tile art and `src/data/tile-library.json` come from a **one-time** inge
 | `pnpm test`   | Vitest (includes CS2 tile library checks)       |
 | `pnpm fetch-tiles` | Regenerate `public/tiles/` + `src/data/tile-library.json` |
 | `pnpm test:e2e` | Full Playwright pipeline (see above)         |
+| `pnpm test:e2e:preview` | Playwright against preview only (after `pnpm build`) |
 | `pnpm lint`   | ESLint                                           |
 
 ## License
