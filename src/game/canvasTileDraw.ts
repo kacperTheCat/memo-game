@@ -21,6 +21,8 @@ export interface TileDrawParams {
   mismatchConceal01?: number
   /** Dev: draw face even for concealed/matched */
   forceShowFace: boolean
+  /** Normalized 0..1 highlight center on face inner rect; omit or null for no extra glow */
+  faceHighlight?: { nx: number; ny: number } | null
 }
 
 const PAD = 3
@@ -54,6 +56,8 @@ function drawFaceContent(
   rarity: string,
   ox: number,
   oy: number,
+  faceHighlight: { nx: number; ny: number } | null,
+  reducedMotion: boolean,
 ): void {
   const { x, y, w, h } = rect
   const innerW = w - PAD * 2
@@ -67,6 +71,18 @@ function drawFaceContent(
   bg.addColorStop(1, end)
   ctx.fillStyle = bg
   ctx.fillRect(ix, iy, innerW, innerH)
+
+  if (faceHighlight && !reducedMotion) {
+    const hx = ix + faceHighlight.nx * innerW
+    const hy = iy + faceHighlight.ny * innerH
+    const rad = Math.max(innerW, innerH) * 0.95
+    const rg = ctx.createRadialGradient(hx, hy, 0, hx, hy, rad)
+    rg.addColorStop(0, 'rgba(255,255,255,0.32)')
+    rg.addColorStop(0.35, 'rgba(255,255,255,0.1)')
+    rg.addColorStop(1, 'rgba(255,255,255,0)')
+    ctx.fillStyle = rg
+    ctx.fillRect(ix, iy, innerW, innerH)
+  }
 
   ctx.save()
   ctx.beginPath()
@@ -118,6 +134,7 @@ export function drawTile(
     shakePx,
     mismatchConceal01,
     forceShowFace,
+    faceHighlight = null,
   } = params
 
   if (phase === 'matched' && matchFade01 >= 1) {
@@ -160,7 +177,17 @@ export function drawTile(
     ctx.scale(Math.max(0.08, scaleX), 1)
     ctx.translate(-cx, -cy)
     if (flipP > 0.5) {
-      drawFaceContent(ctx, rect, img, catalogColor, rarity, ox, oy)
+      drawFaceContent(
+        ctx,
+        rect,
+        img,
+        catalogColor,
+        rarity,
+        ox,
+        oy,
+        faceHighlight,
+        reducedMotion,
+      )
     } else {
       drawConcealedBack(ctx, innerX, innerY, innerW, innerH)
     }
@@ -194,7 +221,17 @@ export function drawTile(
   if (p < 0.5 && !forceShowFace) {
     drawConcealedBack(ctx, innerX, innerY, innerW, innerH)
   } else {
-    drawFaceContent(ctx, rect, img, catalogColor, rarity, ox, oy)
+    drawFaceContent(
+      ctx,
+      rect,
+      img,
+      catalogColor,
+      rarity,
+      ox,
+      oy,
+      faceHighlight,
+      reducedMotion,
+    )
   }
 
   ctx.restore()
