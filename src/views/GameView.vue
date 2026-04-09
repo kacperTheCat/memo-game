@@ -21,6 +21,7 @@ import {
   navAbandonGame,
   navReturnToBriefcase,
 } from '@/constants/appCopy'
+import { persistPlayerSettingsFromStore } from '@/game/playerSettingsStorage'
 import { useGamePlayStore } from '@/stores/gamePlay'
 import { useGameSessionStore } from '@/stores/gameSession'
 import { useGameSettingsStore } from '@/stores/gameSettings'
@@ -52,6 +53,7 @@ function applyRouteQuery(): void {
   if (typeof s === 'string' && s.length > 0) {
     settings.dealSeed = s
   }
+  persistPlayerSettingsFromStore(settings)
 }
 
 applyRouteQuery()

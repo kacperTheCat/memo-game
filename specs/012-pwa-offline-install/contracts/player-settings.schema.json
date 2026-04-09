@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.memo-game/specs/012-pwa-offline-install/player-settings.schema.json",
+  "title": "MemoGamePlayerSettingsV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "difficulty", "briefcaseSeedRaw"],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["easy", "medium", "hard"]
+    },
+    "briefcaseSeedRaw": {
+      "type": "string"
+    }
+  }
+}

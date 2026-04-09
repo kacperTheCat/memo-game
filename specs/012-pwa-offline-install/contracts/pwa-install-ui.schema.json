@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.memo-game/specs/012-pwa-offline-install/pwa-install-ui.schema.json",
+  "title": "MemoGamePwaInstallUiStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "outcome"],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "outcome": {
+      "type": "string",
+      "description": "pending = never shown; seen = sheet was shown once (suppress repeat until cleared); dismissed | installed = terminal",
+      "enum": ["pending", "seen", "dismissed", "installed"]
+    }
+  }
+}
