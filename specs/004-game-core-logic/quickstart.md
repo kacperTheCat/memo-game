@@ -35,5 +35,5 @@ pnpm test:e2e:preview
 
 ## Where to implement
 
-- Canvas + input: `src/components/GameCanvasShell.vue` and new `src/game/*` modules.
+- Canvas + input: `src/components/game/GameCanvasShell.vue` and new `src/game/*` modules.
 - Session: new Pinia store + `localStorage` keys documented in [`contracts/README.md`](./contracts/README.md).

@@ -30,13 +30,13 @@ description: "Task list for 002-stitch-theme-briefcase (Stitch theme + Briefcase
 
 **⚠️** No user story completion until this phase is done.
 
-- [x] T002 Create `src/views/HomeView.vue` with **DOM** main entry only (**do not** import `GameCanvasShell`); migrate non-canvas welcome/header content from `src/App.vue` as needed at repository root
-- [x] T003 Create `src/views/GameView.vue` that **only** mounts `src/components/GameCanvasShell.vue` (plus optional **English** chrome, e.g. link home) at repository root
-- [x] T004 Create stub `src/views/BriefcaseViewPage.vue` with root `data-testid="briefcase-view"` at repository root
+- [x] T002 Create `src/views/home/HomeView.vue` with **DOM** main entry only (**do not** import `GameCanvasShell`); migrate non-canvas welcome/header content from `src/App.vue` as needed at repository root
+- [x] T003 Create `src/views/game/GameView.vue` that **only** mounts `src/components/game/GameCanvasShell.vue` (plus optional **English** chrome, e.g. link home) at repository root
+- [x] T004 Create stub `src/views/briefcase/BriefcaseViewPage.vue` with root `data-testid="briefcase-view"` at repository root
 - [x] T005 Create `src/router/index.ts` with routes **`/`** → `HomeView`, **`/game`** → `GameView`, **`/briefcase`** → `BriefcaseViewPage` at repository root
 - [x] T006 Register the router in `src/main.ts` at repository root
 - [x] T007 Replace inline shell in `src/App.vue` with `<RouterView />` (or layout + `RouterView`) at repository root
-- [x] T008 Add `data-testid="game-canvas"` to the `<canvas>` (or wrapper) in `src/components/GameCanvasShell.vue` per `specs/002-stitch-theme-briefcase/contracts/briefcase-view.e2e.schema.json`
+- [x] T008 Add `data-testid="game-canvas"` to the `<canvas>` (or wrapper) in `src/components/game/GameCanvasShell.vue` per `specs/002-stitch-theme-briefcase/contracts/briefcase-view.e2e.schema.json`
 - [x] T009 Add Stitch-aligned **semantic CSS custom properties** and Tailwind v4 **`@theme`** mapping in `src/style.css` at repository root (optional `src/theme/tokens.css`)
 
 **Checkpoint**: **`/`** shows **home** without **`game-canvas`**; **`/game`** shows canvas; **`/briefcase`** shows stub Briefcase.
@@ -53,15 +53,15 @@ description: "Task list for 002-stitch-theme-briefcase (Stitch theme + Briefcase
 
 > Write **first**; confirm **FAIL** before implementation.
 
-- [x] T010 [P] [US1] Add failing Vitest `src/components/briefcase/BriefcaseView.spec.ts` for English copy and Briefcase **content** testids (`briefcase-seed-input`, etc.); root `data-testid="briefcase-view"` remains on `src/views/BriefcaseViewPage.vue`
+- [x] T010 [P] [US1] Add failing Vitest `src/components/briefcase/BriefcaseView.spec.ts` for English copy and Briefcase **content** testids (`briefcase-seed-input`, etc.); root `data-testid="briefcase-view"` remains on `src/views/briefcase/BriefcaseViewPage.vue`
 - [x] T011 [P] [US1] Add failing Playwright `e2e/briefcase-view.spec.ts` for **P1 scenarios 1–8** shell: **`nav-to-briefcase`**, **`nav-to-home`**, **`nav-to-game`**, assert **`game-canvas`** on **`/game`**, assert **absence** of **`game-canvas`** on **`/`**, deep **`/briefcase`**, **`briefcase-seed-input`**, **`briefcase-backdrop`**, viewports
 
 ### Implementation for User Story 1
 
 - [x] T012 [US1] Add English strings (home, game, briefcase, nav) in `src/constants/appCopy.ts` at repository root
 - [x] T013 [P] [US1] Implement themed `src/components/briefcase/BriefcaseView.vue` (includes **seed** per **FR-010(d)**)
-- [x] T014 [US1] Implement `src/views/BriefcaseViewPage.vue` with **`briefcase-backdrop`** + **`BriefcaseView`** + `data-testid="nav-to-home"` → **`/`** (**FR-010(e)**)
-- [x] T015 [US1] Update `src/views/HomeView.vue` with `data-testid="nav-to-briefcase"` → **`/briefcase`** and `data-testid="nav-to-game"` → **`/game`** (labels from `appCopy.ts`)
+- [x] T014 [US1] Implement `src/views/briefcase/BriefcaseViewPage.vue` with **`briefcase-backdrop`** + **`BriefcaseView`** + `data-testid="nav-to-home"` → **`/`** (**FR-010(e)**)
+- [x] T015 [US1] Update `src/views/home/HomeView.vue` with `data-testid="nav-to-briefcase"` → **`/briefcase`** and `data-testid="nav-to-game"` → **`/game`** (labels from `appCopy.ts`)
 - [x] T016 [US1] Finalize `src/router/index.ts` and remove placeholders
 - [x] T017 [US1] Run `pnpm test` and `pnpm test:e2e` (or `pnpm test:e2e:preview`) until **US1** shell is green
 

@@ -74,24 +74,24 @@ specs/004-game-core-logic/
 ```text
 src/
 ├── components/
-│   ├── GameCanvasShell.vue       # Canvas: paint, hit-test, init/hydrate; no difficulty watcher
+│   ├── game/
+│   │   └── GameCanvasShell.vue   # Canvas: paint, hit-test, init/hydrate; no difficulty watcher
 │   └── briefcase/
 │       └── BriefcaseView.vue     # Radios = next-start only; Unlock → useBriefcaseNavigateToGame
 ├── views/
-│   ├── GameView.vue              # Abandon control, active-time hook
-│   └── BriefcaseViewPage.vue     # Play button → useBriefcaseNavigateToGame (not raw link to /game)
+│   ├── game/GameView.vue         # Abandon control, active-time hook
+│   └── briefcase/BriefcaseViewPage.vue  # Play button → useBriefcaseNavigateToGame (not raw link to /game)
 ├── stores/
-│   ├── gameSettings.ts           # difficulty preset for next start + Briefcase UI
-│   ├── gamePlay.ts               # Board, pair resolution, memoryEngine
-│   └── gameSession.ts            # Metrics, persistence, completed history
+│   └── game/
+│       ├── gameSettings.ts       # difficulty preset for next start + Briefcase UI
+│       ├── gamePlay.ts           # Board, pair resolution, memoryEngine
+│       └── gameSession.ts        # Metrics, persistence, completed history
 ├── game/
-│   ├── buildGridLayout.ts
-│   ├── memoryEngine.ts, memoryTypes.ts, canvasHitTest.ts, cellRect.ts, canvasLayout.ts
-│   ├── canvasTileDraw.ts, tileParallax.ts, sessionConstants.ts
-│   └── tileLibraryTypes.ts
+│   ├── canvas/ … memory/ … seed/ … tiles/ … animation/ … storage/ … win/ … shell/ … library/
 ├── composables/
-│   ├── useActivePlayTime.ts      # Active-tab-only ms (FR-009)
-│   └── useBriefcaseNavigateToGame.ts  # FR-014: confirm abandon before /game when mismatch
+│   └── game/
+│       ├── useActivePlayTime.ts      # Active-tab-only ms (FR-009)
+│       └── useBriefcaseNavigateToGame.ts  # FR-014: confirm abandon before /game when mismatch
 e2e/
 ├── game-core-playthrough.spec.ts
 ├── game-core-layout-motion.spec.ts

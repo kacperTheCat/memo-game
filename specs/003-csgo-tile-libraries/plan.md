@@ -58,7 +58,8 @@ specs/003-csgo-tile-libraries/
 ```text
 src/
 ├── components/
-│   ├── GameCanvasShell.vue    # canvas sizing, draw grid, load images
+│   ├── game/
+│   │   └── GameCanvasShell.vue    # canvas sizing, draw grid, load images
 │   └── briefcase/
 │       └── BriefcaseView.vue  # wire difficulty → Pinia
 ├── constants/
@@ -66,12 +67,12 @@ src/
 ├── data/
 │   └── tile-library.json      # generated — 32 entries
 ├── game/
-│   ├── buildGridLayout.ts     # pure: difficulty → cell list (Vitest)
-│   └── validateTileLibrary.ts # pure + fs checks in tests
+│   ├── canvas/buildGridLayout.ts     # pure: difficulty → cell list (Vitest)
+│   └── library/validateTileLibrary.ts # pure + fs checks in tests
 ├── stores/
-│   └── gameSettings.ts        # Pinia: difficulty
+│   └── game/gameSettings.ts        # Pinia: difficulty
 ├── views/
-│   └── GameView.vue
+│   └── game/GameView.vue
 scripts/
 └── fetch-tile-library.mjs     # or .ts — maintainer ingest
 public/

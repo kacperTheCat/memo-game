@@ -2,7 +2,7 @@
 
 ## 1. Where animations run (canvas-first)
 
-**Decision:** Keep the **playable grid on a single 2D canvas** (`GameCanvasShell.vue` + `canvasTileDraw.ts`). All flip, **collect/merge**, shake, and parallax smoothing are implemented as **parametric drawing** (transforms, alpha, offsets) driven by a **per-frame or rAF tick**, not as a DOM card stack.
+**Decision:** Keep the **playable grid on a single 2D canvas** (`src/components/game/GameCanvasShell.vue` + `src/game/canvas/canvasTileDraw.ts`). All flip, **collect/merge**, shake, and parallax smoothing are implemented as **parametric drawing** (transforms, alpha, offsets) driven by a **per-frame or rAF tick**, not as a DOM card stack.
 
 **Rationale:** Matches constitution **II. Canvas-first gameplay**. DOM/CSS card flips would make the board non-canvas-primary and complicate hit-testing ownership.
 
@@ -40,7 +40,7 @@
 
 ## 5. Rarity → gradient + gold top tier
 
-**Decision:** Add a small **`src/game/rarityTier.ts`** (or similar) defining an **ordered list of rarity strings** aligned with the CS-style ladder. **`isTopTier(rarity)`** returns true only for the highest band (per spec: **Covert** in current library). Face background: **linear/radial gradient** from `entry.color`; top tier uses a **fixed gold-forward palette**. **Concealed back:** no use of `entry.color` (today’s stroke on concealed is an information leak vs **FR-001**).
+**Decision:** Add a small **`src/game/tiles/rarityTier.ts`** (or similar) defining an **ordered list of rarity strings** aligned with the CS-style ladder. **`isTopTier(rarity)`** returns true only for the highest band (per spec: **Covert** in current library). Face background: **linear/radial gradient** from `entry.color`; top tier uses a **fixed gold-forward palette**. **Concealed back:** no use of `entry.color` (today’s stroke on concealed is an information leak vs **FR-001**).
 
 **Rationale:** Single source of truth for tier checks; testable without canvas.
 

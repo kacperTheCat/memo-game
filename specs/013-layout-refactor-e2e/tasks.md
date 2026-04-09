@@ -51,7 +51,7 @@ description: "Task list for 013 layout refactor & screen visual E2E"
 
 ### Implementation for User Story 1
 
-- [X] T005 [US1] Adjust layout in `src/views/GameView.vue` and, only if required, wrapper markup/styles in `src/components/GameCanvasShell.vue` so T004 assertions pass without changing canvas game logic in `src/game/*`.
+- [X] T005 [US1] Adjust layout in `src/views/game/GameView.vue` and, only if required, wrapper markup/styles in `src/components/game/GameCanvasShell.vue` so T004 assertions pass without changing canvas game logic in `src/game/*`.
 - [X] T006 [US1] Run `pnpm exec playwright test e2e/game-layout-balance.spec.ts` until green; then spot-check resize in browser for spec scenario 3 (nav vs canvas overlap).
 
 **Checkpoint**: US1 done — layout E2E green.

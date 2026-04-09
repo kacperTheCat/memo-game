@@ -32,7 +32,7 @@ description: 'Task list for 016 wrong-pair tile input during mismatch feedback'
 
 **⚠️ CRITICAL**: Complete before User Story 1 implementation.
 
-- [x] T003 [P] Verify [`src/game/tileMotionConstants.ts`](../../src/game/tileMotionConstants.ts) `MISMATCH_RESOLVE_MS` matches store + canvas usage; no drift after edits
+- [x] T003 [P] Verify [`src/game/tiles/tileMotionConstants.ts`](../../src/game/tiles/tileMotionConstants.ts) `MISMATCH_RESOLVE_MS` matches store + canvas usage; no drift after edits
 - [x] T004 [P] Skim [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) for Vitest → build → Playwright preview order so new `e2e/*.spec.ts` is picked up automatically
 
 **Checkpoint**: Proceed to User Story 1.
@@ -49,15 +49,15 @@ description: 'Task list for 016 wrong-pair tile input during mismatch feedback'
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [x] T005 [P] [US1] Extend Vitest [`src/game/memoryEngine.spec.ts`](../../src/game/memoryEngine.spec.ts): export and cover **`isWrongPairPending`**; wrong pair returns **`locked: false`**; concealed third index **interrupts** (clears two + reveals third as first pick); taps on wrong-pair indices **rejected**; match path unchanged (maps to acceptance scenarios 1 + 3 / FR-003–FR-004)
-- [x] T006 [P] [US1] Extend Vitest [`src/stores/gamePlay.spec.ts`](../../src/stores/gamePlay.spec.ts): timer arms on wrong pair **without** relying on **`pair.locked`**; interrupt **cancels** timer; timer callback **no-op** if mismatch already cleared; **`hydrateFromSnapshot`** normalizes legacy **`pair.locked: true`** when wrong-pair pending and re-arms timer per [`plan.md`](./plan.md) (maps to FR-001 + [`research.md`](./research.md) §9)
+- [x] T005 [P] [US1] Extend Vitest [`src/game/memory/memoryEngine.spec.ts`](../../src/game/memory/memoryEngine.spec.ts): export and cover **`isWrongPairPending`**; wrong pair returns **`locked: false`**; concealed third index **interrupts** (clears two + reveals third as first pick); taps on wrong-pair indices **rejected**; match path unchanged (maps to acceptance scenarios 1 + 3 / FR-003–FR-004)
+- [x] T006 [P] [US1] Extend Vitest [`src/stores/game/gamePlay.spec.ts`](../../src/stores/game/gamePlay.spec.ts): timer arms on wrong pair **without** relying on **`pair.locked`**; interrupt **cancels** timer; timer callback **no-op** if mismatch already cleared; **`hydrateFromSnapshot`** normalizes legacy **`pair.locked: true`** when wrong-pair pending and re-arms timer per [`plan.md`](./plan.md) (maps to FR-001 + [`research.md`](./research.md) §9)
 - [x] T007 [P] [US1] Add Playwright [`e2e/game-wrong-pair-input-during-animation.spec.ts`](../../e2e/game-wrong-pair-input-during-animation.spec.ts): open `/game`, perform wrong pair via canvas clicks (reuse layout math from [`e2e/game-core-playthrough.spec.ts`](../../e2e/game-core-playthrough.spec.ts)), then click a third concealed cell **immediately** (no `waitForTimeout(MISMATCH_RESOLVE_MS)`); assert via **`data-testid="game-memory-debug"`** / `data-revealed` (or equivalent) that play advanced; optional second case: wait path still resolves mismatch (regression for FR-002 wait path) (maps to [`spec.md`](./spec.md) acceptance scenarios 1–2)
 
 ### Implementation for User Story 1
 
-- [x] T008 [US1] Implement **`isWrongPairPending`** + interrupt branch + wrong-pair **`locked: false`** + **`normalizePairForMismatchPending`** (or equivalent) in [`src/game/memoryEngine.ts`](../../src/game/memoryEngine.ts) per [`plan.md`](./plan.md) §Engine; export helper for canvas
-- [x] T009 [US1] Update [`src/stores/gamePlay.ts`](../../src/stores/gamePlay.ts): arm **`mismatchTimer`** using **`isWrongPairPending`**; guard callback with same predicate; **`hydrateFromSnapshot`** normalize **`locked`** + re-arm timer when wrong-pair pending; on interrupt acceptance, **`playSfx('fail')`** when concealing wrong pair per [`research.md`](./research.md) §5 (coordinate with existing **`sfxOutcomesForPick`** in [`src/components/GameCanvasShell.vue`](../../src/components/GameCanvasShell.vue) if needed to avoid double SFX)
-- [x] T010 [US1] Refactor [`src/components/GameCanvasShell.vue`](../../src/components/GameCanvasShell.vue): replace **`locked &&`** mismatch predicates with **`isWrongPairPending(mem)`** for **`mismatchShake`**, **`mismatchConceal01ForCell`**, **`computeMismatchPhaseUi`**, **`animationActive`**, and tile draw **`isMismatchTile`**; keep reduced-motion paths correct
+- [x] T008 [US1] Implement **`isWrongPairPending`** + interrupt branch + wrong-pair **`locked: false`** + **`normalizePairForMismatchPending`** (or equivalent) in [`src/game/memory/memoryEngine.ts`](../../src/game/memory/memoryEngine.ts) per [`plan.md`](./plan.md) §Engine; export helper for canvas
+- [x] T009 [US1] Update [`src/stores/game/gamePlay.ts`](../../src/stores/game/gamePlay.ts): arm **`mismatchTimer`** using **`isWrongPairPending`**; guard callback with same predicate; **`hydrateFromSnapshot`** normalize **`locked`** + re-arm timer when wrong-pair pending; on interrupt acceptance, **`playSfx('fail')`** when concealing wrong pair per [`research.md`](./research.md) §5 (coordinate with existing **`sfxOutcomesForPick`** in [`src/components/game/GameCanvasShell.vue`](../../src/components/game/GameCanvasShell.vue) if needed to avoid double SFX)
+- [x] T010 [US1] Refactor [`src/components/game/GameCanvasShell.vue`](../../src/components/game/GameCanvasShell.vue): replace **`locked &&`** mismatch predicates with **`isWrongPairPending(mem)`** for **`mismatchShake`**, **`mismatchConceal01ForCell`**, **`computeMismatchPhaseUi`**, **`animationActive`**, and tile draw **`isMismatchTile`**; keep reduced-motion paths correct
 
 ### Verification for User Story 1
 
@@ -96,8 +96,8 @@ description: 'Task list for 016 wrong-pair tile input during mismatch feedback'
 
 ```bash
 # Write failing tests in parallel:
-# - src/game/memoryEngine.spec.ts
-# - src/stores/gamePlay.spec.ts
+# - src/game/memory/memoryEngine.spec.ts
+# - src/stores/game/gamePlay.spec.ts
 # - e2e/game-wrong-pair-input-during-animation.spec.ts
 ```
 
@@ -122,5 +122,5 @@ description: 'Task list for 016 wrong-pair tile input during mismatch feedback'
 
 ## Notes
 
-- Grep for **`pair.locked`** after changes to catch stragglers outside [`GameCanvasShell.vue`](../../src/components/GameCanvasShell.vue).  
+- Grep for **`pair.locked`** after changes to catch stragglers outside [`GameCanvasShell.vue`](../../src/components/game/GameCanvasShell.vue).  
 - Snapshot compatibility: old in-progress saves with **`locked: true`** on wrong pair must still work after [`research.md`](./research.md) §9.  

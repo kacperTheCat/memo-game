@@ -25,8 +25,8 @@
 
 **Purpose**: Shared **smoothed pointer → centroid** math and chase-light composable including **visibility envelope** (**FR-001a**, **FR-001b**). **No user story work until this phase completes.**
 
-- [x] T002 [P] Add or verify `src/game/ambientPointerMath.ts` (`lerp2d`, `springToward2d`, `clampPointToRect`, drift/noise) + Vitest `src/game/ambientPointerMath.spec.ts`
-- [x] T003 Add or extend `src/composables/useAmbientChaseLight.ts` — Pointer Events idle/touch envelope, rAF, `prefers-reduced-motion`, **`data-ambient-spotlight-active`** inputs + Vitest `src/composables/useAmbientChaseLight.spec.ts`
+- [x] T002 [P] Add or verify `src/game/shell/ambientPointerMath.ts` (`lerp2d`, `springToward2d`, `clampPointToRect`, drift/noise) + Vitest `src/game/shell/ambientPointerMath.spec.ts`
+- [x] T003 Add or extend `src/composables/game/useAmbientChaseLight.ts` — Pointer Events idle/touch envelope, rAF, `prefers-reduced-motion`, **`data-ambient-spotlight-active`** inputs + Vitest `src/composables/game/useAmbientChaseLight.spec.ts`
 
 ---
 
@@ -42,37 +42,37 @@
 ### Implementation for User Story 1
 
 - [x] T006 [US1] `src/components/ambient/MemoAmbientSpotlight.vue` — radial glow, `data-testid`, **`data-ambient-spotlight-active`**
-- [x] T007 [US1] Mount in `src/views/HomeView.vue`
-- [x] T008 [US1] Mount in `src/views/BriefcaseViewPage.vue` backdrop
-- [x] T009 [US1] Mount in `src/components/WinDebriefPanel.vue`
+- [x] T007 [US1] Mount in `src/views/home/HomeView.vue`
+- [x] T008 [US1] Mount in `src/views/briefcase/BriefcaseViewPage.vue` backdrop
+- [x] T009 [US1] Mount in `src/components/game/WinDebriefPanel.vue`
 - [x] T010 [US1] Verify `pnpm test` + `e2e/styles-spotlight-depth.spec.ts`
 
 ---
 
 ## Phase 4: User Story 2 — Game card gradient (Priority: P1)
 
-- [x] T011 [P] [US2] Vitest `src/game/tileFaceGradientPointer.spec.ts`
+- [x] T011 [P] [US2] Vitest `src/game/tiles/tileFaceGradientPointer.spec.ts`
 - [x] T012 [P] [US2] Playwright `e2e/styles-game-card-gradient.spec.ts`
-- [x] T013 [US2] `src/game/canvasTileDraw.ts` — revealed-face gradient
-- [x] T014 [US2] `src/components/GameCanvasShell.vue` — lerp focal params
+- [x] T013 [US2] `src/game/canvas/canvasTileDraw.ts` — revealed-face gradient
+- [x] T014 [US2] `src/components/game/GameCanvasShell.vue` — lerp focal params
 - [x] T015 [US2] Verify Vitest + Playwright for US2
 
 ---
 
 ## Phase 5: User Story 3 — Briefcase yellow ambience (Priority: P2)
 
-- [x] T016 [P] [US3] Vitest `src/game/briefcaseAmbienceTargets.spec.ts`
+- [x] T016 [P] [US3] Vitest `src/game/shell/briefcaseAmbienceTargets.spec.ts`
 - [x] T017 [P] [US3] Playwright `e2e/styles-briefcase-ambience.spec.ts`
-- [x] T018 [US3] `src/views/BriefcaseViewPage.vue` — rAF blobs
+- [x] T018 [US3] `src/views/briefcase/BriefcaseViewPage.vue` — rAF blobs
 - [x] T019 [US3] Verify Vitest + Playwright for US3
 
 ---
 
 ## Phase 6: User Story 4 — Operation Complete (Priority: P2)
 
-- [x] T020 [P] [US4] Vitest `src/components/WinDebriefPanel.operationComplete.spec.ts`
+- [x] T020 [P] [US4] Vitest `src/components/game/WinDebriefPanel.operationComplete.spec.ts`
 - [x] T021 [P] [US4] Playwright `e2e/styles-operation-complete-text.spec.ts`
-- [x] T022 [US4] `src/components/WinDebriefPanel.vue` — stagger + per-glyph gradient (no parent clip vanish)
+- [x] T022 [US4] `src/components/game/WinDebriefPanel.vue` — stagger + per-glyph gradient (no parent clip vanish)
 - [x] T023 [US4] Verify Vitest + Playwright for US4
 
 ---
@@ -108,8 +108,8 @@
 ### Implementation
 
 - [x] T033 [US1] `src/components/ambient/MemoAmbientSpotlight.vue` — use **`position: fixed; inset: 0`** (or equivalent) so layer box equals **visual viewport**; tune **z-index** with grain/backdrop so **FR-002** preserved on Home, Briefcase, Win debrief
-- [x] T034 [US1] Adjust parent wrappers in `src/views/HomeView.vue`, `src/views/BriefcaseViewPage.vue`, `src/components/WinDebriefPanel.vue` if needed so **fixed** spotlight still sits **below** `z-10` (and **HubGrainLayer** ordering stays correct)
-- [x] T035 [US1] `src/composables/useAmbientChaseLight.ts` — increase **`FADE_IN_MS`** to **~380–450 ms** (product pick); keep touch/mouse fade-out as-is unless plan changes
+- [x] T034 [US1] Adjust parent wrappers in `src/views/home/HomeView.vue`, `src/views/briefcase/BriefcaseViewPage.vue`, `src/components/game/WinDebriefPanel.vue` if needed so **fixed** spotlight still sits **below** `z-10` (and **HubGrainLayer** ordering stays correct)
+- [x] T035 [US1] `src/composables/game/useAmbientChaseLight.ts` — increase **`FADE_IN_MS`** to **~380–450 ms** (product pick); keep touch/mouse fade-out as-is unless plan changes
 - [x] T036 [P] [US1] **Stretch:** **Ellipse / axis** of radial gradient follows **smoothed pointer velocity** (“wind”); extend composable + `MemoAmbientSpotlight.vue`; Vitest covers mount + viewport hooks (**FR-001c** in spec)
 
 ### Docs

@@ -84,6 +84,8 @@ Vendored tile art and `src/data/tile-library.json` come from a **one-time** inge
 | `pnpm test:e2e:preview` | Playwright against preview only (after `pnpm build`) |
 | `pnpm lint`   | ESLint                                           |
 
+Maintainer: after moving files under `src/`, run `node scripts/sync-doc-paths.mjs` to refresh path strings in `specs/` and `.cursor/plans/`.
+
 ## License
 
 Private / portfolio usage unless otherwise noted.

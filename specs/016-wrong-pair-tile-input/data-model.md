@@ -2,7 +2,7 @@
 
 ## Overview
 
-Game rules and persistence stay aligned with **`MemoryState`** (`src/game/memoryEngine.ts`, `src/game/memoryTypes.ts`). This feature adjusts **when picks are accepted** and **how mismatch completion is detected**; it does **not** add entities or storage keys.
+Game rules and persistence stay aligned with **`MemoryState`** (`src/game/memory/memoryEngine.ts`, `src/game/memory/memoryTypes.ts`). This feature adjusts **when picks are accepted** and **how mismatch completion is detected**; it does **not** add entities or storage keys.
 
 ## Core state (existing)
 

@@ -55,8 +55,8 @@ description: 'Task list for 015 Vercel deployment & debug peek visibility'
 ### Implementation for User Story 1
 
 - [x] T007 [US1] Implement [`src/env/showGameDebugPeekUi.ts`](../../src/env/showGameDebugPeekUi.ts) with `isLoopbackHostname(hostname: string)` and `showGameDebugPeekUi()` (`import.meta.env.DEV` + `typeof window` guard + loopback check) per [`plan.md`](./plan.md)
-- [x] T008 [US1] Replace `showDebugPeekButton = import.meta.env.DEV` with `showGameDebugPeekUi()` (or equivalent `computed`) in [`src/components/GameCanvasShell.vue`](../../src/components/GameCanvasShell.vue)
-- [x] T009 [US1] Update [`src/components/GameCanvasShell.spec.ts`](../../src/components/GameCanvasShell.spec.ts) so dev peek tests still pass under the new helper (mock/stub as needed)
+- [x] T008 [US1] Replace `showDebugPeekButton = import.meta.env.DEV` with `showGameDebugPeekUi()` (or equivalent `computed`) in [`src/components/game/GameCanvasShell.vue`](../../src/components/game/GameCanvasShell.vue)
+- [x] T009 [US1] Update [`src/components/game/GameCanvasShell.spec.ts`](../../src/components/game/GameCanvasShell.spec.ts) so dev peek tests still pass under the new helper (mock/stub as needed)
 
 ### Verification for User Story 1
 

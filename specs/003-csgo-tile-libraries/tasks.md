@@ -27,13 +27,13 @@
 
 **⚠️ CRITICAL**: Write **T003–T004** before implementation; they MUST fail until **T005–T006** land.
 
-- [x] T003 [P] Vitest **failing-first**: `src/game/buildGridLayout.spec.ts` — assert `easy` → 4×4 / 16 cells, `medium` → 6×6 / 36, `hard` → 8×8 / 64; assert identity index per cell uses **two full cycles** (`k % n` over `2n` cells) for `n` = 8 / 18 / 32 per `data-model.md`
-- [x] T004 [P] Vitest **failing-first**: `src/game/validateTileLibrary.spec.ts` — inline minimal fixtures: reject wrong count, missing fields; accept exactly **32** valid entries (no filesystem yet)
-- [x] T005 Implement `src/game/buildGridLayout.ts` exporting typed helpers used by the canvas (import types from `src/game/tileLibraryTypes.ts` if needed) until **T003** passes
-- [x] T006 Implement `src/game/validateTileLibrary.ts` (pure validation + optional `fs.existsSync` for `public/` paths used in integration tests) until **T004** passes
+- [x] T003 [P] Vitest **failing-first**: `src/game/canvas/buildGridLayout.spec.ts` — assert `easy` → 4×4 / 16 cells, `medium` → 6×6 / 36, `hard` → 8×8 / 64; assert identity index per cell uses **two full cycles** (`k % n` over `2n` cells) for `n` = 8 / 18 / 32 per `data-model.md`
+- [x] T004 [P] Vitest **failing-first**: `src/game/library/validateTileLibrary.spec.ts` — inline minimal fixtures: reject wrong count, missing fields; accept exactly **32** valid entries (no filesystem yet)
+- [x] T005 Implement `src/game/canvas/buildGridLayout.ts` exporting typed helpers used by the canvas (import types from `src/game/library/tileLibraryTypes.ts` if needed) until **T003** passes
+- [x] T006 Implement `src/game/library/validateTileLibrary.ts` (pure validation + optional `fs.existsSync` for `public/` paths used in integration tests) until **T004** passes
 - [x] T007 Implement `scripts/fetch-tile-library.mjs`: fetch subset from ByMykel CSGO-API `skins.json` (or pinned raw URL), write **`public/tiles/*`** and **`src/data/tile-library.json`** matching `contracts/tile-library.schema.json`; run once so repo contains generated files for CI
-- [x] T008 Extend `src/game/validateTileLibrary.spec.ts` (or `validateTileLibrary.fs.spec.ts`) to validate the **committed** `src/data/tile-library.json` and that every `imagePath` resolves under `public/tiles/` in the repo
-- [x] T009 Add `src/stores/gameSettings.ts` with `useGameSettingsStore` (`difficulty: 'easy'|'medium'|'hard'`, default **`medium`**) and export from `src/stores/index.ts` if the project uses a barrel file
+- [x] T008 Extend `src/game/library/validateTileLibrary.spec.ts` (or `validateTileLibrary.fs.spec.ts`) to validate the **committed** `src/data/tile-library.json` and that every `imagePath` resolves under `public/tiles/` in the repo
+- [x] T009 Add `src/stores/game/gameSettings.ts` with `useGameSettingsStore` (`difficulty: 'easy'|'medium'|'hard'`, default **`medium`**) and export from `src/stores/index.ts` if the project uses a barrel file
 
 **Checkpoint**: `pnpm test` green; `tile-library.json` + `public/tiles/` present; Pinia store available.
 
@@ -50,13 +50,13 @@
 > **Write FIRST; ensure FAIL before T012–T014**
 
 - [x] T010 [P] [US1] Playwright **failing-first**: `e2e/csgo-tile-library-game.spec.ts` — set difficulty on `/briefcase`, navigate `/game`, assert `data-testid="game-grid-meta"` has `data-rows` / `data-cols` matching **4/6/8**; assert direct `/game` uses **medium** (6×6)
-- [x] T011 [P] [US1] Vitest **failing-first**: extend `src/components/GameCanvasShell.spec.ts` — mount shell with mocked store + stub `tile-library` data; assert grid meta props or emitted layout matches `buildGridLayout` for at least one difficulty
+- [x] T011 [P] [US1] Vitest **failing-first**: extend `src/components/game/GameCanvasShell.spec.ts` — mount shell with mocked store + stub `tile-library` data; assert grid meta props or emitted layout matches `buildGridLayout` for at least one difficulty
 
 ### Implementation for User Story 1
 
 - [x] T012 [US1] Wire `src/components/briefcase/BriefcaseView.vue` so difficulty radios read/write `useGameSettingsStore().difficulty` (remove isolated `ref` or keep synced)
-- [x] T013 [US1] Implement `src/components/GameCanvasShell.vue`: read store + import `src/data/tile-library.json`; use `buildGridLayout`; load/decode images; `drawImage` grid with **DPR**-aware sizing; add **`data-testid="game-grid-meta"`** with **`data-rows`**, **`data-cols`**, **`data-cells`**
-- [x] T014 [US1] Update `src/constants/appCopy.ts` and `src/views/GameView.vue` **English** subline/heading if still placeholder (“display-only grid” per spec)
+- [x] T013 [US1] Implement `src/components/game/GameCanvasShell.vue`: read store + import `src/data/tile-library.json`; use `buildGridLayout`; load/decode images; `drawImage` grid with **DPR**-aware sizing; add **`data-testid="game-grid-meta"`** with **`data-rows`**, **`data-cols`**, **`data-cells`**
+- [x] T014 [US1] Update `src/constants/appCopy.ts` and `src/views/game/GameView.vue` **English** subline/heading if still placeholder (“display-only grid” per spec)
 - [x] T015 [US1] Confirm `pnpm test` and `pnpm run test:e2e:preview` green for US1 paths
 
 **Checkpoint**: US1 fully testable alone (grid dimensions + Briefcase link).
@@ -72,12 +72,12 @@
 ### Tests for User Story 2 (mandatory) ⚠️
 
 - [x] T016 [P] [US2] Playwright: extend `e2e/csgo-tile-library-game.spec.ts` (or add `e2e/csgo-tile-library-selection.spec.ts`) — explicit **Medium** → `data-rows="6"` `data-cols="6"`; **Easy** → `4` after switching from another difficulty
-- [x] T017 [P] [US2] Vitest: extend `src/game/buildGridLayout.spec.ts` — assert first/last cell maps to expected `TileEntry.id` for each difficulty (stable ordering from `tile-library.json` mock)
+- [x] T017 [P] [US2] Vitest: extend `src/game/canvas/buildGridLayout.spec.ts` — assert first/last cell maps to expected `TileEntry.id` for each difficulty (stable ordering from `tile-library.json` mock)
 
 ### Implementation for User Story 2
 
-- [x] T018 [US2] Harden `src/components/GameCanvasShell.vue` + `buildGridLayout.ts` so image loading **dedupes** by `imagePath` across the **2n** cells (performance per `research.md`)
-- [x] T019 [US2] Add short module comment in `src/game/buildGridLayout.ts` linking to `specs/003-csgo-tile-libraries/data-model.md` fill rules
+- [x] T018 [US2] Harden `src/components/game/GameCanvasShell.vue` + `src/game/canvas/buildGridLayout.ts` so image loading **dedupes** by `imagePath` across the **2n** cells (performance per `research.md`)
+- [x] T019 [US2] Add short module comment in `src/game/canvas/buildGridLayout.ts` linking to `specs/003-csgo-tile-libraries/data-model.md` fill rules
 
 **Checkpoint**: US1 + US2 both pass; subset grids verified.
 
@@ -91,7 +91,7 @@
 
 ### Tests for User Story 3 (mandatory) ⚠️
 
-- [x] T020 [P] [US3] Vitest: `src/game/validateTileLibrary.contract.spec.ts` — import real `src/data/tile-library.json`, run `validateTileLibrary`, assert passes; add **negative** case with temporary mutated object or snapshot of invalid shape (skip mutating committed file—use cloned object in memory)
+- [x] T020 [P] [US3] Vitest: `src/game/library/validateTileLibrary.contract.spec.ts` — import real `src/data/tile-library.json`, run `validateTileLibrary`, assert passes; add **negative** case with temporary mutated object or snapshot of invalid shape (skip mutating committed file—use cloned object in memory)
 - [x] T026 [P] [US3] Playwright: `e2e/csgo-tile-library-validation.spec.ts` — for **Easy**, **Medium**, **Hard** (set on `/briefcase`, then `/game`), assert `data-testid="game-grid-meta"` has `data-cells` **16**, **36**, **64** respectively (constitution §V: every user story has Playwright coverage)
 
 ### Implementation for User Story 3
@@ -105,7 +105,7 @@
 
 ## Phase 6: Polish & cross-cutting concerns
 
-- [x] T023 [P] Update `src/components/GameCanvasShell.vue` **`role` / `aria-label`** to describe the static grid (English) for the real board, not the placeholder string
+- [x] T023 [P] Update `src/components/game/GameCanvasShell.vue` **`role` / `aria-label`** to describe the static grid (English) for the real board, not the placeholder string
 - [x] T024 [P] Run manual steps in `specs/003-csgo-tile-libraries/quickstart.md` and fix any drift (paths, script name)
 - [x] T025 Confirm `.github/workflows/ci.yml` still runs **Vitest before Playwright** and that new specs are picked up without changes (if not, adjust workflow)
 
@@ -151,7 +151,7 @@
 ```bash
 # After Phase 2 done, start US1 tests together:
 # - e2e/csgo-tile-library-game.spec.ts
-# - src/components/GameCanvasShell.spec.ts
+# - src/components/game/GameCanvasShell.spec.ts
 ```
 
 ---

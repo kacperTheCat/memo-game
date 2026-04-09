@@ -33,12 +33,12 @@ description: "Task list for 012-pwa-offline-install"
 
 **⚠️ CRITICAL**: No user story work until this phase completes
 
-- [x] T002 Export `STORAGE_PLAYER_SETTINGS_KEY` and `STORAGE_PWA_INSTALL_UI_KEY` in `src/game/sessionConstants.ts` matching [contracts/README.md](./contracts/README.md)
-- [x] T003 [P] Add failing Vitest `src/game/playerSettingsStorage.spec.ts` for `PlayerSettingsV1` parse defaults, invalid JSON rejection, and round-trip write shape per [contracts/player-settings.schema.json](./contracts/player-settings.schema.json)
-- [x] T004 [P] Add failing Vitest `src/game/pwaInstallUiStorage.spec.ts` for `outcome` transitions (`pending` → `seen` → `dismissed` | `installed`) per [data-model.md](./data-model.md)
+- [x] T002 Export `STORAGE_PLAYER_SETTINGS_KEY` and `STORAGE_PWA_INSTALL_UI_KEY` in `src/game/storage/sessionConstants.ts` matching [contracts/README.md](./contracts/README.md)
+- [x] T003 [P] Add failing Vitest `src/game/storage/playerSettingsStorage.spec.ts` for `PlayerSettingsV1` parse defaults, invalid JSON rejection, and round-trip write shape per [contracts/player-settings.schema.json](./contracts/player-settings.schema.json)
+- [x] T004 [P] Add failing Vitest `src/game/storage/pwaInstallUiStorage.spec.ts` for `outcome` transitions (`pending` → `seen` → `dismissed` | `installed`) per [data-model.md](./data-model.md)
 - [x] T005 Extend `vite.config.ts` **`VitePWA` → `workbox`**: add **`mp3`** to **`globPatterns`** and **`runtimeCaching`** for `fonts.googleapis.com` / `fonts.gstatic.com` per [research.md](./research.md) §1–2
-- [x] T006 Implement `src/game/playerSettingsStorage.ts` (read/write/validate `memo-game.v1.playerSettings`) until `src/game/playerSettingsStorage.spec.ts` passes
-- [x] T007 Implement `src/game/pwaInstallUiStorage.ts` (read/write `memo-game.v1.pwaInstallUi`) until `src/game/pwaInstallUiStorage.spec.ts` passes
+- [x] T006 Implement `src/game/storage/playerSettingsStorage.ts` (read/write/validate `memo-game.v1.playerSettings`) until `src/game/storage/playerSettingsStorage.spec.ts` passes
+- [x] T007 Implement `src/game/storage/pwaInstallUiStorage.ts` (read/write `memo-game.v1.pwaInstallUi`) until `src/game/storage/pwaInstallUiStorage.spec.ts` passes
 
 **Checkpoint**: `pnpm test` green for new storage modules; production build includes audio precache entries
 
@@ -58,9 +58,9 @@ description: "Task list for 012-pwa-offline-install"
 
 ### Implementation for User Story 1
 
-- [x] T009 [US1] Hydrate `useGameSettingsStore` from `src/game/playerSettingsStorage.ts` after Pinia is installed (e.g. `src/main.ts` or `src/stores/index.ts`) before first navigation reads settings
+- [x] T009 [US1] Hydrate `useGameSettingsStore` from `src/game/storage/playerSettingsStorage.ts` after Pinia is installed (e.g. `src/main.ts` or `src/stores/index.ts`) before first navigation reads settings
 - [x] T010 [US1] Subscribe to `useGameSettingsStore` changes with **~300ms** debounced writes of **`difficulty`** + **`briefcaseSeedRaw`** only (exclude **`dealSeed`**) per [data-model.md](./data-model.md)
-- [x] T011 [US1] After `applyRouteQuery()` in `src/views/GameView.vue`, sync query overrides into persisted **`PlayerSettingsV1`** per [contracts/README.md](./contracts/README.md) recommendation
+- [x] T011 [US1] After `applyRouteQuery()` in `src/views/game/GameView.vue`, sync query overrides into persisted **`PlayerSettingsV1`** per [contracts/README.md](./contracts/README.md) recommendation
 - [x] T012 [US1] Green `e2e/pwa-persistence-offline.spec.ts` (use `page.waitForFunction` / service worker readiness as needed) and `pnpm test` for US1-related Vitest files
 
 **Checkpoint**: User Story 1 fully testable alone; MVP = P1 complete
@@ -82,9 +82,9 @@ description: "Task list for 012-pwa-offline-install"
 ### Implementation for User Story 2
 
 - [x] T014 [US2] Add English user-visible strings for install sheet (title, body, **Install**, **Not now**) in `src/constants/appCopy.ts` (or dedicated `src/constants/pwaInstallCopy.ts` imported from app copy barrel if preferred)
-- [x] T015 [US2] Add `src/composables/usePwaInstallPrompt.ts`: capture **`beforeinstallprompt`** (`preventDefault`), stash deferred prompt, **`appinstalled`** → **`installed`**, **`matchMedia('(display-mode: standalone)')`** / iOS **`navigator.standalone`** → hide sheet, integrate `src/game/pwaInstallUiStorage.ts` (**`pending`**/**`seen`**/**`dismissed`**/**`installed`**)
+- [x] T015 [US2] Add `src/composables/pwa/usePwaInstallPrompt.ts`: capture **`beforeinstallprompt`** (`preventDefault`), stash deferred prompt, **`appinstalled`** → **`installed`**, **`matchMedia('(display-mode: standalone)')`** / iOS **`navigator.standalone`** → hide sheet, integrate `src/game/storage/pwaInstallUiStorage.ts` (**`pending`**/**`seen`**/**`dismissed`**/**`installed`**)
 - [x] T016 [US2] Add `src/components/pwa/PwaInstallSheet.vue` (bottom **`fixed`** sheet, Tailwind + `AppButton` / existing tokens, dismiss without blocking canvas when hidden) and mount from `src/App.vue`
-- [x] T017 [US2] Green `e2e/pwa-install-prompt.spec.ts` + no regressions in `src/game/pwaInstallUiStorage.spec.ts`
+- [x] T017 [US2] Green `e2e/pwa-install-prompt.spec.ts` + no regressions in `src/game/storage/pwaInstallUiStorage.spec.ts`
 
 **Checkpoint**: US1 and US2 both pass tests independently
 
@@ -128,8 +128,8 @@ description: "Task list for 012-pwa-offline-install"
 
 ```bash
 # Together after T002 + T005 land:
-Task: "Vitest src/game/playerSettingsStorage.spec.ts"
-Task: "Vitest src/game/pwaInstallUiStorage.spec.ts"
+Task: "Vitest src/game/storage/playerSettingsStorage.spec.ts"
+Task: "Vitest src/game/storage/pwaInstallUiStorage.spec.ts"
 ```
 
 ---
