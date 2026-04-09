@@ -12,7 +12,7 @@
     },
     "outcome": {
       "type": "string",
-      "description": "pending = never shown; seen = sheet was shown once (suppress repeat until cleared); dismissed | installed = terminal",
+      "description": "pending = eligible for sheet; dismissed | installed = terminal. Legacy seen is migrated to pending on read.",
       "enum": ["pending", "seen", "dismissed", "installed"]
     }
   }

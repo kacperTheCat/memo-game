@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { STORAGE_PWA_INSTALL_UI_KEY } from '@/game/sessionConstants'
 import {
+  blocksPwaInstallSheet,
   defaultPwaInstallUiState,
   markPwaInstallOutcome,
   parsePwaInstallUiJson,
@@ -37,11 +38,22 @@ describe('pwaInstallUiStorage', () => {
     expect(readPwaInstallUiFromStorage().outcome).toBe('installed')
   })
 
-  it('supports pending → seen → dismissed transition', () => {
+  it('migrates legacy seen outcome to pending on read', () => {
+    writePwaInstallUiToStorage({ schemaVersion: 1, outcome: 'seen' })
+    expect(readPwaInstallUiFromStorage().outcome).toBe('pending')
+    expect(JSON.parse(localStorage.getItem(STORAGE_PWA_INSTALL_UI_KEY)!).outcome).toBe('pending')
+  })
+
+  it('blocksPwaInstallSheet only for dismissed and installed', () => {
+    expect(blocksPwaInstallSheet('pending')).toBe(false)
+    expect(blocksPwaInstallSheet('seen')).toBe(false)
+    expect(blocksPwaInstallSheet('dismissed')).toBe(true)
+    expect(blocksPwaInstallSheet('installed')).toBe(true)
+  })
+
+  it('supports pending → dismissed transition', () => {
     markPwaInstallOutcome('pending')
     expect(readPwaInstallUiFromStorage().outcome).toBe('pending')
-    markPwaInstallOutcome('seen')
-    expect(readPwaInstallUiFromStorage().outcome).toBe('seen')
     markPwaInstallOutcome('dismissed')
     expect(readPwaInstallUiFromStorage().outcome).toBe('dismissed')
   })

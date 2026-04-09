@@ -5,6 +5,9 @@ export const pwaInstallBody =
   'Add this app to your device for quick access and a fuller screen experience.'
 export const pwaInstallButtonInstall = 'Install'
 export const pwaInstallButtonDismiss = 'Not now'
+/** Shown on home when install UI is still pending but the browser never fired `beforeinstallprompt`. */
+export const pwaInstallFallbackHint =
+  'Install: use Chrome or Edge and look for the install icon in the address bar or use the browser menu. DevTools Offline mode does not trigger the install prompt by itself.'
 
 export const documentTitle = 'CS2 Memory'
 export const primaryHeading = 'CS2 Memory'

@@ -1,58 +1,128 @@
 import { onMounted, onUnmounted, ref, shallowRef } from 'vue'
-import { markPwaInstallOutcome, readPwaInstallUiFromStorage } from '@/game/pwaInstallUiStorage'
+import {
+  clearDeferredInstallPrompt,
+  onInstallPromptAvailable,
+  peekDeferredInstallPrompt,
+} from '@/pwa/captureInstallPrompt'
+import {
+  blocksPwaInstallSheet,
+  markPwaInstallOutcome,
+  readPwaInstallUiFromStorage,
+} from '@/game/pwaInstallUiStorage'
+import { SESSION_STORAGE_PWA_INSTALL_SHEET_OFFERED_KEY } from '@/game/sessionConstants'
+import { isStandalonePwa } from '@/pwa/isStandalonePwa'
 
-function isStandalonePwa(): boolean {
-  if (typeof window === 'undefined') {
-    return false
-  }
-  const standaloneMq = window.matchMedia?.('(display-mode: standalone)')?.matches
-  const iosStandalone =
-    (window.navigator as Navigator & { standalone?: boolean }).standalone === true
-  return Boolean(standaloneMq || iosStandalone)
-}
+/** Extra attempts: Chrome may emit `beforeinstallprompt` well after first paint. */
+const INSTALL_SHEET_RETRY_MS = [2000, 6000, 14_000] as const
 
 export function usePwaInstallPrompt() {
   const visible = ref(false)
   const deferred = shallowRef<BeforeInstallPromptEvent | null>(null)
 
-  function onBeforeInstallPrompt(e: Event): void {
-    e.preventDefault()
-    const ev = e as BeforeInstallPromptEvent
-    if (typeof ev.prompt !== 'function') {
-      return
-    }
-    deferred.value = ev
-
+  function tryOfferInstallSheet(): void {
     if (isStandalonePwa()) {
       markPwaInstallOutcome('installed')
+      clearDeferredInstallPrompt()
+      deferred.value = null
       return
     }
 
     const st = readPwaInstallUiFromStorage()
-    if (st.outcome !== 'pending') {
+    if (blocksPwaInstallSheet(st.outcome)) {
+      clearDeferredInstallPrompt()
+      deferred.value = null
       return
     }
 
+    try {
+      if (sessionStorage.getItem(SESSION_STORAGE_PWA_INSTALL_SHEET_OFFERED_KEY) === '1') {
+        return
+      }
+    } catch {
+      /* private mode */
+    }
+
+    const ev = peekDeferredInstallPrompt()
+    if (!ev || typeof ev.prompt !== 'function') {
+      return
+    }
+
+    try {
+      sessionStorage.setItem(SESSION_STORAGE_PWA_INSTALL_SHEET_OFFERED_KEY, '1')
+    } catch {
+      /* private mode */
+    }
+    deferred.value = ev
     visible.value = true
-    markPwaInstallOutcome('seen')
   }
 
   function onAppInstalled(): void {
     markPwaInstallOutcome('installed')
     visible.value = false
+    clearDeferredInstallPrompt()
     deferred.value = null
   }
+
+  let stopAvailable: (() => void) | null = null
+  let removeLoadListener: (() => void) | null = null
+  let removeControllerListener: (() => void) | null = null
+  const retryTimeouts: number[] = []
 
   onMounted(() => {
     if (isStandalonePwa()) {
       markPwaInstallOutcome('installed')
     }
-    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
+    tryOfferInstallSheet()
+    stopAvailable = onInstallPromptAvailable(() => tryOfferInstallSheet())
     window.addEventListener('appinstalled', onAppInstalled)
+
+    /** `beforeinstallprompt` often arrives after first paint or once the SW controls the client. */
+    const onLoad = (): void => {
+      tryOfferInstallSheet()
+    }
+    if (document.readyState === 'complete') {
+      queueMicrotask(onLoad)
+    } else {
+      window.addEventListener('load', onLoad, { once: true })
+      removeLoadListener = () => window.removeEventListener('load', onLoad)
+    }
+
+    const onControllerChange = (): void => {
+      tryOfferInstallSheet()
+    }
+    if ('serviceWorker' in navigator) {
+      if (navigator.serviceWorker.controller) {
+        queueMicrotask(() => tryOfferInstallSheet())
+      } else {
+        navigator.serviceWorker.addEventListener(
+          'controllerchange',
+          onControllerChange,
+          { once: true },
+        )
+        removeControllerListener = () =>
+          navigator.serviceWorker.removeEventListener(
+            'controllerchange',
+            onControllerChange,
+          )
+      }
+    }
+
+    for (const ms of INSTALL_SHEET_RETRY_MS) {
+      retryTimeouts.push(window.setTimeout(() => tryOfferInstallSheet(), ms))
+    }
   })
 
   onUnmounted(() => {
-    window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
+    for (const id of retryTimeouts) {
+      window.clearTimeout(id)
+    }
+    retryTimeouts.length = 0
+    stopAvailable?.()
+    stopAvailable = null
+    removeLoadListener?.()
+    removeLoadListener = null
+    removeControllerListener?.()
+    removeControllerListener = null
     window.removeEventListener('appinstalled', onAppInstalled)
   })
 
@@ -64,14 +134,16 @@ export function usePwaInstallPrompt() {
     try {
       await d.prompt()
     } catch {
-      /* user dismissed native prompt — keep seen state */
+      /* user dismissed native prompt — keep dismissed/install flow out of localStorage until Not now */
     }
+    clearDeferredInstallPrompt()
     deferred.value = null
   }
 
   function dismiss(): void {
     markPwaInstallOutcome('dismissed')
     visible.value = false
+    clearDeferredInstallPrompt()
     deferred.value = null
   }
 

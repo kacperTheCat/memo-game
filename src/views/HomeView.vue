@@ -7,6 +7,7 @@ import SessionHistoryLedger from "@/components/SessionHistoryLedger.vue";
 import MemoAmbientSpotlight from "@/components/ambient/MemoAmbientSpotlight.vue";
 import HubGrainLayer from "@/components/layout/HubGrainLayer.vue";
 import MemoSecondaryNavButton from "@/components/ui/MemoSecondaryNavButton.vue";
+import PwaInstallFallbackHint from "@/components/pwa/PwaInstallFallbackHint.vue";
 import {
   navConfigureGame,
   navReturnToGame,
@@ -51,6 +52,7 @@ function onConfigureNavClick(): void {
         >
           {{ primaryHeading }}
         </h1>
+        <PwaInstallFallbackHint />
       </header>
       <div
         class="flex flex-wrap items-center justify-center gap-4"

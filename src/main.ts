@@ -6,9 +6,12 @@ import {
   subscribeDebouncedPlayerSettingsPersistence,
 } from '@/game/playerSettingsStorage'
 import { useGameSettingsStore } from '@/stores/gameSettings'
+import { registerInstallPromptCapture } from '@/pwa/captureInstallPrompt'
 import { router } from './router'
 import { pinia } from './stores'
 import './style.css'
+
+registerInstallPromptCapture()
 
 const app = createApp(App)
 app.use(pinia)

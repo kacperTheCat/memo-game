@@ -39,6 +39,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,mp3}'],
+        /** SPA shell for precache / offline navigations (preview + production). */
+        navigateFallback: 'index.html',
+        navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -64,8 +67,14 @@ export default defineConfig({
           },
         ],
       },
+      /**
+       * Dev SW + manifest so installability can be tested on `pnpm dev`.
+       * Default allowlist is only `/`; widen to app routes so the SW matches real usage (e.g. `/game`).
+       */
       devOptions: {
-        enabled: false,
+        enabled: true,
+        navigateFallback: 'index.html',
+        navigateFallbackAllowlist: [/^\/$/, /^\/game/, /^\/briefcase/],
       },
     }),
   ],
