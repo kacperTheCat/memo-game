@@ -47,7 +47,6 @@ function chipClass(d: Difficulty): string {
       <h3 class="text-xl font-semibold text-white">
         History Ledger
       </h3>
-      <span class="font-mono text-xs uppercase tracking-widest text-gray-500">Local Data</span>
     </div>
     <div class="ledger-glass overflow-hidden rounded-2xl">
       <!-- min-height stabilizes cross-OS table metrics (Linux vs macOS) for Playwright screenshots -->
@@ -61,16 +60,24 @@ function chipClass(d: Difficulty): string {
         >
           <thead>
             <tr class="border-b border-white/10 bg-black/40">
-              <th class="px-6 py-4 text-xs font-medium uppercase tracking-[0.1em] text-gray-400">
+              <th
+                class="px-3 py-2 text-xs font-medium uppercase tracking-[0.1em] text-gray-400 md:px-4 md:py-3 lg:px-6 lg:py-4"
+              >
                 Date
               </th>
-              <th class="px-6 py-4 text-xs font-medium uppercase tracking-[0.1em] text-gray-400">
+              <th
+                class="px-3 py-2 text-xs font-medium uppercase tracking-[0.1em] text-gray-400 md:px-4 md:py-3 lg:px-6 lg:py-4"
+              >
                 Difficulty
               </th>
-              <th class="px-6 py-4 text-xs font-medium uppercase tracking-[0.1em] text-gray-400">
+              <th
+                class="px-3 py-2 text-xs font-medium uppercase tracking-[0.1em] text-gray-400 md:px-4 md:py-3 lg:px-6 lg:py-4"
+              >
                 Time
               </th>
-              <th class="px-6 py-4 text-xs font-medium uppercase tracking-[0.1em] text-gray-400">
+              <th
+                class="px-3 py-2 text-xs font-medium uppercase tracking-[0.1em] text-gray-400 md:px-4 md:py-3 lg:px-6 lg:py-4"
+              >
                 Moves
               </th>
             </tr>
@@ -80,7 +87,7 @@ function chipClass(d: Difficulty): string {
               <tr>
                 <td
                   colspan="4"
-                  class="px-6 py-12 text-center text-sm text-gray-500"
+                  class="px-3 py-8 text-center text-sm text-gray-500 md:px-4 md:py-10 lg:px-6 lg:py-12"
                 >
                   <span data-testid="session-history-empty">No operational data found.</span>
                 </td>
@@ -93,10 +100,14 @@ function chipClass(d: Difficulty): string {
                 class="transition-colors hover:bg-white/[0.02]"
                 :class="{ 'bg-white/[0.01]': idx % 2 === 1 }"
               >
-                <td class="px-6 py-5 font-mono text-sm text-gray-300">
+                <td
+                  class="px-3 py-2 font-mono text-sm text-gray-300 md:px-4 md:py-4 lg:px-6 lg:py-5"
+                >
                   {{ formatCompletedAtDateLocalYyyyMmDd(row.completedAt) }}
                 </td>
-                <td class="px-6 py-5">
+                <td
+                  class="px-3 py-2 md:px-4 md:py-4 lg:px-6 lg:py-5"
+                >
                   <span
                     class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium"
                     :class="chipClass(row.difficulty)"
@@ -104,10 +115,14 @@ function chipClass(d: Difficulty): string {
                     {{ difficultyDisplayLabel(row.difficulty) }}
                   </span>
                 </td>
-                <td class="px-6 py-5 font-mono text-sm font-medium text-white">
+                <td
+                  class="px-3 py-2 font-mono text-sm font-medium text-white md:px-4 md:py-4 lg:px-6 lg:py-5"
+                >
                   {{ formatActivePlayMsAsMmSs(row.activePlayMs) }}
                 </td>
-                <td class="px-6 py-5 font-mono text-sm font-medium text-gray-300">
+                <td
+                  class="px-3 py-2 font-mono text-sm font-medium text-gray-300 md:px-4 md:py-4 lg:px-6 lg:py-5"
+                >
                   {{ row.clickCount }}
                 </td>
               </tr>
