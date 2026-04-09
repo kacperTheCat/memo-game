@@ -1,12 +1,9 @@
+import { isDifficulty } from '@/game/isDifficulty'
 import type { Difficulty } from '@/game/tileLibraryTypes'
 
 /** Survives full reload; consumed when starting the Play Again–equivalent game (FR-013). */
 export const SESSION_STORAGE_RELOAD_NEW_GAME_DIFFICULTY_KEY =
   'memo-game.v1.reloadNewGameDifficulty'
-
-function isDifficulty(x: string): x is Difficulty {
-  return x === 'easy' || x === 'medium' || x === 'hard'
-}
 
 export function peekReloadNewGameDifficulty(): Difficulty | null {
   try {

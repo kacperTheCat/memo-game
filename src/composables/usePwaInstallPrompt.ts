@@ -4,12 +4,13 @@ import {
   onInstallPromptAvailable,
   peekDeferredInstallPrompt,
 } from '@/pwa/captureInstallPrompt'
+import { markPwaInstallOutcome } from '@/game/pwaInstallUiStorage'
 import {
-  blocksPwaInstallSheet,
-  markPwaInstallOutcome,
-  readPwaInstallUiFromStorage,
-} from '@/game/pwaInstallUiStorage'
-import { SESSION_STORAGE_PWA_INSTALL_SHEET_OFFERED_KEY } from '@/game/sessionConstants'
+  hasPwaInstallSheetBeenOfferedThisTab,
+  hasUsableDeferredInstallPrompt,
+  markPwaInstallSheetOfferedThisTab,
+  pwaInstallUiPersistenceBlocksOffers,
+} from '@/pwa/pwaInstallUiGating'
 import { isStandalonePwa } from '@/pwa/isStandalonePwa'
 
 /** Extra attempts: Chrome may emit `beforeinstallprompt` well after first paint. */
@@ -27,32 +28,22 @@ export function usePwaInstallPrompt() {
       return
     }
 
-    const st = readPwaInstallUiFromStorage()
-    if (blocksPwaInstallSheet(st.outcome)) {
+    if (pwaInstallUiPersistenceBlocksOffers()) {
       clearDeferredInstallPrompt()
       deferred.value = null
       return
     }
 
-    try {
-      if (sessionStorage.getItem(SESSION_STORAGE_PWA_INSTALL_SHEET_OFFERED_KEY) === '1') {
-        return
-      }
-    } catch {
-      /* private mode */
-    }
-
-    const ev = peekDeferredInstallPrompt()
-    if (!ev || typeof ev.prompt !== 'function') {
+    if (hasPwaInstallSheetBeenOfferedThisTab()) {
       return
     }
 
-    try {
-      sessionStorage.setItem(SESSION_STORAGE_PWA_INSTALL_SHEET_OFFERED_KEY, '1')
-    } catch {
-      /* private mode */
+    if (!hasUsableDeferredInstallPrompt()) {
+      return
     }
-    deferred.value = ev
+
+    markPwaInstallSheetOfferedThisTab()
+    deferred.value = peekDeferredInstallPrompt()
     visible.value = true
   }
 

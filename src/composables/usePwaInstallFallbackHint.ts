@@ -1,7 +1,10 @@
 import { onMounted, onUnmounted, ref } from 'vue'
-import { onInstallPromptAvailable, peekDeferredInstallPrompt } from '@/pwa/captureInstallPrompt'
-import { blocksPwaInstallSheet, readPwaInstallUiFromStorage } from '@/game/pwaInstallUiStorage'
-import { SESSION_STORAGE_PWA_INSTALL_SHEET_OFFERED_KEY } from '@/game/sessionConstants'
+import { onInstallPromptAvailable } from '@/pwa/captureInstallPrompt'
+import {
+  hasPwaInstallSheetBeenOfferedThisTab,
+  pwaFallbackHintSuppressedByDeferredPrompt,
+  pwaInstallUiPersistenceBlocksOffers,
+} from '@/pwa/pwaInstallUiGating'
 import { isStandalonePwa } from '@/pwa/isStandalonePwa'
 
 /** When `beforeinstallprompt` never fires, explain address-bar install + offline misconception. */
@@ -20,19 +23,15 @@ export function usePwaInstallFallbackHint() {
       showFallbackHint.value = false
       return
     }
-    if (blocksPwaInstallSheet(readPwaInstallUiFromStorage().outcome)) {
+    if (pwaInstallUiPersistenceBlocksOffers()) {
       showFallbackHint.value = false
       return
     }
-    try {
-      if (sessionStorage.getItem(SESSION_STORAGE_PWA_INSTALL_SHEET_OFFERED_KEY) === '1') {
-        showFallbackHint.value = false
-        return
-      }
-    } catch {
-      /* private mode */
+    if (hasPwaInstallSheetBeenOfferedThisTab()) {
+      showFallbackHint.value = false
+      return
     }
-    if (peekDeferredInstallPrompt()) {
+    if (pwaFallbackHintSuppressedByDeferredPrompt()) {
       showFallbackHint.value = false
       return
     }
@@ -43,15 +42,11 @@ export function usePwaInstallFallbackHint() {
     if (isStandalonePwa()) {
       return
     }
-    if (blocksPwaInstallSheet(readPwaInstallUiFromStorage().outcome)) {
+    if (pwaInstallUiPersistenceBlocksOffers()) {
       return
     }
-    try {
-      if (sessionStorage.getItem(SESSION_STORAGE_PWA_INSTALL_SHEET_OFFERED_KEY) === '1') {
-        return
-      }
-    } catch {
-      /* private mode */
+    if (hasPwaInstallSheetBeenOfferedThisTab()) {
+      return
     }
     stopAvailable = onInstallPromptAvailable(() => {
       showFallbackHint.value = false

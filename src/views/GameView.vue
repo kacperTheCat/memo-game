@@ -13,7 +13,8 @@ import {
   clearReloadNewGameDifficulty,
   setReloadNewGameDifficulty,
 } from '@/game/reloadNewGameDifficulty'
-import type { Difficulty, TileLibraryFile } from '@/game/tileLibraryTypes'
+import { isDifficulty } from '@/game/isDifficulty'
+import type { TileLibraryFile } from '@/game/tileLibraryTypes'
 import {
   abandonGameConfirm,
   memoConfirmAbandonTitle,
@@ -40,10 +41,6 @@ const showDebrief = ref(false)
 const showAbandonDialog = ref(false)
 
 useActivePlayTime((ms) => session.addActiveMs(ms))
-
-function isDifficulty(x: unknown): x is Difficulty {
-  return x === 'easy' || x === 'medium' || x === 'hard'
-}
 
 function applyRouteQuery(): void {
   const d = route.query.difficulty
