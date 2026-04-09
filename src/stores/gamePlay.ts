@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, shallowRef } from 'vue'
+import { playSfx } from '@/audio/gameSfx'
 import type { BuiltGrid } from '@/game/buildGridLayout'
 import {
   clearMismatch,
@@ -91,6 +92,7 @@ export const useGamePlayStore = defineStore('gamePlay', () => {
         mismatchTimer = setTimeout(() => {
           if (memory.value) {
             memory.value = clearMismatch(memory.value)
+            playSfx('fail')
           }
           mismatchTimer = null
         }, MISMATCH_RESOLVE_MS)

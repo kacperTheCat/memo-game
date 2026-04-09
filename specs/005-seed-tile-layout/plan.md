@@ -13,6 +13,7 @@ The Briefcase seed field drives **deterministic initial deals** when the user su
 **Primary Dependencies**: Vue **3.5**, Vite **6**, Pinia **3**, Vue Router **4**, Tailwind **4** (`@tailwindcss/vite`), `vite-plugin-pwa`  
 **Storage**: `localStorage` for in-progress snapshot + completed-session list (**004**); **`briefcaseSeedRaw`** not persisted for v1 unless product asks  
 **Testing**: Vitest **3**, `@vue/test-utils`, Playwright **~1.49** (`e2e/`, bootstrap + preview configs)  
+**Playwright authoring** (persistence timing, `goto` vs in-app nav, `data-deal-init` / snapshot restore): see **004** [`contracts/README.md`](../004-game-core-logic/contracts/README.md) § *Playwright / integration notes*.  
 **Target Platform**: Responsive web (desktop + mobile); **PWA** with offline shell after first load  
 **Project Type**: Single-page Vue app (recruitment / portfolio CS2 memory game)  
 **Performance Goals**: Seed hash + shuffle for **n ≤ 32** pairs is sub-millisecond; mask normalizes per input event—no full-canvas impact  

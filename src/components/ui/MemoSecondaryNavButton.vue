@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import type { RouteLocationRaw } from 'vue-router'
+import { playUiClick } from '@/audio/gameSfx'
 
 defineOptions({ name: 'MemoSecondaryNavButton' })
 
@@ -35,6 +36,15 @@ const iconMotionClass = computed(() => {
 const iconSpacingClass = computed(() =>
   props.variant === 'forward' ? 'ml-2' : 'mr-2',
 )
+
+function onLinkActivate(): void {
+  playUiClick()
+}
+
+function onButtonActivate(): void {
+  playUiClick()
+  emit('click')
+}
 </script>
 
 <template>
@@ -43,6 +53,7 @@ const iconSpacingClass = computed(() =>
     :to="to"
     :data-testid="dataTestid"
     :class="navClass"
+    @click="onLinkActivate"
   >
     <template v-if="variant === 'forward'">
       {{ label }}
@@ -66,7 +77,7 @@ const iconSpacingClass = computed(() =>
     type="button"
     :data-testid="dataTestid"
     :class="navClass"
-    @click="emit('click')"
+    @click="onButtonActivate"
   >
     <template v-if="variant === 'forward'">
       {{ label }}

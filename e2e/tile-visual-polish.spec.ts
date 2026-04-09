@@ -187,6 +187,15 @@ test.describe('008 tile visual polish', () => {
     await page.goto('/game')
     const shell = page.getByTestId('game-canvas-shell')
     const meta = page.getByTestId('game-grid-meta')
+    const debug = page.getByTestId('game-memory-debug')
+    const initial = page.getByTestId('game-initial-identities')
+    await expect
+      .poll(async () => (await initial.getAttribute('data-identities'))?.length ?? 0)
+      .toBeGreaterThan(4)
+    const rawInit = await initial.getAttribute('data-identities')
+    expect(rawInit).toBeTruthy()
+    const identities = JSON.parse(rawInit!) as number[]
+
     const rows = Number(await meta.getAttribute('data-rows'))
     const cols = Number(await meta.getAttribute('data-cols'))
     const canvas = page.getByTestId('game-canvas')
@@ -197,12 +206,6 @@ test.describe('008 tile visual polish', () => {
     const ih = boardH - 2 * BOARD_CANVAS_INSET_PX
     const cellW = (iw - BOARD_GAP_PX * (cols - 1)) / cols
     const cellH = (ih - BOARD_GAP_PX * (rows - 1)) / rows
-
-    const identities = JSON.parse(
-      (await page.getByTestId('game-initial-identities').getAttribute(
-        'data-identities',
-      )) || '[]',
-    ) as number[]
 
     let a = -1
     let b = -1
@@ -237,11 +240,28 @@ test.describe('008 tile visual polish', () => {
     await canvas.click({ position: rc(a) })
     await canvas.click({ position: rc(b) })
     await expect
-      .poll(async () => shell.getAttribute('data-mismatch-phase'))
-      .toBe('shake', { timeout: 2000 })
+      .poll(async () => debug.getAttribute('data-revealed'))
+      .toBe('2', { timeout: 5000 })
+
+    // `flip_back` is only ~280ms after shake; two sequential polls can miss it
+    // when the first resolves late (CPU contention from parallel workers).
+    let sawShake = false
+    let sawFlipBack = false
     await expect
-      .poll(async () => shell.getAttribute('data-mismatch-phase'))
-      .toBe('flip_back', { timeout: 3000 })
+      .poll(
+        async () => {
+          const p = (await shell.getAttribute('data-mismatch-phase')) || 'idle'
+          if (p === 'shake') {
+            sawShake = true
+          }
+          if (p === 'flip_back') {
+            sawFlipBack = true
+          }
+          return sawShake && sawFlipBack
+        },
+        { timeout: 10_000, intervals: [16, 32, 64, 128] },
+      )
+      .toBe(true)
   })
 
   test('US4: pointer move on shell keeps canvas responsive', async ({

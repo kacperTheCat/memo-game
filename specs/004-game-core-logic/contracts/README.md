@@ -18,6 +18,13 @@ Implementations MAY bump `v1` → `v2` only with a migration note in code and pl
 - `data-testid="game-canvas"`: primary hit target.
 - `data-testid="game-grid-meta"`: attributes `data-rows`, `data-cols`, `data-cells` (strings) for e2e to derive **one** cell center without scanning every pixel.
 
+## Playwright / integration notes
+
+- **Workers**: Each Playwright test runs in an isolated `BrowserContext`; `localStorage` is **not** shared across parallel workers. Effects that look like “cross-test” noise usually come from **multiple steps in one test** or **timing** against persistence, not worker crosstalk.
+- **In-progress debounce**: Writes to `memo-game.v1.inProgress` are **debounced** (currently ~300ms in `gameSession`). Clearing the key **before** the first flush can still lose to a **pending timer** that runs **after** `removeItem`. Tests that need a clean slate after `/game` should **wait until the key is present**, then remove it, or prefer **in-app** navigation (e.g. Return to Briefcase) and **confirm** flows instead of a bare `page.goto('/briefcase')` when the next visit must be a **new** deal from Briefcase settings.
+- **`data-deal-init`**: Snapshot **restore** uses `hydrateFromSnapshot`, which sets deal-init to **`random`** by design. `random` after an intended seeded unlock usually means **`loadInProgressSnapshot()` took precedence** over `history.state.memoDealInit`, not flaky parallelism.
+- **Full reload vs SPA**: `page.goto('/briefcase')` resets Pinia but can leave **`memo-game.v1.inProgress`** populated; the next `/game` load may **restore** that snapshot instead of consuming a fresh **`memoDealInit`** payload.
+
 ## JSON Schema
 
 - [`session-storage.schema.json`](./session-storage.schema.json) — in-progress snapshot.

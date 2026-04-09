@@ -3,6 +3,7 @@ import {
   briefcaseSeedIncompleteMessage,
   briefcaseSeedLabel,
 } from '../src/constants/appCopy'
+import { STORAGE_IN_PROGRESS_KEY } from '../src/game/sessionConstants'
 
 const goldenEasy000 = '[6,3,4,3,7,7,5,6,0,1,0,5,1,2,2,4]'
 
@@ -32,6 +33,19 @@ test.describe('US1 reproducible deal', () => {
     await expect(shell).toHaveAttribute('data-deal-init', 'seeded')
     const idBox = page.getByTestId('game-initial-identities')
     await expect(idBox).toHaveAttribute('data-identities', goldenEasy000)
+
+    // Full reload clears Pinia but leaves `memo-game.v1.inProgress`; the next `/game`
+    // would restore that snapshot (dealInitKind `random`) instead of reading
+    // `memoDealInit` from navigation. Flush happens on a 300ms debounce — wait until
+    // the snapshot exists, then remove, so a pending timer cannot repopulate after.
+    await page.waitForFunction(
+      (key) => localStorage.getItem(key) !== null,
+      STORAGE_IN_PROGRESS_KEY,
+      { timeout: 5000 },
+    )
+    await page.evaluate((key) => {
+      localStorage.removeItem(key)
+    }, STORAGE_IN_PROGRESS_KEY)
 
     await page.goto('/briefcase')
     await selectDifficulty(page, 'easy')
