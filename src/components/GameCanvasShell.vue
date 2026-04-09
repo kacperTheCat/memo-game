@@ -953,7 +953,7 @@ watch(debugPeekAllFaces, () => {
     <button
       v-if="showDebugPeekButton"
       type="button"
-      class="absolute right-2 top-0 z-10 rounded border border-amber-600/80 bg-amber-950/90 px-2 py-1 text-xs font-medium text-amber-100 shadow hover:bg-amber-900/90"
+      class="absolute right-2 top-0 z-10 rounded border border-amber-600/80 bg-amber-950/90 px-2 py-1 font-sans text-xs font-medium text-amber-100 shadow hover:bg-amber-900/90"
       data-testid="game-debug-peek-faces"
       :aria-pressed="debugPeekAllFaces ? 'true' : 'false'"
       :aria-label="

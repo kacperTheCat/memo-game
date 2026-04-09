@@ -19,7 +19,7 @@ const emit = defineEmits<{
 }>()
 
 const navClass =
-  'group inline-flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-medium uppercase tracking-wide text-gray-400 transition-colors hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30'
+  'group inline-flex items-center gap-2 rounded-lg px-2 py-1 font-sans text-sm font-medium uppercase tracking-wide text-gray-400 transition-colors hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30'
 
 const iconGlyph = computed(() => {
   const m = { back: 'arrow_back', forward: 'arrow_forward', dismiss: 'close' } as const

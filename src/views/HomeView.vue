@@ -61,7 +61,7 @@ function onConfigureNavClick(): void {
         <RouterLink
           data-testid="home-configure-game"
           :to="{ name: 'briefcase' }"
-          class="inline-flex h-12 min-w-[200px] items-center justify-center rounded-[var(--memo-radius-md)] bg-memo-accent px-6 text-base font-semibold text-memo-cta-text shadow-[0_0_20px_rgb(228_168_52/0.25)] transition-all hover:scale-[1.02] hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-memo-accent/80 focus-visible:ring-offset-2 focus-visible:ring-offset-memo-bg"
+          class="inline-flex h-12 min-w-[200px] items-center justify-center rounded-[var(--memo-radius-md)] bg-memo-accent px-6 font-display text-base font-semibold text-memo-cta-text shadow-[0_0_20px_rgb(228_168_52/0.25)] transition-all hover:scale-[1.02] hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-memo-accent/80 focus-visible:ring-offset-2 focus-visible:ring-offset-memo-bg"
           @click="onConfigureNavClick"
         >
           {{ navConfigureGame }}

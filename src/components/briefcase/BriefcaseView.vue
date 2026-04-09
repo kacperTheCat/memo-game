@@ -190,7 +190,7 @@ function onDifficultyChange(): void {
                 >
                   <div class="mb-2 flex items-center justify-between">
                     <span
-                      class="memo-radio-title text-base font-semibold text-memo-text transition-colors"
+                      class="memo-radio-title font-display text-base font-semibold text-memo-text transition-colors"
                     >
                       {{ opt.label }}
                     </span>
@@ -232,7 +232,7 @@ function onDifficultyChange(): void {
                 : undefined
             "
             :class="[
-              'w-full rounded-[var(--memo-radius-md)] border bg-black/30 px-4 py-3 text-sm text-memo-text placeholder:text-memo-muted/50 focus:outline-none focus:ring-1',
+              'w-full rounded-[var(--memo-radius-md)] border bg-black/30 px-4 py-3 font-mono text-sm text-memo-text placeholder:text-memo-muted/50 focus:outline-none focus:ring-1',
               seedShowIncompleteChrome
                 ? 'border-red-400/70 focus:border-red-400/80 focus:ring-red-400/40'
                 : 'border-memo-border focus:border-memo-accent/50 focus:ring-memo-accent/50',

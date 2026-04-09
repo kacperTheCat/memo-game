@@ -14,7 +14,7 @@ const props = defineProps<{
 
 const buttonClass = computed(() => {
   const base =
-    'theme-nav-link rounded-[var(--memo-radius-md)] border border-memo-border bg-memo-surface px-4 py-2 text-sm font-medium text-memo-text transition-colors hover:border-white/20 hover:bg-memo-surface-hover'
+    'theme-nav-link rounded-[var(--memo-radius-md)] border border-memo-border bg-memo-surface px-4 py-2 font-sans text-sm font-medium text-memo-text transition-colors hover:border-white/20 hover:bg-memo-surface-hover'
   return props.disabled ? `${base} cursor-not-allowed opacity-50` : base
 })
 
@@ -34,7 +34,7 @@ function onButtonActivate(): void {
   <RouterLink
     v-if="to"
     :to="to"
-    class="theme-nav-link rounded-[var(--memo-radius-md)] border border-memo-border bg-memo-surface px-4 py-2 text-sm font-medium text-memo-text transition-colors hover:border-white/20 hover:bg-memo-surface-hover"
+    class="theme-nav-link rounded-[var(--memo-radius-md)] border border-memo-border bg-memo-surface px-4 py-2 font-sans text-sm font-medium text-memo-text transition-colors hover:border-white/20 hover:bg-memo-surface-hover"
     @click="onLinkActivate"
   >
     <slot />
