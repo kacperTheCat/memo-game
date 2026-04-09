@@ -50,6 +50,7 @@ import {
 } from '@/game/sfxPickOutcomes'
 import type { Difficulty, TileEntry, TileLibraryFile } from '@/game/tileLibraryTypes'
 import { ensureSfxAudioUnlocked, playSfx, playUiClick } from '@/audio/gameSfx'
+import { showGameDebugPeekUi } from '@/env/showGameDebugPeekUi'
 import { useGamePlayStore } from '@/stores/gamePlay'
 import { useGameSessionStore } from '@/stores/gameSession'
 import { useGameSettingsStore } from '@/stores/gameSettings'
@@ -83,7 +84,7 @@ const reducedMotion = ref(false)
 
 /** Dev-only: paint all tile faces (concealed + matched) as revealed for asset inspection. */
 const debugPeekAllFaces = ref(false)
-const showDebugPeekButton = import.meta.env.DEV
+const showDebugPeekButton = showGameDebugPeekUi()
 
 function onDebugPeekToggle(): void {
   playUiClick()

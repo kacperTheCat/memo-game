@@ -5,7 +5,7 @@ import { defineConfig, devices } from '@playwright/test'
  */
 export default defineConfig({
   testDir: 'e2e/project-setup',
-  testMatch: 'bootstrap.spec.ts',
+  testMatch: ['bootstrap.spec.ts', 'game-debug-peek-dev.spec.ts'],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
